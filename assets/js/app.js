@@ -205,15 +205,21 @@ async function gasGet(action, params = {}) {
   } finally { clearTimeout(timeout); }
 }
 
+// GAS no soporta CORS preflight (POST), se envía todo como GET
 async function gasPost(action, data = {}) {
+  const url = new URL(GAS_URL);
+  url.searchParams.set('action', action);
+  Object.entries(data).forEach(([k, v]) => {
+    if (typeof v === 'object') {
+      url.searchParams.set(k, JSON.stringify(v));
+    } else {
+      url.searchParams.set(k, v);
+    }
+  });
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
-    const r = await fetch(GAS_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action, ...data }),
-      signal: controller.signal,
-    });
+    const r = await fetch(url.toString(), { signal: controller.signal });
     return r.json();
   } finally { clearTimeout(timeout); }
 }
