@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <circle cx="100" cy="100" r="95" fill="#1B4F8A" stroke="#D4A843" stroke-width="5"/>
-  <text x="100" y="75" font-family="Georgia,serif" font-size="13" fill="#D4A843" text-anchor="middle" font-weight="bold">ESCUELA BÁSICA</text>
-  <text x="100" y="102" font-family="Georgia,serif" font-size="21" fill="white" text-anchor="middle" font-weight="bold">LLANKANAO</text>
-  <text x="100" y="122" font-family="Georgia,serif" font-size="10" fill="#D4A843" text-anchor="middle">M.F.M.S.</text>
-  <text x="100" y="145" font-family="Georgia,serif" font-size="10" fill="white" text-anchor="middle">LINARES · CHILE</text>
-  <line x1="55" y1="155" x2="145" y2="155" stroke="#D4A843" stroke-width="1.5" opacity="0.5"/>
-</svg>
