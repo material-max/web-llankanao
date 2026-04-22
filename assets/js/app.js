@@ -17,7 +17,7 @@ const SITE_CONFIG = {
   email: '',
   facebook: '',
   instagram: '',
-  logo: 'assets/img/logo.svg',
+  logo: 'assets/img/logo.png',
   plataformas: []
 };
 
