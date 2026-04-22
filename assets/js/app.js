@@ -5,7 +5,7 @@
 
 // ── CONFIGURACIÓN GAS ──────────────────────────────────────
 // Después de desplegar el Google Apps Script, pegar la URL aquí:
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx5rVsbYFjaPCLgOrPeiDJrCFNf2Q5QeMcACxHDWy9Hx8dtE-uMymXT97nvke2t4jhERg/exec';
+const GAS_URL = 'https://script.google.com/macros/s/TU_DEPLOYMENT_ID/exec';
 
 // Configuración local (se sobreescribe con datos del GAS si está disponible)
 const SITE_CONFIG = {
@@ -17,7 +17,7 @@ const SITE_CONFIG = {
   email: '',
   facebook: '',
   instagram: '',
-  logo: 'assets/img/logo.png',
+  logo: 'assets/img/logo.svg',
   plataformas: []
 };
 
@@ -197,16 +197,25 @@ async function gasGet(action, params = {}) {
   const url = new URL(GAS_URL);
   url.searchParams.set('action', action);
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  const r = await fetch(url.toString());
-  return r.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const r = await fetch(url.toString(), { signal: controller.signal });
+    return r.json();
+  } finally { clearTimeout(timeout); }
 }
 
 async function gasPost(action, data = {}) {
-  const r = await fetch(GAS_URL, {
-    method: 'POST',
-    body: JSON.stringify({ action, ...data }),
-  });
-  return r.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const r = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...data }),
+      signal: controller.signal,
+    });
+    return r.json();
+  } finally { clearTimeout(timeout); }
 }
 
 // ── ANIMADOR DE CONTADORES ─────────────────────────────────
