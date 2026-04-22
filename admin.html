@@ -5,7 +5,7 @@
   <title>Administrador — Escuela Llankanao</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css">
   <style>
     .tab-pane { display: none; } .tab-pane.active { display: block; }
     .sidebar-nav a { cursor: pointer; }
@@ -18,7 +18,7 @@
 <!-- ── LOGIN ── -->
 <div id="login-screen" class="admin-login-page">
   <div class="login-card">
-    <img src="../assets/img/logo.svg" class="login-logo" alt="Logo">
+    <img src="assets/img/logo.png" class="login-logo" alt="Logo" onerror="this.src='assets/img/logo.svg'">
     <h4 class="text-center fw-bold mb-1">Panel de Administración</h4>
     <p class="text-center text-muted mb-4 small">Escuela Llankanao M.F.M.S.</p>
     <div id="login-error" class="alert alert-danger d-none"></div>
@@ -294,7 +294,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/js/app.js"></script>
+<script src="assets/js/app.js"></script>
 <script>
 // ── AUTH ──────────────────────────────────────────────────
 let currentUser = sessionStorage.getItem('admin_user');
