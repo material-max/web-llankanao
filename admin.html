@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrador — Escuela Llankanao</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .tab-pane { display: none; } .tab-pane.active { display: block; }
+    .sidebar-nav a { cursor: pointer; }
+    .img-preview { max-width: 100px; max-height: 100px; object-fit: cover; border-radius: 8px; display: none; }
+    #admin-app.d-none { display: none!important; }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen" class="admin-login-page">
+  <div class="login-card">
+    <img src="../assets/img/logo.svg" class="login-logo" alt="Logo">
+    <h4 class="text-center fw-bold mb-1">Panel de Administración</h4>
+    <p class="text-center text-muted mb-4 small">Escuela Llankanao M.F.M.S.</p>
+    <div id="login-error" class="alert alert-danger d-none"></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Usuario</label><input type="text" id="login-user" class="form-control form-control-lg" placeholder="admin"></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Contraseña</label><input type="password" id="login-pass" class="form-control form-control-lg" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn btn-primary btn-lg w-100" id="login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt me-2"></i>Ingresar</button>
+    <p class="text-center text-muted mt-3 small">Acceso restringido al personal autorizado</p>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="admin-app" class="admin-layout d-none">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="sidebar">
+    <div class="logo-area">
+      <div class="school-name">Escuela Llankanao</div>
+      <div class="admin-label">Panel Administrativo</div>
+    </div>
+    <nav class="sidebar-nav mt-2">
+      <div class="nav-section">Principal</div>
+      <a onclick="showTab('dashboard')" data-tab="dashboard"><i class="fas fa-th-large me-2"></i>Dashboard</a>
+      <div class="nav-section">Contenido</div>
+      <a onclick="showTab('noticias')" data-tab="noticias"><i class="fas fa-newspaper me-2"></i>Noticias <span id="badge-noticias" class="badge bg-primary ms-auto"></span></a>
+      <a onclick="showTab('documentos')" data-tab="documentos"><i class="fas fa-file-alt me-2"></i>Documentos</a>
+      <a onclick="showTab('equipo')" data-tab="equipo"><i class="fas fa-users me-2"></i>Equipo</a>
+      <a onclick="showTab('avisos')" data-tab="avisos"><i class="fas fa-bell me-2"></i>Avisos</a>
+      <div class="nav-section">Gestión</div>
+      <a onclick="showTab('contactos')" data-tab="contactos"><i class="fas fa-inbox me-2"></i>Mensajes <span id="badge-contactos" class="badge bg-danger ms-auto"></span></a>
+      <a onclick="showTab('plataformas')" data-tab="plataformas"><i class="fas fa-th me-2"></i>Plataformas</a>
+      <a onclick="showTab('configuracion')" data-tab="configuracion"><i class="fas fa-cog me-2"></i>Configuración</a>
+      <div class="nav-section">Cuenta</div>
+      <a onclick="showTab('password')" data-tab="password"><i class="fas fa-key me-2"></i>Contraseña</a>
+      <a onclick="doLogout()" style="color:rgba(255,100,100,.8)!important"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a>
+    </nav>
+    <div class="p-3 mt-3" style="font-size:.75rem;color:rgba(255,255,255,.3)">
+      <a href="../index.html" target="_blank" style="color:rgba(255,255,255,.4);text-decoration:none"><i class="fas fa-external-link-alt me-1"></i>Ver sitio web</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h5 class="mb-0 fw-bold" id="topbar-title">Dashboard</h5>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-muted small" id="topbar-user"></span>
+        <button class="btn btn-sm btn-outline-danger" onclick="doLogout()"><i class="fas fa-sign-out-alt me-1"></i>Salir</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <div id="global-msg" class="d-none"></div>
+
+      <!-- DASHBOARD -->
+      <div id="tab-dashboard" class="tab-pane active">
+        <div class="row g-4 mb-4" id="dash-stats"></div>
+        <div class="row g-4">
+          <div class="col-lg-6"><div class="admin-card"><div class="card-header">Últimas Noticias</div><div class="card-body p-0" id="dash-noticias"><div class="p-3 text-muted">Cargando...</div></div></div></div>
+          <div class="col-lg-6"><div class="admin-card"><div class="card-header">Mensajes Recientes</div><div class="card-body p-0" id="dash-contactos"><div class="p-3 text-muted">Cargando...</div></div></div></div>
+        </div>
+      </div>
+
+      <!-- NOTICIAS -->
+      <div id="tab-noticias" class="tab-pane">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="admin-card"><div class="card-header" id="noticia-form-title">Nueva Noticia</div>
+            <div class="card-body">
+              <form id="noticia-form">
+                <input type="hidden" id="n-id">
+                <div class="mb-3"><label class="form-label fw-semibold">Título *</label><input type="text" id="n-titulo" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Resumen</label><textarea id="n-resumen" class="form-control" rows="2"></textarea></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Contenido *</label><textarea id="n-contenido" class="form-control" rows="6" required></textarea></div>
+                <div class="row g-3 mb-3">
+                  <div class="col-6"><label class="form-label fw-semibold">Categoría</label>
+                    <select id="n-categoria" class="form-select"><option>Noticias</option><option>Eventos</option><option>Logros</option><option>Avisos</option><option>Actividades</option></select>
+                  </div>
+                  <div class="col-6"><label class="form-label fw-semibold">Estado</label>
+                    <select id="n-estado" class="form-select"><option value="publicado">Publicado</option><option value="borrador">Borrador</option></select>
+                  </div>
+                </div>
+                <div class="mb-3"><label class="form-label fw-semibold">URL de imagen (opcional)</label><input type="url" id="n-imagen" class="form-control" placeholder="https://..."><small class="text-muted">Link de imagen de Google Drive, Imgur, etc.</small></div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary" id="n-save-btn">Guardar</button>
+                  <button type="button" class="btn btn-outline-secondary" onclick="resetNoticiaForm()">Limpiar</button>
+                </div>
+              </form>
+            </div></div>
+          </div>
+          <div class="col-lg-7">
+            <div class="admin-card"><div class="card-header d-flex justify-content-between align-items-center">
+              <span>Noticias</span>
+              <input type="text" id="n-buscar" class="form-control form-control-sm w-auto" placeholder="Buscar..." oninput="filtrarNoticias()">
+            </div>
+            <div class="card-body p-0" id="noticias-table"><div class="p-4 text-center text-muted">Cargando...</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTOS -->
+      <div id="tab-documentos" class="tab-pane">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="admin-card"><div class="card-header" id="doc-form-title">Nuevo Documento</div>
+            <div class="card-body">
+              <form id="doc-form">
+                <input type="hidden" id="d-id">
+                <div class="mb-3"><label class="form-label fw-semibold">Nombre *</label><input type="text" id="d-nombre" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Categoría</label>
+                  <select id="d-categoria" class="form-select"><option>Transparencia</option><option>Presupuesto</option><option>Reglamentos</option><option>Informes</option><option>PME</option><option>Otro</option></select>
+                </div>
+                <div class="mb-3"><label class="form-label fw-semibold">Fecha</label><input type="date" id="d-fecha" class="form-control"></div>
+                <div class="mb-3"><label class="form-label fw-semibold">URL del archivo *</label><input type="url" id="d-url" class="form-control" placeholder="https://drive.google.com/..."><small class="text-muted">Link de Google Drive (acceso público)</small></div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary" id="d-save-btn">Guardar</button>
+                  <button type="button" class="btn btn-outline-secondary" onclick="resetDocForm()">Limpiar</button>
+                </div>
+              </form>
+            </div></div>
+          </div>
+          <div class="col-lg-7">
+            <div class="admin-card"><div class="card-header">Documentos</div>
+            <div class="card-body p-0" id="docs-table"><div class="p-4 text-center text-muted">Cargando...</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EQUIPO -->
+      <div id="tab-equipo" class="tab-pane">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="admin-card"><div class="card-header" id="eq-form-title">Nuevo Miembro</div>
+            <div class="card-body">
+              <form id="eq-form">
+                <input type="hidden" id="eq-id">
+                <div class="mb-3"><label class="form-label fw-semibold">Nombre completo *</label><input type="text" id="eq-nombre" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Cargo *</label><input type="text" id="eq-cargo" class="form-control" placeholder="Ej: Director, Profesora de Matemáticas..." required></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Tipo</label>
+                  <select id="eq-tipo" class="form-select"><option>Directivo</option><option>Docente</option><option>Asistente de la Educación</option><option>Administrativo</option><option>Otro</option></select>
+                </div>
+                <div class="mb-3"><label class="form-label fw-semibold">Especialidad / Mención</label><input type="text" id="eq-especialidad" class="form-control"></div>
+                <div class="mb-3"><label class="form-label fw-semibold">URL foto (opcional)</label><input type="url" id="eq-foto" class="form-control" placeholder="https://..."></div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary" id="eq-save-btn">Guardar</button>
+                  <button type="button" class="btn btn-outline-secondary" onclick="resetEqForm()">Limpiar</button>
+                </div>
+              </form>
+            </div></div>
+          </div>
+          <div class="col-lg-7">
+            <div class="admin-card"><div class="card-header">Equipo</div>
+            <div class="card-body p-0" id="equipo-table"><div class="p-4 text-center text-muted">Cargando...</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVISOS -->
+      <div id="tab-avisos" class="tab-pane">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="admin-card"><div class="card-header">Nuevo Aviso</div>
+            <div class="card-body">
+              <form id="av-form">
+                <input type="hidden" id="av-id">
+                <div class="mb-3"><label class="form-label fw-semibold">Texto del aviso *</label><textarea id="av-texto" class="form-control" rows="3" required></textarea><small class="text-muted">Aparece en el banner del sitio</small></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Tipo</label>
+                  <select id="av-tipo" class="form-select"><option value="info">Informativo (azul)</option><option value="warning">Advertencia (amarillo)</option><option value="success">Positivo (verde)</option><option value="danger">Urgente (rojo)</option></select>
+                </div>
+                <div class="mb-3 form-check"><input type="checkbox" id="av-activo" class="form-check-input" checked><label for="av-activo" class="form-check-label">Activar aviso</label></div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                  <button type="button" class="btn btn-outline-secondary" onclick="resetAvForm()">Limpiar</button>
+                </div>
+              </form>
+            </div></div>
+          </div>
+          <div class="col-lg-7">
+            <div class="admin-card"><div class="card-header">Avisos activos</div>
+            <div class="card-body p-0" id="avisos-table"><div class="p-4 text-center text-muted">Cargando...</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACTOS -->
+      <div id="tab-contactos" class="tab-pane">
+        <div id="contacto-detalle" class="d-none">
+          <div class="admin-card mb-4"><div class="card-header d-flex justify-content-between"><span id="det-asunto">Mensaje</span><button class="btn btn-sm btn-outline-secondary" onclick="cerrarDetalle()"><i class="fas fa-arrow-left me-1"></i>Volver</button></div>
+          <div class="card-body" id="det-body"></div></div>
+        </div>
+        <div id="contacto-lista">
+          <div class="admin-card"><div class="card-header d-flex justify-content-between align-items-center">
+            <span>Mensajes <span id="badge-no-leidos" class="badge bg-danger ms-2 d-none"></span></span>
+          </div>
+          <div class="card-body p-0" id="contactos-list"><div class="p-4 text-center text-muted">Cargando...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLATAFORMAS -->
+      <div id="tab-plataformas" class="tab-pane">
+        <div class="admin-card">
+          <div class="card-header">Plataformas y Accesos Rápidos</div>
+          <div class="card-body">
+            <p class="text-muted mb-4">Configure las URLs de sus plataformas. Aparecerán en la sección de accesos del sitio.</p>
+            <div id="plat-container"></div>
+            <button type="button" class="btn btn-outline-primary mb-4" onclick="addPlat()"><i class="fas fa-plus me-2"></i>Agregar Plataforma</button>
+            <div><button class="btn btn-primary btn-lg px-5" onclick="savePlataformas()"><i class="fas fa-save me-2"></i>Guardar Plataformas</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIGURACIÓN -->
+      <div id="tab-configuracion" class="tab-pane">
+        <div class="admin-card">
+          <div class="card-header">Configuración del Sitio</div>
+          <div class="card-body">
+            <ul class="nav nav-tabs mb-4" id="cfg-tabs">
+              <li class="nav-item"><button class="nav-link active" onclick="cfgTab('escuela',this)">Escuela</button></li>
+              <li class="nav-item"><button class="nav-link" onclick="cfgTab('redes',this)">Redes Sociales</button></li>
+              <li class="nav-item"><button class="nav-link" onclick="cfgTab('contacto-cfg',this)">Contacto</button></li>
+            </ul>
+            <div id="cfg-escuela">
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-semibold">Nombre de la Escuela</label><input type="text" id="cfg-nombre" class="form-control"></div>
+                <div class="col-md-6"><label class="form-label fw-semibold">Slogan</label><input type="text" id="cfg-slogan" class="form-control"></div>
+                <div class="col-12"><label class="form-label fw-semibold">URL del Logo (Google Drive u otro)</label><input type="url" id="cfg-logo" class="form-control" placeholder="https://..."></div>
+              </div>
+            </div>
+            <div id="cfg-redes" class="d-none">
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-semibold"><i class="fab fa-facebook me-2 text-primary"></i>Facebook</label><input type="url" id="cfg-facebook" class="form-control" placeholder="https://facebook.com/..."></div>
+                <div class="col-md-6"><label class="form-label fw-semibold"><i class="fab fa-instagram me-2" style="color:#e4405f"></i>Instagram</label><input type="url" id="cfg-instagram" class="form-control" placeholder="https://instagram.com/..."></div>
+              </div>
+            </div>
+            <div id="cfg-contacto-cfg" class="d-none">
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-semibold">Dirección</label><input type="text" id="cfg-direccion" class="form-control"></div>
+                <div class="col-md-6"><label class="form-label fw-semibold">Teléfono</label><input type="text" id="cfg-telefono" class="form-control"></div>
+                <div class="col-md-6"><label class="form-label fw-semibold">Email</label><input type="email" id="cfg-email" class="form-control"></div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <button class="btn btn-primary btn-lg px-5" onclick="saveConfig()"><i class="fas fa-save me-2"></i>Guardar Configuración</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMBIAR CONTRASEÑA -->
+      <div id="tab-password" class="tab-pane">
+        <div class="row justify-content-center">
+          <div class="col-lg-6">
+            <div class="admin-card">
+              <div class="card-header"><i class="fas fa-key me-2 text-warning"></i>Cambiar Contraseña de Admin</div>
+              <div class="card-body">
+                <div id="pass-msg" class="d-none"></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Contraseña actual</label><input type="password" id="p-actual" class="form-control"></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Nueva contraseña</label><input type="password" id="p-nueva" class="form-control"><small class="text-muted">Mínimo 8 caracteres</small></div>
+                <div class="mb-3"><label class="form-label fw-semibold">Confirmar nueva contraseña</label><input type="password" id="p-confirmar" class="form-control"></div>
+                <button class="btn btn-warning w-100" onclick="cambiarPassword()"><i class="fas fa-save me-2"></i>Actualizar Contraseña</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/app.js"></script>
+<script>
+// ── AUTH ──────────────────────────────────────────────────
+let currentUser = sessionStorage.getItem('admin_user');
+let sessionToken = sessionStorage.getItem('admin_token');
+
+function doLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const btn = document.getElementById('login-btn');
+  if(!user||!pass) { showLoginError('Ingresa usuario y contraseña.'); return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Ingresando...';
+  gasPost('login', { usuario: user, password: pass }).then(r => {
+    if(r.ok) {
+      currentUser = user; sessionToken = r.token;
+      sessionStorage.setItem('admin_user', user);
+      sessionStorage.setItem('admin_token', r.token);
+      document.getElementById('login-screen').classList.add('d-none');
+      document.getElementById('admin-app').classList.remove('d-none');
+      document.getElementById('topbar-user').textContent = user;
+      loadDashboard();
+    } else { showLoginError(r.error || 'Credenciales incorrectas.'); btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt me-2"></i>Ingresar'; }
+  }).catch(() => { showLoginError('Error de conexión. Verifique la URL del GAS.'); btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt me-2"></i>Ingresar'; });
+}
+
+function showLoginError(msg) { const el=document.getElementById('login-error'); el.textContent=msg; el.classList.remove('d-none'); }
+function doLogout() { sessionStorage.clear(); location.reload(); }
+
+if(currentUser && sessionToken) {
+  document.getElementById('login-screen').classList.add('d-none');
+  document.getElementById('admin-app').classList.remove('d-none');
+  document.getElementById('topbar-user').textContent = currentUser;
+  setTimeout(loadDashboard, 100);
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(a=>a.classList.remove('active'));
+  document.getElementById('tab-'+name)?.classList.add('active');
+  document.querySelector(`.sidebar-nav a[data-tab="${name}"]`)?.classList.add('active');
+  const titles = {dashboard:'Dashboard',noticias:'Gestión de Noticias',documentos:'Gestión de Documentos',equipo:'Gestión de Equipo',avisos:'Gestión de Avisos',contactos:'Mensajes de Contacto',plataformas:'Plataformas',configuracion:'Configuración',password:'Cambiar Contraseña'};
+  document.getElementById('topbar-title').textContent = titles[name]||name;
+  if(name==='noticias') loadNoticias();
+  if(name==='documentos') loadDocumentos();
+  if(name==='equipo') loadEquipo();
+  if(name==='avisos') loadAvisosAdmin();
+  if(name==='contactos') loadContactos();
+  if(name==='plataformas') loadPlataformasAdmin();
+  if(name==='configuracion') loadConfigAdmin();
+}
+
+function showGlobalMsg(msg, type='success') {
+  const el = document.getElementById('global-msg');
+  el.className = `alert alert-${type} alert-dismissible mb-3`;
+  el.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+  el.classList.remove('d-none');
+  setTimeout(() => el.classList.add('d-none'), 4000);
+}
+
+function gasAuth(action, data={}) { return gasPost(action, {...data, token: sessionToken}); }
+
+// ── DASHBOARD ────────────────────────────────────────────
+async function loadDashboard() {
+  showTab('dashboard');
+  try {
+    const [n, d, e, c] = await Promise.all([gasGet('getNoticias',{limit:100}), gasGet('getDocumentos'), gasGet('getEquipo'), gasGet('getContactos',{token:sessionToken})]);
+    const noticias = n.noticias||[]; const docs = d.documentos||[]; const equipo = e.equipo||[]; const contactos = c.contactos||[];
+    const noLeidos = contactos.filter(c=>!c.leido).length;
+    if(noLeidos) { document.getElementById('badge-contactos').textContent = noLeidos; document.getElementById('badge-no-leidos').textContent = noLeidos; document.getElementById('badge-no-leidos').classList.remove('d-none'); }
+    document.getElementById('badge-noticias').textContent = noticias.length || '';
+
+    document.getElementById('dash-stats').innerHTML = [
+      ['Noticias',noticias.length,'fas fa-newspaper','#1B4F8A','noticias'],
+      ['Documentos',docs.length,'fas fa-file-alt','#2A6B3C','documentos'],
+      ['Equipo',equipo.length,'fas fa-users','#D4A843','equipo'],
+      [`Mensajes${noLeidos?` (${noLeidos} nuevo${noLeidos>1?'s':''})`:``}`,contactos.length,'fas fa-inbox',noLeidos?'#e74c3c':'#9b59b6','contactos'],
+    ].map(s=>`<div class="col-md-3 col-sm-6"><div class="stat-admin-card hover-lift" onclick="showTab('${s[4]}')" style="cursor:pointer"><div class="stat-admin-icon" style="background:${s[3]}"><i class="${s[2]}"></i></div><div><div style="font-size:1.8rem;font-weight:700;line-height:1">${s[1]}</div><div class="text-muted small">${s[0]}</div></div></div></div>`).join('');
+
+    document.getElementById('dash-noticias').innerHTML = noticias.slice(0,5).map(n=>`<div class="d-flex align-items-center gap-3 p-3 border-bottom"><div class="flex-grow-1"><div class="fw-semibold small">${n.titulo}</div><small class="text-muted">${formatFecha(n.fecha)}</small></div><span class="badge bg-${n.estado==='publicado'?'success':'secondary'}">${n.estado}</span></div>`).join('') || '<div class="p-3 text-muted">Sin noticias</div>';
+    document.getElementById('dash-contactos').innerHTML = contactos.slice(0,5).map(c=>`<div class="d-flex align-items-center gap-3 p-3 border-bottom ${!c.leido?'bg-light':''}"><div class="flex-grow-1"><div class="fw-semibold small">${c.nombre}</div><small class="text-muted">${c.asunto||'Sin asunto'}</small></div><small class="text-muted">${formatFecha(c.fecha)}</small></div>`).join('') || '<div class="p-3 text-muted">Sin mensajes</div>';
+  } catch(e) { console.error(e); }
+}
+
+// ── NOTICIAS ─────────────────────────────────────────────
+let allNoticias = [];
+async function loadNoticias() {
+  const data = await gasGet('getNoticias',{limit:200});
+  allNoticias = data.noticias||[];
+  renderNoticiasTable();
+}
+function filtrarNoticias() { renderNoticiasTable(document.getElementById('n-buscar').value.toLowerCase()); }
+function renderNoticiasTable(q='') {
+  const list = q ? allNoticias.filter(n=>n.titulo?.toLowerCase().includes(q)) : allNoticias;
+  document.getElementById('noticias-table').innerHTML = list.length ? `
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+      <thead class="table-light"><tr><th>Título</th><th>Categoría</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
+      <tbody>${list.map(n=>`<tr><td class="fw-semibold">${truncate(n.titulo,50)}</td><td><small>${n.categoria||''}</small></td><td><span class="badge bg-${n.estado==='publicado'?'success':'secondary'}">${n.estado}</span></td><td><small>${n.fecha||''}</small></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editNoticia('${n.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteNoticia('${n.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="p-4 text-center text-muted">Sin noticias registradas</div>';
+}
+function editNoticia(id) {
+  const n = allNoticias.find(x=>x.id===id); if(!n) return;
+  document.getElementById('n-id').value=n.id; document.getElementById('n-titulo').value=n.titulo||''; document.getElementById('n-resumen').value=n.resumen||''; document.getElementById('n-contenido').value=n.contenido||''; document.getElementById('n-categoria').value=n.categoria||'Noticias'; document.getElementById('n-estado').value=n.estado||'publicado'; document.getElementById('n-imagen').value=n.imagen||'';
+  document.getElementById('noticia-form-title').textContent='Editar Noticia'; document.getElementById('n-save-btn').textContent='Actualizar';
+  document.querySelector('#tab-noticias').scrollIntoView({behavior:'smooth'});
+}
+function resetNoticiaForm() { document.getElementById('noticia-form').reset(); document.getElementById('n-id').value=''; document.getElementById('noticia-form-title').textContent='Nueva Noticia'; document.getElementById('n-save-btn').textContent='Guardar'; }
+document.getElementById('noticia-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('n-save-btn'); btn.disabled=true; btn.textContent='Guardando...';
+  const data = {id:document.getElementById('n-id').value||null,titulo:document.getElementById('n-titulo').value,resumen:document.getElementById('n-resumen').value,contenido:document.getElementById('n-contenido').value,categoria:document.getElementById('n-categoria').value,estado:document.getElementById('n-estado').value,imagen:document.getElementById('n-imagen').value,fecha:new Date().toISOString().split('T')[0]};
+  const r = await gasAuth('saveNoticia', data);
+  if(r.ok) { showGlobalMsg('Noticia guardada correctamente.'); resetNoticiaForm(); loadNoticias(); } else { showGlobalMsg(r.error||'Error al guardar.','danger'); }
+  btn.disabled=false; btn.textContent='Guardar';
+});
+async function deleteNoticia(id) {
+  if(!confirm('¿Eliminar esta noticia?')) return;
+  const r = await gasAuth('deleteNoticia',{id}); if(r.ok) { showGlobalMsg('Noticia eliminada.'); loadNoticias(); } else showGlobalMsg('Error al eliminar.','danger');
+}
+
+// ── DOCUMENTOS ───────────────────────────────────────────
+let allDocs = [];
+async function loadDocumentos() {
+  const data = await gasGet('getDocumentos'); allDocs = data.documentos||[]; renderDocsTable();
+}
+function renderDocsTable() {
+  document.getElementById('docs-table').innerHTML = allDocs.length ? `
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+      <thead class="table-light"><tr><th>Nombre</th><th>Categoría</th><th>Fecha</th><th>Acciones</th></tr></thead>
+      <tbody>${allDocs.map(d=>`<tr><td class="fw-semibold">${truncate(d.nombre,50)}</td><td><span class="badge bg-secondary">${d.categoria||''}</span></td><td><small>${d.fecha||''}</small></td><td><div class="d-flex gap-1">${d.url?`<a href="${d.url}" target="_blank" class="btn btn-sm btn-outline-success"><i class="fas fa-external-link-alt"></i></a>`:''}<button class="btn btn-sm btn-outline-primary" onclick="editDoc('${d.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteDoc('${d.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="p-4 text-center text-muted">Sin documentos publicados</div>';
+}
+function editDoc(id) {
+  const d = allDocs.find(x=>x.id===id); if(!d) return;
+  document.getElementById('d-id').value=d.id; document.getElementById('d-nombre').value=d.nombre||''; document.getElementById('d-categoria').value=d.categoria||'Transparencia'; document.getElementById('d-fecha').value=d.fecha||''; document.getElementById('d-url').value=d.url||'';
+  document.getElementById('doc-form-title').textContent='Editar Documento'; document.getElementById('d-save-btn').textContent='Actualizar';
+}
+function resetDocForm() { document.getElementById('doc-form').reset(); document.getElementById('d-id').value=''; document.getElementById('doc-form-title').textContent='Nuevo Documento'; document.getElementById('d-save-btn').textContent='Guardar'; }
+document.getElementById('doc-form').addEventListener('submit', async e => {
+  e.preventDefault(); const btn=document.getElementById('d-save-btn'); btn.disabled=true;
+  const data={id:document.getElementById('d-id').value||null,nombre:document.getElementById('d-nombre').value,categoria:document.getElementById('d-categoria').value,fecha:document.getElementById('d-fecha').value,url:document.getElementById('d-url').value};
+  const r=await gasAuth('saveDocumento',data); if(r.ok){showGlobalMsg('Documento guardado.');resetDocForm();loadDocumentos();}else showGlobalMsg(r.error||'Error.','danger'); btn.disabled=false; btn.textContent='Guardar';
+});
+async function deleteDoc(id) { if(!confirm('¿Eliminar?')) return; const r=await gasAuth('deleteDocumento',{id}); if(r.ok){showGlobalMsg('Eliminado.');loadDocumentos();}else showGlobalMsg('Error.','danger'); }
+
+// ── EQUIPO ───────────────────────────────────────────────
+let allEquipo = [];
+async function loadEquipo() { const data=await gasGet('getEquipo'); allEquipo=data.equipo||[]; renderEquipoTable(); }
+function renderEquipoTable() {
+  document.getElementById('equipo-table').innerHTML = allEquipo.length ? `
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+      <thead class="table-light"><tr><th>Nombre</th><th>Cargo</th><th>Tipo</th><th>Acciones</th></tr></thead>
+      <tbody>${allEquipo.map(m=>`<tr><td class="fw-semibold">${m.nombre}</td><td><small>${m.cargo}</small></td><td><span class="badge bg-secondary small">${m.cargo_tipo||''}</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editEq('${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteEq('${m.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="p-4 text-center text-muted">Sin miembros registrados</div>';
+}
+function editEq(id) {
+  const m=allEquipo.find(x=>x.id===id); if(!m) return;
+  document.getElementById('eq-id').value=m.id; document.getElementById('eq-nombre').value=m.nombre||''; document.getElementById('eq-cargo').value=m.cargo||''; document.getElementById('eq-tipo').value=m.cargo_tipo||'Otro'; document.getElementById('eq-especialidad').value=m.especialidad||''; document.getElementById('eq-foto').value=m.foto||'';
+  document.getElementById('eq-form-title').textContent='Editar Miembro'; document.getElementById('eq-save-btn').textContent='Actualizar';
+}
+function resetEqForm() { document.getElementById('eq-form').reset(); document.getElementById('eq-id').value=''; document.getElementById('eq-form-title').textContent='Nuevo Miembro'; document.getElementById('eq-save-btn').textContent='Guardar'; }
+document.getElementById('eq-form').addEventListener('submit', async e => {
+  e.preventDefault(); const btn=document.getElementById('eq-save-btn'); btn.disabled=true;
+  const data={id:document.getElementById('eq-id').value||null,nombre:document.getElementById('eq-nombre').value,cargo:document.getElementById('eq-cargo').value,cargo_tipo:document.getElementById('eq-tipo').value,especialidad:document.getElementById('eq-especialidad').value,foto:document.getElementById('eq-foto').value};
+  const r=await gasAuth('saveEquipo',data); if(r.ok){showGlobalMsg('Miembro guardado.');resetEqForm();loadEquipo();}else showGlobalMsg(r.error||'Error.','danger'); btn.disabled=false; btn.textContent='Guardar';
+});
+async function deleteEq(id) { if(!confirm('¿Eliminar miembro?')) return; const r=await gasAuth('deleteEquipo',{id}); if(r.ok){showGlobalMsg('Eliminado.');loadEquipo();}else showGlobalMsg('Error.','danger'); }
+
+// ── AVISOS ───────────────────────────────────────────────
+let allAvisos = [];
+async function loadAvisosAdmin() { const data=await gasGet('getAvisos'); allAvisos=data.avisos||[]; renderAvisosTable(); }
+function renderAvisosTable() {
+  document.getElementById('avisos-table').innerHTML = allAvisos.length ? `
+    <div class="table-responsive"><table class="table table-hover align-middle mb-0">
+      <thead class="table-light"><tr><th>Aviso</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>${allAvisos.map(a=>`<tr><td><small class="fw-semibold">${truncate(a.texto,60)}</small></td><td><span class="badge bg-${a.tipo||'info'}">${a.tipo||'info'}</span></td><td><button class="btn btn-sm ${a.activo?'btn-success':'btn-outline-secondary'}" onclick="toggleAviso('${a.id}')">${a.activo?'Activo':'Inactivo'}</button></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editAv('${a.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteAv('${a.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="p-4 text-center text-muted">Sin avisos creados</div>';
+}
+function editAv(id) { const a=allAvisos.find(x=>x.id===id); if(!a) return; document.getElementById('av-id').value=a.id; document.getElementById('av-texto').value=a.texto||''; document.getElementById('av-tipo').value=a.tipo||'info'; document.getElementById('av-activo').checked=!!a.activo; }
+function resetAvForm() { document.getElementById('av-form').reset(); document.getElementById('av-id').value=''; document.getElementById('av-activo').checked=true; }
+document.getElementById('av-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const data={id:document.getElementById('av-id').value||null,texto:document.getElementById('av-texto').value,tipo:document.getElementById('av-tipo').value,activo:document.getElementById('av-activo').checked};
+  const r=await gasAuth('saveAviso',data); if(r.ok){showGlobalMsg('Aviso guardado.');resetAvForm();loadAvisosAdmin();}else showGlobalMsg(r.error||'Error.','danger');
+});
+async function toggleAviso(id) { const r=await gasAuth('toggleAviso',{id}); if(r.ok) loadAvisosAdmin(); }
+async function deleteAv(id) { if(!confirm('¿Eliminar aviso?')) return; const r=await gasAuth('deleteAviso',{id}); if(r.ok){showGlobalMsg('Eliminado.');loadAvisosAdmin();}else showGlobalMsg('Error.','danger'); }
+
+// ── CONTACTOS ────────────────────────────────────────────
+let allContactos = [];
+async function loadContactos() {
+  const data=await gasAuth('getContactos'); allContactos=data.contactos||[];
+  const noLeidos=allContactos.filter(c=>!c.leido).length;
+  document.getElementById('badge-contactos').textContent=noLeidos||''; document.getElementById('badge-no-leidos').textContent=noLeidos; document.getElementById('badge-no-leidos').classList.toggle('d-none',!noLeidos);
+  document.getElementById('contactos-list').innerHTML = allContactos.length ? allContactos.map(c=>`
+    <div class="d-flex align-items-center gap-3 p-3 border-bottom ${!c.leido?'bg-light':''}" style="cursor:pointer" onclick="verContacto('${c.id}')">
+      <div class="flex-shrink-0">${!c.leido?`<span class="badge bg-danger">Nuevo</span>`:`<i class="fas fa-envelope-open text-muted"></i>`}</div>
+      <div class="flex-grow-1 min-width-0">
+        <div class="d-flex justify-content-between"><span class="fw-semibold">${c.nombre}</span><small class="text-muted">${c.fecha||''}</small></div>
+        <small class="text-muted text-truncate d-block">${c.asunto||'Sin asunto'} — ${truncate(c.mensaje,60)}</small>
+      </div>
+      <button class="btn btn-sm btn-outline-danger ms-2" onclick="event.stopPropagation();deleteContacto('${c.id}')"><i class="fas fa-trash"></i></button>
+    </div>`).join('') : '<div class="p-4 text-center text-muted">No hay mensajes</div>';
+}
+function verContacto(id) {
+  const c=allContactos.find(x=>x.id===id); if(!c) return;
+  if(!c.leido) { gasAuth('marcarLeidoContacto',{id}); c.leido=true; }
+  document.getElementById('det-asunto').textContent=c.asunto||'Mensaje de '+c.nombre;
+  document.getElementById('det-body').innerHTML=`
+    <div class="row g-3 mb-4"><div class="col-md-4"><strong>De:</strong> ${c.nombre}</div><div class="col-md-4"><strong>Email:</strong> <a href="mailto:${c.email}">${c.email}</a></div><div class="col-md-4"><strong>Fecha:</strong> ${c.fecha||''}</div></div>
+    <div class="p-4 bg-light rounded-3 mb-3">${c.mensaje?.replace(/\n/g,'<br>')||''}</div>
+    <a href="mailto:${c.email}?subject=Re: ${encodeURIComponent(c.asunto||'')}" class="btn btn-primary"><i class="fas fa-reply me-2"></i>Responder por Email</a>`;
+  document.getElementById('contacto-lista').classList.add('d-none');
+  document.getElementById('contacto-detalle').classList.remove('d-none');
+}
+function cerrarDetalle() { document.getElementById('contacto-detalle').classList.add('d-none'); document.getElementById('contacto-lista').classList.remove('d-none'); loadContactos(); }
+async function deleteContacto(id) { if(!confirm('¿Eliminar mensaje?')) return; const r=await gasAuth('deleteContacto',{id}); if(r.ok){showGlobalMsg('Eliminado.');loadContactos();}else showGlobalMsg('Error.','danger'); }
+
+// ── PLATAFORMAS ──────────────────────────────────────────
+async function loadPlataformasAdmin() {
+  const data=await gasGet('getConfig'); const plats=(data.config||{}).plataformas||[{nombre:'',url:'',descripcion:''}];
+  renderPlatsAdmin(plats);
+}
+function renderPlatsAdmin(plats) {
+  document.getElementById('plat-container').innerHTML = plats.map((p,i)=>`
+    <div class="row g-3 align-items-end mb-3 plat-row">
+      <div class="col-md-3"><label class="form-label fw-semibold small">Nombre</label><input type="text" name="plat-nombre" class="form-control" value="${p.nombre||''}"></div>
+      <div class="col-md-4"><label class="form-label fw-semibold small">URL</label><input type="url" name="plat-url" class="form-control" value="${p.url||''}" placeholder="https://..."></div>
+      <div class="col-md-4"><label class="form-label fw-semibold small">Descripción</label><input type="text" name="plat-desc" class="form-control" value="${p.descripcion||''}"></div>
+      <div class="col-md-1 pb-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.plat-row').remove()"><i class="fas fa-times"></i></button></div>
+    </div>`).join('');
+}
+function addPlat() { const c=document.getElementById('plat-container'); const d=document.createElement('div'); d.className='row g-3 align-items-end mb-3 plat-row'; d.innerHTML=`<div class="col-md-3"><input type="text" name="plat-nombre" class="form-control" placeholder="Nombre"></div><div class="col-md-4"><input type="url" name="plat-url" class="form-control" placeholder="https://..."></div><div class="col-md-4"><input type="text" name="plat-desc" class="form-control" placeholder="Descripción"></div><div class="col-md-1 pb-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.plat-row').remove()"><i class="fas fa-times"></i></button></div>`; c.appendChild(d); }
+async function savePlataformas() {
+  const rows=document.querySelectorAll('.plat-row');
+  const plats=[...rows].map(r=>({nombre:r.querySelector('[name="plat-nombre"]').value.trim(),url:r.querySelector('[name="plat-url"]').value.trim(),descripcion:r.querySelector('[name="plat-desc"]').value.trim()})).filter(p=>p.nombre&&p.url);
+  const r=await gasAuth('savePlataformas',{plataformas:plats}); if(r.ok) showGlobalMsg('Plataformas guardadas.'); else showGlobalMsg('Error.','danger');
+}
+
+// ── CONFIGURACIÓN ─────────────────────────────────────────
+async function loadConfigAdmin() {
+  const data=await gasGet('getConfig'); const cfg=data.config||{};
+  ['nombre','slogan','logo','facebook','instagram','direccion','telefono','email'].forEach(k=>{ const el=document.getElementById('cfg-'+k); if(el) el.value=cfg[k]||''; });
+}
+function cfgTab(name, btn) {
+  ['cfg-escuela','cfg-redes','cfg-contacto-cfg'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('d-none');});
+  document.getElementById('cfg-'+name)?.classList.remove('d-none');
+  document.querySelectorAll('#cfg-tabs .nav-link').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+async function saveConfig() {
+  const data={nombre:document.getElementById('cfg-nombre').value,slogan:document.getElementById('cfg-slogan').value,logo:document.getElementById('cfg-logo').value,facebook:document.getElementById('cfg-facebook').value,instagram:document.getElementById('cfg-instagram').value,direccion:document.getElementById('cfg-direccion').value,telefono:document.getElementById('cfg-telefono').value,email:document.getElementById('cfg-email').value};
+  const r=await gasAuth('saveConfig',{config:data}); if(r.ok) showGlobalMsg('Configuración guardada.'); else showGlobalMsg('Error.','danger');
+}
+
+// ── CONTRASEÑA ────────────────────────────────────────────
+async function cambiarPassword() {
+  const actual=document.getElementById('p-actual').value, nueva=document.getElementById('p-nueva').value, confirmar=document.getElementById('p-confirmar').value;
+  const msgEl=document.getElementById('pass-msg');
+  if(nueva.length<8) { msgEl.className='alert alert-danger'; msgEl.textContent='La nueva contraseña debe tener al menos 8 caracteres.'; msgEl.classList.remove('d-none'); return; }
+  if(nueva!==confirmar) { msgEl.className='alert alert-danger'; msgEl.textContent='Las contraseñas no coinciden.'; msgEl.classList.remove('d-none'); return; }
+  const r=await gasAuth('cambiarPassword',{passwordActual:actual,passwordNueva:nueva});
+  msgEl.className=`alert alert-${r.ok?'success':'danger'}`; msgEl.textContent=r.ok?'Contraseña actualizada correctamente.':r.error||'Error.'; msgEl.classList.remove('d-none');
+  if(r.ok) { document.getElementById('p-actual').value=''; document.getElementById('p-nueva').value=''; document.getElementById('p-confirmar').value=''; }
+}
+</script>
+</body></html>

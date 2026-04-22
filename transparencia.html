@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Transparencia — Escuela Llankanao</title><link rel="icon" href="assets/img/favicon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><link rel="stylesheet" href="assets/css/style.css"></head>
+<body>
+<div id="navbar-container"></div>
+<div class="page-hero"><div class="container"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="index.html">Inicio</a></li><li class="breadcrumb-item active">Transparencia</li></ol></nav><h1>Transparencia</h1><p>Información pública conforme a la Ley N° 20.285</p></div></div>
+<section class="py-5"><div class="container">
+  <div class="alert d-flex align-items-start gap-3 border-0 rounded-4 mb-5" style="background:linear-gradient(135deg,#e8f4fd,#d6eaf8)">
+    <i class="fas fa-info-circle fa-2x mt-1" style="color:var(--color-primary)"></i>
+    <div><strong>Transparencia Activa</strong><br>La Escuela Básica Llankanao M.F.M.S. publica en forma permanente la información que la Ley de Transparencia N° 20.285 exige, permitiendo a la ciudadanía conocer el uso de los recursos públicos.</div>
+  </div>
+  <ul class="nav nav-tabs mb-4" id="transTabs">
+    <li class="nav-item"><button class="nav-link active" data-cat="Transparencia" onclick="filtrarCat('Transparencia',this)">Transparencia</button></li>
+    <li class="nav-item"><button class="nav-link" data-cat="Presupuesto" onclick="filtrarCat('Presupuesto',this)">Presupuesto</button></li>
+    <li class="nav-item"><button class="nav-link" data-cat="Reglamentos" onclick="filtrarCat('Reglamentos',this)">Reglamentos</button></li>
+    <li class="nav-item"><button class="nav-link" data-cat="Informes" onclick="filtrarCat('Informes',this)">Informes</button></li>
+    <li class="nav-item"><button class="nav-link" data-cat="PME" onclick="filtrarCat('PME',this)">PME</button></li>
+    <li class="nav-item"><button class="nav-link" data-cat="Otro" onclick="filtrarCat('Otro',this)">Otros</button></li>
+  </ul>
+  <div id="docs-grid"><div class="loading-spinner"><div class="spinner-border" role="status"></div><p class="mt-2">Cargando documentos...</p></div></div>
+  <div class="row g-4 mt-5">
+    <div class="col-md-4 text-center"><i class="fas fa-landmark fa-2x mb-2" style="color:var(--color-primary)"></i><h6 class="fw-bold">Ley de Transparencia</h6><p class="small text-muted mb-2">Ley N° 20.285</p><a href="https://www.leychile.cl/Navegar?idNorma=276363" target="_blank" class="btn btn-sm btn-outline-primary">Ver Ley</a></div>
+    <div class="col-md-4 text-center"><i class="fas fa-globe fa-2x mb-2" style="color:var(--color-primary)"></i><h6 class="fw-bold">CPLT</h6><p class="small text-muted mb-2">Consejo para la Transparencia</p><a href="https://www.consejotransparencia.cl" target="_blank" class="btn btn-sm btn-outline-primary">Visitar</a></div>
+    <div class="col-md-4 text-center"><i class="fas fa-envelope fa-2x mb-2" style="color:var(--color-primary)"></i><h6 class="fw-bold">Solicitud</h6><p class="small text-muted mb-2">Para solicitar información pública</p><a href="contacto.html" class="btn btn-sm btn-outline-primary">Contacto</a></div>
+  </div>
+</div></section>
+<div id="footer-container"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  initComponents('transparencia'); loadAvisos();
+  let allDocs = []; let catActual = 'Transparencia';
+  const ICONS = {pdf:'fas fa-file-pdf text-danger',docx:'fas fa-file-word text-primary',doc:'fas fa-file-word text-primary',xlsx:'fas fa-file-excel text-success',xls:'fas fa-file-excel text-success'};
+  async function loadDocs() {
+    try {
+      const data = await gasGet('getDocumentos');
+      allDocs = data.documentos || [];
+      renderDocs();
+    } catch(e) { document.getElementById('docs-grid').innerHTML = `<div class="text-center py-5 text-muted"><i class="fas fa-folder-open fa-3x mb-2"></i><p>Los documentos estarán disponibles pronto.</p></div>`; }
+  }
+  function filtrarCat(cat, btn) {
+    catActual = cat;
+    document.querySelectorAll('#transTabs .nav-link').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderDocs();
+  }
+  function renderDocs() {
+    const filtered = allDocs.filter(d=>(d.categoria||'Otro')===catActual);
+    const grid = document.getElementById('docs-grid');
+    if(!filtered.length) { grid.innerHTML = `<div class="text-center py-5 text-muted"><i class="fas fa-folder-open fa-3x mb-2"></i><p>No hay documentos en esta categoría aún.</p></div>`; return; }
+    grid.innerHTML = `<div class="row g-3">${filtered.map(d=>{
+      const ext = (d.archivo||'').split('.').pop().toLowerCase();
+      const ic = ICONS[ext]||'fas fa-file text-secondary';
+      return `<div class="col-md-6 col-lg-4"><div class="card border-0 shadow-sm h-100 hover-lift"><div class="card-body d-flex align-items-center gap-3 p-3"><i class="${ic} fa-2x flex-shrink-0"></i><div class="flex-grow-1"><p class="mb-1 fw-semibold small">${d.nombre}</p><small class="text-muted">${d.fecha||''}</small></div>${d.url?`<a href="${d.url}" target="_blank" class="btn btn-sm btn-outline-primary flex-shrink-0"><i class="fas fa-download"></i></a>`:''}</div></div></div>`;
+    }).join('')}</div>`;
+  }
+  loadDocs();
+</script>
+</body></html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto — Escuela Llankanao</title>
+  <link rel="icon" href="assets/img/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="navbar-container"></div>
+<div class="page-hero">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="index.html">Inicio</a></li><li class="breadcrumb-item active">Contacto</li></ol></nav>
+    <h1>Contacto</h1><p>Estamos para atenderte</p>
+  </div>
+</div>
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-5">
+        <span class="section-badge">Datos</span>
+        <h2 class="section-title">Información de Contacto</h2>
+        <div class="d-flex flex-column gap-4 mt-4" id="contact-info">
+          <div class="d-flex gap-3">
+            <div style="background:var(--color-primary);width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-map-marker-alt text-white"></i></div>
+            <div><strong>Dirección</strong><p class="text-muted mb-0">Linares, Región del Maule, Chile</p></div>
+          </div>
+          <div class="d-flex gap-3">
+            <div style="background:var(--color-primary);width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-clock text-white"></i></div>
+            <div><strong>Horario de Atención</strong><p class="text-muted mb-0">Lunes a Viernes<br>08:00 – 16:30 hrs</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="card border-0 shadow p-4 p-md-5">
+          <div id="form-success" class="d-none text-center py-4">
+            <div class="mb-4" style="width:80px;height:80px;background:#d4edda;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:auto"><i class="fas fa-check fa-2x text-success"></i></div>
+            <h4 class="fw-bold">¡Mensaje enviado!</h4>
+            <p class="text-muted">Hemos recibido su mensaje. Nos pondremos en contacto a la brevedad.</p>
+            <button class="btn btn-outline-primary" onclick="resetForm()">Enviar otro mensaje</button>
+          </div>
+          <div id="form-area">
+            <h4 class="fw-bold mb-4">Envíanos un mensaje</h4>
+            <div id="form-error" class="alert alert-danger d-none"></div>
+            <form id="contactForm">
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-semibold">Nombre completo *</label><input type="text" id="c-nombre" class="form-control form-control-lg" required></div>
+                <div class="col-md-6"><label class="form-label fw-semibold">Correo electrónico *</label><input type="email" id="c-email" class="form-control form-control-lg" required></div>
+                <div class="col-12"><label class="form-label fw-semibold">Asunto</label>
+                  <select id="c-asunto" class="form-select form-select-lg">
+                    <option>Consulta general</option><option>Matrícula</option><option>Información académica</option><option>Inspectoría</option><option>Transporte escolar</option><option>Otro</option>
+                  </select>
+                </div>
+                <div class="col-12"><label class="form-label fw-semibold">Mensaje *</label><textarea id="c-mensaje" class="form-control" rows="5" required></textarea></div>
+                <div class="col-12"><button type="submit" class="btn btn-primary btn-lg w-100" id="submit-btn"><i class="fas fa-paper-plane me-2"></i>Enviar Mensaje</button></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div id="footer-container"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  initComponents('contacto'); loadAvisos();
+
+  async function loadContactInfo() {
+    try {
+      const data = await gasGet('getConfig');
+      const cfg = data.config || {};
+      const info = document.getElementById('contact-info');
+      let extra = '';
+      if(cfg.telefono) extra += `<div class="d-flex gap-3"><div style="background:var(--color-primary);width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-phone text-white"></i></div><div><strong>Teléfono</strong><p class="text-muted mb-0"><a href="tel:${cfg.telefono}" class="text-muted text-decoration-none">${cfg.telefono}</a></p></div></div>`;
+      if(cfg.email) extra += `<div class="d-flex gap-3"><div style="background:var(--color-primary);width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-envelope text-white"></i></div><div><strong>Correo Electrónico</strong><p class="text-muted mb-0"><a href="mailto:${cfg.email}" class="text-muted text-decoration-none">${cfg.email}</a></p></div></div>`;
+      if(extra) info.innerHTML = `<div class="d-flex gap-3"><div style="background:var(--color-primary);width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-map-marker-alt text-white"></i></div><div><strong>Dirección</strong><p class="text-muted mb-0">${cfg.direccion||'Linares, Chile'}</p></div></div>` + extra + `<div class="d-flex gap-3"><div style="background:var(--color-primary);width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-clock text-white"></i></div><div><strong>Horario</strong><p class="text-muted mb-0">Lunes a Viernes<br>08:00 – 16:30 hrs</p></div></div>`;
+    } catch(e) {}
+  }
+  loadContactInfo();
+
+  document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+    document.getElementById('form-error').classList.add('d-none');
+    try {
+      await gasPost('saveContacto', {
+        nombre: document.getElementById('c-nombre').value,
+        email: document.getElementById('c-email').value,
+        asunto: document.getElementById('c-asunto').value,
+        mensaje: document.getElementById('c-mensaje').value,
+      });
+      document.getElementById('form-area').classList.add('d-none');
+      document.getElementById('form-success').classList.remove('d-none');
+    } catch(err) {
+      document.getElementById('form-error').textContent = 'Error al enviar. Intente nuevamente.';
+      document.getElementById('form-error').classList.remove('d-none');
+      btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Enviar Mensaje';
+    }
+  });
+  function resetForm() { document.getElementById('form-area').classList.remove('d-none'); document.getElementById('form-success').classList.add('d-none'); document.getElementById('contactForm').reset(); }
+</script>
+</body></html>

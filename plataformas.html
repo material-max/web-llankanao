@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plataformas — Escuela Llankanao</title>
+  <link rel="icon" href="assets/img/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="navbar-container"></div>
+<div class="page-hero">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="index.html">Inicio</a></li><li class="breadcrumb-item active">Plataformas</li></ol></nav>
+    <h1>Plataformas Digitales</h1><p>Accede a todos nuestros sistemas en línea</p>
+  </div>
+</div>
+<section class="py-5">
+  <div class="container">
+    <p class="lead text-center text-muted mb-5">Nuestra escuela cuenta con plataformas digitales propias para facilitar la gestión académica y administrativa.</p>
+    <div id="plataformas-list">
+      <div class="loading-spinner"><div class="spinner-border" role="status"></div><p class="mt-2">Cargando...</p></div>
+    </div>
+    <div class="alert border-0 rounded-4 mt-5 d-flex gap-3" style="background:#fff8e1">
+      <i class="fas fa-lock fa-lg mt-1" style="color:#D4A843"></i>
+      <div><strong>Acceso Seguro:</strong> Para acceder a las plataformas necesitas tus credenciales de usuario. Si tienes problemas para ingresar, contacta a la secretaría de la escuela.</div>
+    </div>
+  </div>
+</section>
+<div id="footer-container"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  initComponents('plataformas'); loadAvisos();
+  const ICONS = ['fas fa-graduation-cap','fas fa-search','fas fa-user-check','fas fa-boxes','fas fa-bus','fas fa-cogs'];
+  const COLORS = ['#1B4F8A','#2A6B3C','#D4A843','#e74c3c','#9b59b6','#607d8b'];
+  async function loadPlataformas() {
+    const container = document.getElementById('plataformas-list');
+    try {
+      const data = await gasGet('getConfig');
+      const plats = (data.config||{}).plataformas || [];
+      if(!plats.length) { container.innerHTML = `<div class="text-center py-5 text-muted"><i class="fas fa-laptop fa-4x mb-3"></i><p>Las plataformas serán configuradas próximamente.</p></div>`; return; }
+      container.innerHTML = plats.filter(p=>p.url).map((p,i) => `
+        <div class="card border-0 shadow-sm mb-3 hover-lift">
+          <div class="card-body d-flex align-items-center gap-4 p-4">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:70px;height:70px;background:${COLORS[i%COLORS.length]}">
+              <i class="${ICONS[i%ICONS.length]} fa-2x text-white"></i>
+            </div>
+            <div class="flex-grow-1">
+              <h5 class="fw-bold mb-1">${p.nombre}</h5>
+              ${p.descripcion?`<p class="text-muted mb-0">${p.descripcion}</p>`:''}
+            </div>
+            <a href="${p.url}" target="_blank" class="btn btn-primary btn-lg flex-shrink-0"><i class="fas fa-external-link-alt me-2"></i>Acceder</a>
+          </div>
+        </div>`).join('');
+    } catch(e) {
+      container.innerHTML = `
+        <div class="row g-3">
+          ${[['Notas','fas fa-graduation-cap','#1B4F8A','Sistema de calificaciones'],['Consulta','fas fa-search','#2A6B3C','Notas en línea'],['Inspectoría','fas fa-user-check','#D4A843','Atrasos y permisos'],['Bodega','fas fa-boxes','#e74c3c','Gestión de inventario'],['Transporte','fas fa-bus','#9b59b6','Rutas escolares']].map((p,i)=>`
+          <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm hover-lift">
+              <div class="card-body d-flex align-items-center gap-3 p-3">
+                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:50px;height:50px;background:${p[2]}">
+                  <i class="${p[1]} text-white"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0">${p[0]}</h6>
+                  <small class="text-muted">${p[3]}</small>
+                </div>
+              </div>
+            </div>
+          </div>`).join('')}
+        </div>
+        <p class="text-center text-muted mt-4 small">Configure las URLs desde el <a href="admin.html">panel de administración</a>.</p>`;
+    }
+  }
+  loadPlataformas();
+</script>
+</body></html>

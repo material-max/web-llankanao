@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escuela Básica Llankanao M.F.M.S. — Linares, Chile</title>
+  <meta name="description" content="Sitio web oficial de la Escuela Básica Llankanao M.F.M.S. de Linares, Región del Maule, Chile.">
+  <meta property="og:title" content="Escuela Llankanao — Linares">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.escuelallankanao.cl">
+  <link rel="icon" href="assets/img/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="navbar-container"></div>
+<div id="avisos-container"></div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="hero-badge">
+          <i class="fas fa-map-marker-alt"></i>
+          Linares, Región del Maule
+        </div>
+        <h1>Formando ciudadanos para el <span>futuro</span></h1>
+        <p class="lead">Escuela Básica Llankanao M.F.M.S. — comprometida con la educación de calidad, los valores y el desarrollo integral de cada estudiante.</p>
+        <div class="hero-btns">
+          <a href="matricula.html" class="btn-hero-primary">
+            <i class="fas fa-graduation-cap"></i> Proceso de Matrícula
+          </a>
+          <a href="nosotros.html" class="btn-hero-secondary">
+            <i class="fas fa-info-circle"></i> Conócenos
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number" data-count="8" data-suffix="°">0°</span>
+            <span class="stat-label">Niveles</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-count="154">0</span>
+            <span class="stat-label">Estudiantes</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-count="100" data-suffix="%">0%</span>
+            <span class="stat-label">Compromiso</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block">
+        <div class="hero-img-card">
+          <div class="text-center py-4">
+            <img src="assets/img/logo.svg" alt="Escuela Llankanao" style="width:160px;height:160px;border-radius:50%;border:4px solid rgba(212,168,67,.4)">
+            <h4 class="text-white mt-4 mb-1" style="font-family:'Playfair Display',serif">Escuela Básica Llankanao</h4>
+            <p style="color:rgba(255,255,255,.6)">M.F.M.S. • Linares, Chile</p>
+            <div class="d-flex gap-3 justify-content-center mt-3">
+              <a href="plataformas.html" class="btn btn-sm" style="background:rgba(212,168,67,.2);color:var(--color-secondary);border:1px solid rgba(212,168,67,.3)">
+                <i class="fas fa-th me-1"></i> Plataformas
+              </a>
+              <a href="noticias.html" class="btn btn-sm" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2)">
+                <i class="fas fa-newspaper me-1"></i> Noticias
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ACCESO RÁPIDO PLATAFORMAS ── -->
+<section class="quick-access">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="section-badge">Accesos directos</span>
+      <h2 class="section-title">Plataformas Digitales</h2>
+      <p class="section-subtitle">Accede a todos nuestros sistemas en línea</p>
+    </div>
+    <div class="row g-3 justify-content-center" id="plataformas-home">
+      <!-- Se carga dinámicamente o muestra fallback -->
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="plataformas.html" class="platform-card reveal">
+          <div class="p-icon" style="background:#1B4F8A"><i class="fas fa-graduation-cap"></i></div>
+          <span class="p-name">Notas</span>
+          <span class="p-desc">Sistema de calificaciones</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="plataformas.html" class="platform-card reveal">
+          <div class="p-icon" style="background:#2A6B3C"><i class="fas fa-search"></i></div>
+          <span class="p-name">Consulta</span>
+          <span class="p-desc">Notas en línea</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="plataformas.html" class="platform-card reveal">
+          <div class="p-icon" style="background:#D4A843"><i class="fas fa-user-check"></i></div>
+          <span class="p-name">Inspectoría</span>
+          <span class="p-desc">Atrasos y permisos</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="plataformas.html" class="platform-card reveal">
+          <div class="p-icon" style="background:#e74c3c"><i class="fas fa-boxes"></i></div>
+          <span class="p-name">Bodega</span>
+          <span class="p-desc">Inventario escolar</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="plataformas.html" class="platform-card reveal">
+          <div class="p-icon" style="background:#9b59b6"><i class="fas fa-bus"></i></div>
+          <span class="p-name">Transporte</span>
+          <span class="p-desc">Rutas escolares</span>
+        </a>
+      </div>
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="plataformas.html" class="platform-card reveal" style="border:2px dashed #e2e8f0">
+          <div class="p-icon" style="background:#607d8b"><i class="fas fa-th"></i></div>
+          <span class="p-name">Ver todas</span>
+          <span class="p-desc">Más plataformas</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOBRE NOSOTROS ── -->
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 reveal">
+        <span class="section-badge">Nuestra Institución</span>
+        <h2 class="section-title">Una escuela comprometida con la comunidad</h2>
+        <p class="text-muted mb-3">La Escuela Básica Llankanao M.F.M.S. es una institución educativa de la ciudad de Linares, comprometida con la formación integral de niños y niñas de la Región del Maule.</p>
+        <p class="text-muted mb-4">Con años de trayectoria, hemos formado a generaciones de estudiantes entregando valores, conocimientos y habilidades para la vida. El nombre "Llankanao" tiene raíces en la cultura local que nos da identidad.</p>
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:36px;height:36px;border-radius:8px;background:rgba(27,79,138,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <i class="fas fa-check" style="color:var(--color-primary)"></i>
+              </div>
+              <span class="fw-semibold small">1° a 8° Básico</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:36px;height:36px;border-radius:8px;background:rgba(27,79,138,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <i class="fas fa-check" style="color:var(--color-primary)"></i>
+              </div>
+              <span class="fw-semibold small">Programa PIE</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:36px;height:36px;border-radius:8px;background:rgba(27,79,138,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <i class="fas fa-check" style="color:var(--color-primary)"></i>
+              </div>
+              <span class="fw-semibold small">JEC Completa</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:36px;height:36px;border-radius:8px;background:rgba(27,79,138,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <i class="fas fa-check" style="color:var(--color-primary)"></i>
+              </div>
+              <span class="fw-semibold small">Subvención SEP</span>
+            </div>
+          </div>
+        </div>
+        <a href="nosotros.html" class="btn btn-primary px-4 py-2">
+          <i class="fas fa-arrow-right me-2"></i>Conocer más
+        </a>
+      </div>
+      <div class="col-lg-6 reveal">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="p-4 rounded-4 text-center h-100" style="background:linear-gradient(135deg,var(--color-primary),var(--color-dark));color:white">
+              <i class="fas fa-bullseye fa-3x mb-3" style="color:var(--color-secondary)"></i>
+              <h5 class="fw-bold">Misión</h5>
+              <p class="small" style="color:rgba(255,255,255,.8)">Formar ciudadanos íntegros con énfasis en valores e inclusión</p>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-4 rounded-4 text-center h-100" style="background:linear-gradient(135deg,var(--color-accent),#1a4d28);color:white">
+              <i class="fas fa-eye fa-3x mb-3" style="color:var(--color-secondary)"></i>
+              <h5 class="fw-bold">Visión</h5>
+              <p class="small" style="color:rgba(255,255,255,.8)">Ser referente de calidad educativa en la región del Maule</p>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="p-4 rounded-4" style="background:var(--color-light);border-left:4px solid var(--color-secondary)">
+              <h6 class="fw-bold mb-2"><i class="fas fa-heart me-2" style="color:var(--color-secondary)"></i>Nuestros Valores</h6>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Respeto</span>
+                <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Responsabilidad</span>
+                <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Solidaridad</span>
+                <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Honestidad</span>
+                <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Inclusión</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NOTICIAS ── -->
+<section class="py-5" style="background:var(--color-light)">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="section-badge">Actualidad</span>
+        <h2 class="section-title mb-0">Últimas Noticias</h2>
+      </div>
+      <a href="noticias.html" class="btn btn-outline-primary d-none d-md-inline-flex align-items-center gap-2">
+        Ver todas <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="row g-4" id="noticias-home">
+      <div class="col-12 loading-spinner">
+        <div class="spinner-border" role="status"></div>
+        <p class="mt-2">Cargando noticias...</p>
+      </div>
+    </div>
+    <div class="text-center mt-4 d-md-none">
+      <a href="noticias.html" class="btn btn-outline-primary">Ver todas las noticias</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── REDES SOCIALES ── -->
+<section class="social-section py-5">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="section-badge" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)">Síguenos</span>
+      <h2 class="section-title" style="color:#fff">Redes Sociales</h2>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-5" id="fb-widget">
+        <div class="p-4 rounded-4" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);text-align:center">
+          <i class="fab fa-facebook-f fa-3x mb-3" style="color:#1877f2"></i>
+          <h5 style="color:#fff">Facebook</h5>
+          <p style="color:rgba(255,255,255,.6);font-size:.9rem">Sigue nuestra página para estar al día con las últimas noticias y actividades.</p>
+          <a id="fb-link" href="#" target="_blank" class="btn" style="background:#1877f2;color:white">
+            <i class="fab fa-facebook-f me-2"></i>Seguir en Facebook
+          </a>
+        </div>
+      </div>
+      <div class="col-md-5" id="ig-widget">
+        <div class="p-4 rounded-4" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);text-align:center">
+          <i class="fab fa-instagram fa-3x mb-3" style="color:#e4405f"></i>
+          <h5 style="color:#fff">Instagram</h5>
+          <p style="color:rgba(255,255,255,.6);font-size:.9rem">Descubre fotos y momentos especiales de nuestra comunidad educativa.</p>
+          <a id="ig-link" href="#" target="_blank" class="btn" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:white">
+            <i class="fab fa-instagram me-2"></i>Seguir en Instagram
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA MATRÍCULA ── -->
+<section class="cta-section py-5">
+  <div class="container text-center">
+    <h2 class="fw-bold mb-3" style="font-family:'Playfair Display',serif;color:var(--color-dark);font-size:2rem">¿Quieres matricular a tu hijo/a?</h2>
+    <p class="mb-4" style="color:rgba(0,0,0,.65);font-size:1.05rem">Conoce el proceso de matrícula y los documentos requeridos para incorporarse a nuestra comunidad educativa.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="matricula.html" class="btn btn-dark btn-lg px-5">
+        <i class="fas fa-graduation-cap me-2"></i>Ver proceso de Matrícula
+      </a>
+      <a href="contacto.html" class="btn btn-outline-dark btn-lg px-5">
+        <i class="fas fa-envelope me-2"></i>Contáctenos
+      </a>
+    </div>
+  </div>
+</section>
+
+<div id="footer-container"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  initComponents('index');
+  loadAvisos();
+
+  // Contadores al entrar en pantalla
+  const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) { animateCounters(); heroObserver.disconnect(); } });
+  });
+  const heroStats = document.querySelector('.hero-stats');
+  if(heroStats) heroObserver.observe(heroStats);
+
+  // Cargar noticias recientes
+  async function loadNoticiasHome() {
+    const container = document.getElementById('noticias-home');
+    try {
+      const data = await gasGet('getNoticias', { limit: 3 });
+      const noticias = data.noticias || [];
+      if (!noticias.length) {
+        container.innerHTML = `
+          <div class="col-12 text-center py-4 text-muted">
+            <i class="fas fa-newspaper fa-3x mb-2"></i>
+            <p>Pronto publicaremos noticias. Vuelve a visitar el sitio.</p>
+          </div>`;
+        return;
+      }
+      container.innerHTML = noticias.map(n => `
+        <div class="col-md-4 reveal">
+          <article class="news-card card">
+            ${n.imagen
+              ? `<img src="${n.imagen}" alt="${n.titulo}" class="card-img-top" style="height:200px;object-fit:cover">`
+              : `<div class="card-img-placeholder"><i class="fas fa-newspaper"></i></div>`}
+            <div class="card-body d-flex flex-column">
+              <div class="news-meta">
+                ${n.categoria ? `<span class="cat-badge">${n.categoria}</span>` : ''}
+                <span><i class="fas fa-calendar me-1"></i>${formatFecha(n.fecha)}</span>
+              </div>
+              <h5 class="card-title">${n.titulo}</h5>
+              <p class="card-text flex-grow-1">${truncate(n.resumen)}</p>
+              <a href="noticia.html?id=${n.id}" class="btn-read-more">Leer más <i class="fas fa-arrow-right"></i></a>
+            </div>
+          </article>
+        </div>`).join('');
+    } catch(e) {
+      container.innerHTML = `
+        <div class="col-12 text-center py-4 text-muted">
+          <i class="fas fa-newspaper fa-3x mb-2"></i>
+          <p>Las noticias estarán disponibles una vez configurado el sistema.</p>
+          <a href="admin.html" class="btn btn-sm btn-outline-primary">Ir al Admin</a>
+        </div>`;
+    }
+  }
+  loadNoticiasHome();
+
+  // Redes sociales
+  async function loadSocialLinks() {
+    try {
+      const data = await gasGet('getConfig');
+      const cfg = data.config || {};
+      if(cfg.facebook) {
+        document.getElementById('fb-link').href = cfg.facebook;
+        // Intentar embed del plugin de Facebook
+        const fbWidget = document.getElementById('fb-widget');
+        fbWidget.innerHTML = `
+          <div class="fb-page rounded-4 overflow-hidden" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">
+            <div class="fb-page" data-href="${cfg.facebook}" data-tabs="timeline" data-width="400" data-height="300" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="false"></div>
+          </div>`;
+        // Load FB SDK
+        const script = document.createElement('script');
+        script.src = 'https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v18.0';
+        script.async = true; script.defer = true;
+        document.head.appendChild(script);
+        window.fbAsyncInit = function() { FB.init({ xfbml: true, version: 'v18.0' }); };
+      }
+      if(cfg.instagram) document.getElementById('ig-link').href = cfg.instagram;
+    } catch(e) {}
+  }
+  loadSocialLinks();
+</script>
+</body>
+</html>

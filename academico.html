@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Académico — Escuela Llankanao</title><link rel="icon" href="assets/img/favicon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><link rel="stylesheet" href="assets/css/style.css"></head>
+<body>
+<div id="navbar-container"></div>
+<div class="page-hero"><div class="container"><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="index.html">Inicio</a></li><li class="breadcrumb-item active">Académico</li></ol></nav><h1>Oferta Académica</h1><p>Plan de estudios y formación integral</p></div></div>
+<section class="py-5"><div class="container">
+  <div class="text-center mb-5"><span class="section-badge">Niveles</span><h2 class="section-title">Niveles Educativos</h2><p class="text-muted">Ofrecemos educación básica completa de 1° a 8° año básico</p></div>
+  <div class="row g-3">
+    ${[['1°','Primero Básico','Iniciación a la lectoescritura, matemáticas básicas y exploración del entorno.','#e74c3c'],['2°','Segundo Básico','Consolidación de la lectura, escritura y operaciones matemáticas fundamentales.','#e67e22'],['3°','Tercero Básico','Ampliación del vocabulario, comprensión lectora y pensamiento matemático.','#f1c40f'],['4°','Cuarto Básico','Desarrollo del pensamiento crítico y habilidades de investigación.','#2ecc71'],['5°','Quinto Básico','Profundización curricular con énfasis en ciencias naturales y sociales.','#1abc9c'],['6°','Sexto Básico','Fortalecimiento de habilidades comunicativas y razonamiento matemático.','#3498db'],['7°','Séptimo Básico','Preparación para el nivel medio con currículum ampliado.','#9b59b6'],['8°','Octavo Básico','Consolidación de la educación básica y preparación para la enseñanza media.','#1B4F8A']].map(n=>`
+    <div class="col-lg-3 col-md-4 col-sm-6 reveal">
+      <div class="card border-0 shadow-sm h-100 text-center p-4">
+        <div class="mb-3 mx-auto" style="background:${n[3]};color:white;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700">${n[0]}</div>
+        <h6 class="fw-bold">${n[1]}</h6><p class="text-muted small">${n[2]}</p>
+      </div>
+    </div>`).join('')}
+  </div>
+</div></section>
+<section class="py-5 bg-light"><div class="container">
+  <div class="text-center mb-5"><span class="section-badge">Asignaturas</span><h2 class="section-title">Plan de Estudios</h2></div>
+  <div class="row g-4">
+    ${[['Lenguaje y Comunicación','fas fa-book-open','#3498db'],['Matemáticas','fas fa-calculator','#e74c3c'],['Ciencias Naturales','fas fa-flask','#2ecc71'],['Historia y Ciencias Sociales','fas fa-globe-americas','#e67e22'],['Inglés','fas fa-language','#9b59b6'],['Educación Física','fas fa-running','#1abc9c'],['Artes Visuales','fas fa-palette','#f39c12'],['Música','fas fa-music','#e91e63'],['Tecnología','fas fa-laptop','#607d8b'],['Religión / Ed. Moral','fas fa-star','#795548']].map(a=>`
+    <div class="col-lg-4 col-md-6 reveal">
+      <div class="d-flex align-items-start p-3 bg-white rounded-3 shadow-sm h-100">
+        <div class="me-3 mt-1" style="background:${a[2]};width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="${a[1]} text-white"></i></div>
+        <div><h6 class="fw-bold mb-0">${a[0]}</h6></div>
+      </div>
+    </div>`).join('')}
+  </div>
+</div></section>
+<section class="py-5"><div class="container"><div class="row g-5 align-items-center">
+  <div class="col-lg-6 reveal">
+    <span class="section-badge">Programas</span><h2 class="section-title">Programas Especiales</h2>
+    <div class="d-flex flex-column gap-3">
+      <div class="d-flex align-items-start"><i class="fas fa-check-circle text-success me-3 mt-1 fa-lg"></i><div><strong>PIE - Programa de Integración Escolar</strong><p class="text-muted mb-0 small">Apoyo especializado para estudiantes con NEE.</p></div></div>
+      <div class="d-flex align-items-start"><i class="fas fa-check-circle text-success me-3 mt-1 fa-lg"></i><div><strong>SEP - Subvención Escolar Preferencial</strong><p class="text-muted mb-0 small">Programas de reforzamiento para estudiantes prioritarios.</p></div></div>
+      <div class="d-flex align-items-start"><i class="fas fa-check-circle text-success me-3 mt-1 fa-lg"></i><div><strong>Extraescolares y Talleres</strong><p class="text-muted mb-0 small">Actividades de deporte, arte y cultura.</p></div></div>
+      <div class="d-flex align-items-start"><i class="fas fa-check-circle text-success me-3 mt-1 fa-lg"></i><div><strong>Jornada Escolar Completa (JEC)</strong><p class="text-muted mb-0 small">Horario extendido con actividades complementarias.</p></div></div>
+    </div>
+  </div>
+  <div class="col-lg-6 reveal">
+    <div class="p-4 rounded-4" style="background:linear-gradient(135deg,var(--color-primary),var(--color-accent))">
+      <h4 class="text-white mb-4"><i class="fas fa-calendar-check me-2"></i>Horario General</h4>
+      <table class="table table-borderless text-white mb-0">
+        <tbody>
+          <tr><td><i class="fas fa-sun me-2"></i>Jornada Mañana</td><td class="fw-bold">08:00 - 13:30 hrs</td></tr>
+          <tr><td><i class="fas fa-cloud-sun me-2"></i>Almuerzo</td><td class="fw-bold">13:30 - 14:30 hrs</td></tr>
+          <tr><td><i class="fas fa-moon me-2"></i>Jornada Tarde</td><td class="fw-bold">14:30 - 16:30 hrs</td></tr>
+          <tr><td><i class="fas fa-calendar me-2"></i>Días hábiles</td><td class="fw-bold">Lunes a Viernes</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div></div></section>
+<div id="footer-container"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script>initComponents('academico');loadAvisos();</script>
+</body></html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuestro Equipo — Escuela Llankanao</title>
+  <link rel="icon" href="assets/img/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="navbar-container"></div>
+<div class="page-hero">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="index.html">Inicio</a></li><li class="breadcrumb-item active">Nuestro Equipo</li></ol></nav>
+    <h1>Nuestro Equipo</h1><p>Las personas que hacen posible nuestra comunidad educativa</p>
+  </div>
+</div>
+<section class="py-5">
+  <div class="container" id="equipo-container">
+    <div class="loading-spinner"><div class="spinner-border" role="status"></div><p class="mt-2">Cargando equipo...</p></div>
+  </div>
+</section>
+<div id="footer-container"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  initComponents('equipo'); loadAvisos();
+  const TIPOS = ['Directivo','Docente','Asistente de la Educación','Administrativo','Otro'];
+  async function loadEquipo() {
+    const container = document.getElementById('equipo-container');
+    try {
+      const data = await gasGet('getEquipo');
+      const equipo = data.equipo || [];
+      if(!equipo.length) { container.innerHTML = `<div class="text-center py-5 text-muted"><i class="fas fa-users fa-4x mb-3"></i><p>El equipo se publicará próximamente.</p></div>`; return; }
+      let html = '';
+      TIPOS.forEach(tipo => {
+        const miembros = equipo.filter(m => (m.cargo_tipo||'Otro') === tipo);
+        if(!miembros.length) return;
+        html += `<div class="mb-5">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width:4px;height:40px;background:var(--color-secondary);border-radius:2px"></div>
+            <h3 class="mb-0 fw-bold">${tipo}</h3>
+          </div>
+          <div class="row g-4">
+            ${miembros.map(m => `
+            <div class="col-lg-3 col-md-4 col-sm-6 reveal">
+              <div class="card border-0 shadow-sm text-center p-4 h-100 hover-lift">
+                ${m.foto ? `<img src="${m.foto}" class="rounded-circle mx-auto mb-3" style="width:100px;height:100px;object-fit:cover" alt="">` : `<div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:100px;height:100px;background:linear-gradient(135deg,var(--color-primary),var(--color-accent))"><i class="fas fa-user fa-3x text-white"></i></div>`}
+                <h6 class="fw-bold mb-1">${m.nombre}</h6>
+                <p class="text-muted small mb-0">${m.cargo}</p>
+                ${m.especialidad?`<p class="small mb-0" style="color:var(--color-secondary)">${m.especialidad}</p>`:''}
+              </div>
+            </div>`).join('')}
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    } catch(e) { container.innerHTML = `<div class="text-center py-5 text-muted"><i class="fas fa-users fa-4x mb-3"></i><p>El equipo estará disponible pronto.</p></div>`; }
+  }
+  loadEquipo();
+</script>
+</body></html>

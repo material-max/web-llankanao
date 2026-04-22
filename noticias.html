@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noticias — Escuela Llankanao</title>
+  <meta name="description" content="Últimas noticias de la Escuela Básica Llankanao M.F.M.S.">
+  <link rel="icon" href="assets/img/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="navbar-container"></div>
+<div id="avisos-container"></div>
+
+<div class="page-hero">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="index.html">Inicio</a></li><li class="breadcrumb-item active">Noticias</li></ol></nav>
+    <h1>Noticias</h1><p>Últimas novedades de nuestra comunidad educativa</p>
+  </div>
+</div>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center mb-5">
+      <div class="col-md-6">
+        <div class="input-group input-group-lg shadow-sm">
+          <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+          <input type="text" id="buscar-input" class="form-control border-start-0 ps-0" placeholder="Buscar noticias...">
+          <button class="btn btn-primary px-4" onclick="buscarNoticias()">Buscar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="noticias-grid" class="row g-4">
+      <div class="col-12 loading-spinner">
+        <div class="spinner-border" role="status"></div>
+        <p class="mt-2">Cargando noticias...</p>
+      </div>
+    </div>
+
+    <div id="paginacion" class="d-flex justify-content-center mt-5"></div>
+  </div>
+</section>
+
+<div id="footer-container"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  initComponents('noticias');
+  loadAvisos();
+
+  let todasNoticias = [];
+  let paginaActual = 1;
+  const POR_PAGINA = 9;
+
+  async function cargarNoticias() {
+    const grid = document.getElementById('noticias-grid');
+    try {
+      const data = await gasGet('getNoticias', { limit: 100 });
+      todasNoticias = data.noticias || [];
+      renderNoticias();
+    } catch(e) {
+      grid.innerHTML = `<div class="col-12 text-center py-5 text-muted"><i class="fas fa-newspaper fa-4x mb-3"></i><p>Las noticias estarán disponibles pronto.</p></div>`;
+    }
+  }
+
+  function buscarNoticias() {
+    const q = document.getElementById('buscar-input').value.toLowerCase();
+    paginaActual = 1;
+    renderNoticias(q);
+  }
+
+  document.getElementById('buscar-input').addEventListener('keydown', e => { if(e.key === 'Enter') buscarNoticias(); });
+
+  function renderNoticias(busqueda = '') {
+    const grid = document.getElementById('noticias-grid');
+    let filtradas = todasNoticias;
+    if(busqueda) filtradas = filtradas.filter(n => n.titulo?.toLowerCase().includes(busqueda) || n.resumen?.toLowerCase().includes(busqueda));
+    const total = filtradas.length;
+    const totalPags = Math.ceil(total / POR_PAGINA);
+    const slice = filtradas.slice((paginaActual-1)*POR_PAGINA, paginaActual*POR_PAGINA);
+
+    if(!slice.length) {
+      grid.innerHTML = `<div class="col-12 text-center py-5 text-muted"><i class="fas fa-search fa-3x mb-2"></i><p>No se encontraron noticias${busqueda?' para "'+busqueda+'"':''}.</p></div>`;
+      document.getElementById('paginacion').innerHTML = '';
+      return;
+    }
+
+    grid.innerHTML = slice.map(n => `
+      <div class="col-lg-4 col-md-6">
+        <article class="news-card card">
+          ${n.imagen ? `<img src="${n.imagen}" alt="${n.titulo}" class="card-img-top" style="height:200px;object-fit:cover">` : `<div class="card-img-placeholder"><i class="fas fa-newspaper"></i></div>`}
+          <div class="card-body d-flex flex-column">
+            <div class="news-meta">
+              ${n.categoria?`<span class="cat-badge">${n.categoria}</span>`:''}
+              <span><i class="fas fa-calendar me-1"></i>${formatFecha(n.fecha)}</span>
+            </div>
+            <h5 class="card-title">${n.titulo}</h5>
+            <p class="card-text flex-grow-1">${truncate(n.resumen,120)}</p>
+            <a href="noticia.html?id=${n.id}" class="btn-read-more">Leer más <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>`).join('');
+
+    // Paginación
+    let pages = '';
+    if(totalPags > 1) {
+      pages += `<ul class="pagination">`;
+      if(paginaActual>1) pages += `<li class="page-item"><button class="page-link" onclick="irPagina(${paginaActual-1})"><i class="fas fa-chevron-left"></i></button></li>`;
+      for(let i=Math.max(1,paginaActual-2);i<=Math.min(totalPags,paginaActual+2);i++) {
+        pages += `<li class="page-item ${i===paginaActual?'active':''}"><button class="page-link" onclick="irPagina(${i})">${i}</button></li>`;
+      }
+      if(paginaActual<totalPags) pages += `<li class="page-item"><button class="page-link" onclick="irPagina(${paginaActual+1})"><i class="fas fa-chevron-right"></i></button></li>`;
+      pages += `</ul>`;
+    }
+    document.getElementById('paginacion').innerHTML = pages;
+  }
+
+  function irPagina(n) { paginaActual = n; renderNoticias(document.getElementById('buscar-input').value.toLowerCase()); window.scrollTo({top:0,behavior:'smooth'}); }
+  cargarNoticias();
+</script>
+</body></html>
