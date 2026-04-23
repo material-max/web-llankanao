@@ -272,7 +272,7 @@
     const container = document.getElementById('plataformas-home');
     try {
       const data = await gasGet('getConfig');
-      const plats = ((data.config||{}).plataformas||[]).filter(p=>p.url);
+      const plats = (data.config||{}).plataformas||[];
       if(!plats.length) {
         container.innerHTML = `<div class="col-12 text-center text-muted py-3"><a href="plataformas.html" class="btn btn-outline-primary">Ver plataformas</a></div>`;
         return;
