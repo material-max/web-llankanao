@@ -5,7 +5,7 @@
 
 // ── CONFIGURACIÓN GAS ──────────────────────────────────────
 // Después de desplegar el Google Apps Script, pegar la URL aquí:
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx0fulywu16KpQ-Tkj0OT-UoG3QbILNjRhVOVmAA-jLB6u69pexmM_4pOlthykfJwsV-g/exec';
+const GAS_URL = 'https://script.google.com/macros/s/TU_DEPLOYMENT_ID/exec';
 
 // Configuración local (se sobreescribe con datos del GAS si está disponible)
 const SITE_CONFIG = {
@@ -17,7 +17,7 @@ const SITE_CONFIG = {
   email: '',
   facebook: '',
   instagram: '',
-  logo: 'assets/img/logo.png',
+  logo: 'assets/img/logo.svg',
   plataformas: []
 };
 
@@ -58,7 +58,8 @@ function renderNavbar(activePage = '') {
   <nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
     <div class="container">
       <a class="navbar-brand" href="index.html">
-        <img src="${SITE_CONFIG.logo}" alt="Logo" onerror="this.src='assets/img/logo.svg'">
+        <img src="assets/img/logo.png" alt="Logo" onerror="this.onerror=null;this.src='assets/img/logo.svg'"
+             style="height:48px;width:48px;min-width:48px;border-radius:50%;object-fit:contain;background:#1B4F8A;border:2px solid #D4A843;flex-shrink:0;display:block">
         <div class="brand-text">
           <div class="brand-name">Escuela Llankanao</div>
           <div class="brand-sub">M.F.M.S. • Linares</div>
