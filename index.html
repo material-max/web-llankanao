@@ -269,420 +269,280 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/app.js"></script>
 <script>
-  initComponents('index');
-  loadAvisos();
+initComponents('index');
+loadAvisos();
 
-  // Cargar contenido editable de la página
-  gasGet('getPagina', {pagina:'inicio'}).then(d => {
-    const c = d.contenido;
-    if(!c) return;
-    if(c.heroTitulo) { const t=document.getElementById('hero-titulo'); if(t) t.innerHTML=c.heroTitulo+(c.heroSpan?` <span>${c.heroSpan}</span>`:''); }
-    if(c.heroDesc)   { const e=document.getElementById('hero-desc');   if(e) e.textContent=c.heroDesc; }
-    if(c.stat1n)     { const e=document.getElementById('stat1-n'); if(e){e.dataset.count=c.stat1n;e.dataset.suffix=c.stat1s||'';} }
-    if(c.stat1l)     { const e=document.getElementById('stat1-l'); if(e) e.textContent=c.stat1l; }
-    if(c.stat2n)     { const e=document.getElementById('stat2-n'); if(e){e.dataset.count=c.stat2n;e.dataset.suffix=c.stat2s||'';} }
-    if(c.stat2l)     { const e=document.getElementById('stat2-l'); if(e) e.textContent=c.stat2l; }
-    if(c.sobreTitulo){ const e=document.getElementById('sobre-titulo'); if(e) e.textContent=c.sobreTitulo; }
-    if(c.sobreP1)    { const e=document.getElementById('sobre-p1');     if(e) e.textContent=c.sobreP1; }
-    if(c.sobreP2)    { const e=document.getElementById('sobre-p2');     if(e) e.textContent=c.sobreP2; }
-    if(c.ctaTitulo)  { const e=document.getElementById('cta-titulo');   if(e) e.textContent=c.ctaTitulo; }
-    if(c.ctaTexto)   { const e=document.getElementById('cta-texto');    if(e) e.textContent=c.ctaTexto; }
-  }).catch(()=>{});
+// ── TEXTOS EDITABLES ─────────────────────────────────────
+gasGet('getPagina', {pagina:'inicio'}).then(function(d) {
+  var c = d.contenido; if(!c) return;
+  function set(id, val) { var e=document.getElementById(id); if(e&&val) e.textContent=val; }
+  if(c.heroTitulo) { var t=document.getElementById('hero-titulo'); if(t) t.innerHTML=c.heroTitulo+(c.heroSpan?' <span>'+c.heroSpan+'</span>':''); }
+  if(c.heroDesc)    set('hero-desc', c.heroDesc);
+  if(c.stat1n)  { var e=document.getElementById('stat1-n'); if(e){e.dataset.count=c.stat1n; e.dataset.suffix=c.stat1s||'';} }
+  if(c.stat1l)      set('stat1-l', c.stat1l);
+  if(c.stat2n)  { var e=document.getElementById('stat2-n'); if(e){e.dataset.count=c.stat2n; e.dataset.suffix=c.stat2s||'';} }
+  if(c.stat2l)      set('stat2-l', c.stat2l);
+  if(c.sobreTitulo) set('sobre-titulo', c.sobreTitulo);
+  if(c.sobreP1)     set('sobre-p1', c.sobreP1);
+  if(c.sobreP2)     set('sobre-p2', c.sobreP2);
+  if(c.ctaTitulo)   set('cta-titulo', c.ctaTitulo);
+  if(c.ctaTexto)    set('cta-texto', c.ctaTexto);
+}).catch(function(){});
 
-  // Cargar plataformas dinámicamente
-  const ICONS_HOME  = ['fas fa-graduation-cap','fas fa-search','fas fa-user-check','fas fa-boxes','fas fa-bus','fas fa-cogs','fas fa-laptop','fas fa-globe'];
-  const COLORS_HOME = ['#1B4F8A','#2A6B3C','#D4A843','#e74c3c','#9b59b6','#607d8b','#e67e22','#1abc9c'];
-  async function loadPlataformasHome() {
-    const container = document.getElementById('plataformas-home');
-    try {
-      const data = await gasGet('getConfig');
-      const plats = (data.config||{}).plataformas||[];
-      if(!plats.length) {
-        container.innerHTML = `<div class="col-12 text-center text-muted py-3"><a href="plataformas.html" class="btn btn-outline-primary">Ver plataformas</a></div>`;
-        return;
-      }
-      container.innerHTML = plats.map((p,i) => `
-        <div class="col-6 col-md-4 col-lg-2">
-          <a href="plataformas.html" class="platform-card" title="${p.nombre}">
-            <div class="p-icon" style="background:${COLORS_HOME[i%COLORS_HOME.length]}">
-              <i class="${ICONS_HOME[i%ICONS_HOME.length]}"></i>
-            </div>
-            <span class="p-name">${p.nombre}</span>
-            <span class="p-desc">${p.descripcion||''}</span>
-          </a>
-        </div>`).join('') + `
-        <div class="col-6 col-md-4 col-lg-2">
-          <a href="plataformas.html" class="platform-card" style="border:2px dashed #e2e8f0">
-            <div class="p-icon" style="background:#607d8b"><i class="fas fa-th"></i></div>
-            <span class="p-name">Ver todas</span>
-            <span class="p-desc">Más plataformas</span>
-          </a>
-        </div>`;
-    } catch(e) {
-      container.innerHTML = `<div class="col-12 text-center text-muted py-3"><a href="plataformas.html" class="btn btn-outline-primary">Ver plataformas</a></div>`;
-    }
-  }
-  loadPlataformasHome();
+// ── PLATAFORMAS ───────────────────────────────────────────
+var ICONS_HOME  = ['fas fa-graduation-cap','fas fa-search','fas fa-user-check','fas fa-boxes','fas fa-bus','fas fa-cogs','fas fa-laptop','fas fa-globe'];
+var COLORS_HOME = ['#1B4F8A','#2A6B3C','#D4A843','#e74c3c','#9b59b6','#607d8b','#e67e22','#1abc9c'];
 
-  // Cargar secciones, galería y módulos — cada llamada independiente
-  let galeriaItems = [], galeriaIdx = 0;
+function loadPlataformasHome() {
+  var container = document.getElementById('plataformas-home');
+  gasGet('getConfig').then(function(data) {
+    var plats = (data.config||{}).plataformas||[];
+    if(!plats.length) { container.innerHTML='<div class="col-12 text-center py-3"><a href="plataformas.html" class="btn btn-outline-primary">Ver plataformas</a></div>'; return; }
+    container.innerHTML = plats.map(function(p,i) {
+      return '<div class="col-6 col-md-4 col-lg-2"><a href="plataformas.html" class="platform-card" title="'+p.nombre+'">'
+        +'<div class="p-icon" style="background:'+COLORS_HOME[i%COLORS_HOME.length]+'"><i class="'+ICONS_HOME[i%ICONS_HOME.length]+'"></i></div>'
+        +'<span class="p-name">'+p.nombre+'</span>'
+        +'<span class="p-desc">'+(p.descripcion||'')+'</span>'
+        +'</a></div>';
+    }).join('')
+    + '<div class="col-6 col-md-4 col-lg-2"><a href="plataformas.html" class="platform-card" style="border:2px dashed #e2e8f0">'
+    + '<div class="p-icon" style="background:#607d8b"><i class="fas fa-th"></i></div>'
+    + '<span class="p-name">Ver todas</span><span class="p-desc">Más plataformas</span></a></div>';
+  }).catch(function(){
+    container.innerHTML='<div class="col-12 text-center py-3"><a href="plataformas.html" class="btn btn-outline-primary">Ver plataformas</a></div>';
+  });
+}
+loadPlataformasHome();
 
-  async function cargarSecciones() {
-    // Cada llamada es independiente — si una falla no rompe las demás
-    const [ds, dg, dm] = await Promise.allSettled([
-      gasGet('getSecciones'),
-      gasGet('getGaleria'),
-      gasGet('getModulos')
-    ]);
+// ── CONTADORES HERO ───────────────────────────────────────
+var heroObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) { if(e.isIntersecting) { animateCounters(); heroObs.disconnect(); } });
+});
+var heroStats = document.querySelector('.hero-stats');
+if(heroStats) heroObs.observe(heroStats);
 
-    const sec      = ds.status==='fulfilled' ? (ds.value.secciones||{}) : {};
-    galeriaItems   = dg.status==='fulfilled' ? (dg.value.galeria||[])   : [];
-    const modulos  = dm.status==='fulfilled' ? (dm.value.modulos||[]).filter(m=>m.activo) : [];
+// ── NOTICIAS ──────────────────────────────────────────────
+function loadNoticiasHome() {
+  var container = document.getElementById('noticias-home');
+  gasGet('getNoticias', {limit:3}).then(function(data) {
+    var noticias = data.noticias||[];
+    if(!noticias.length) { container.innerHTML='<div class="col-12 text-center py-4 text-muted"><i class="fas fa-newspaper fa-3x mb-2 d-block"></i><p>Pronto publicaremos noticias.</p></div>'; return; }
+    container.innerHTML = noticias.map(function(n) {
+      return '<div class="col-md-4">'
+        +'<article class="news-card card">'
+        +(n.imagen ? '<img src="'+n.imagen+'" alt="'+n.titulo+'" class="card-img-top" style="height:200px;object-fit:cover">'
+                   : '<div class="card-img-placeholder"><i class="fas fa-newspaper"></i></div>')
+        +'<div class="card-body d-flex flex-column">'
+        +'<div class="news-meta">'+(n.categoria?'<span class="cat-badge">'+n.categoria+'</span>':'')
+        +'<span><i class="fas fa-calendar me-1"></i>'+formatFecha(n.fecha)+'</span></div>'
+        +'<h5 class="card-title">'+n.titulo+'</h5>'
+        +'<p class="card-text flex-grow-1">'+truncate(n.resumen)+'</p>'
+        +'<a href="noticia.html?id='+n.id+'" class="btn-read-more">Leer más <i class="fas fa-arrow-right"></i></a>'
+        +'</div></article></div>';
+    }).join('');
+  }).catch(function() {
+    container.innerHTML='<div class="col-12 text-center py-4 text-muted"><i class="fas fa-newspaper fa-3x mb-2 d-block"></i><p>Las noticias estarán disponibles pronto.</p></div>';
+  });
+}
+loadNoticiasHome();
+
+// ── REDES SOCIALES ────────────────────────────────────────
+function loadSocialLinks() {
+  gasGet('getConfig').then(function(data) {
+    var cfg = data.config||{};
+    if(cfg.facebook) document.getElementById('fb-link').href = cfg.facebook;
+    if(cfg.instagram) document.getElementById('ig-link').href = cfg.instagram;
+  }).catch(function(){});
+}
+loadSocialLinks();
+
+// ── GALERÍA + MÓDULOS + SECCIONES ────────────────────────
+var galeriaItems = [];
+var galeriaIdx   = 0;
+
+function cargarSecciones() {
+  Promise.all([gasGet('getSecciones'), gasGet('getGaleria'), gasGet('getModulos')]).then(function(res) {
+    var sec     = res[0].secciones || {};
+    galeriaItems = res[1].galeria  || [];
+    var modulos  = (res[2].modulos || []).filter(function(m){ return m.activo; });
 
     // Módulos personalizados
-    try {
-      const mc = document.getElementById('modulos-container');
-      if (mc && modulos.length) {
-        mc.innerHTML = modulos.map(m => { try { return renderModulo(m); } catch(e){ return ''; } }).join('');
-        document.querySelectorAll('[data-countdown]').forEach(el => { try { iniciarCountdown(el); } catch(e){} });
-      }
-    } catch(e) {}
+    var mc = document.getElementById('modulos-container');
+    if(mc && modulos.length) {
+      mc.innerHTML = modulos.map(renderModulo).join('');
+      document.querySelectorAll('[data-countdown]').forEach(iniciarCountdown);
+    }
 
     // Mostrar/ocultar secciones fijas
-    try {
-      const seccMap = [
-        ['sobreNosotros', '.sobre-nosotros-section'],
-        ['noticias',      '.noticias-section'],
-        ['redes',         '.social-section'],
-        ['matricula',     '.cta-section'],
-      ];
-      seccMap.forEach(([k, sel]) => {
-        if (sec[k] && sec[k].activa === false) {
-          const el = document.querySelector(sel);
-          if (el) el.style.display = 'none';
-        }
-      });
-    } catch(e) {}
+    var mapa = {
+      sobreNosotros: document.querySelector('section.py-5:not(.quick-access):not(.social-section):not(.cta-section)'),
+      noticias:      document.querySelector('section[style*="color-light"]'),
+      redes:         document.querySelector('section.social-section'),
+      matricula:     document.querySelector('section.cta-section'),
+    };
+    Object.keys(mapa).forEach(function(k) {
+      var el = mapa[k];
+      if(el && sec[k] && sec[k].activa === false) el.style.display = 'none';
+    });
 
     // Galería
-    try {
-      const secGal = sec.galeria || {};
-      if (secGal.activa && galeriaItems.length) {
-        const s = document.getElementById('seccion-galeria');
-        if (s) {
-          s.classList.remove('d-none');
-          if (secGal.titulo)    document.getElementById('galeria-titulo').textContent    = secGal.titulo;
-          if (secGal.subtitulo) document.getElementById('galeria-subtitulo').textContent = secGal.subtitulo;
-          const layout = secGal.layout || 'mosaico';
-          const grid   = document.getElementById('galeria-grid');
-          if (layout === 'mosaico') {
-            const cols  = secGal.columnas || 3;
-            const colCl = cols===2?'col-6 col-md-6':cols===4?'col-6 col-md-3':'col-6 col-md-4';
-            grid.innerHTML = galeriaItems.map((img,i) => `
-              <div class="${colCl}">
-                <div onclick="abrirLightbox(${i})" style="cursor:pointer;overflow:hidden;border-radius:10px;aspect-ratio:4/3;background:#e2e8f0">
-                  <img src="${img.url}" alt="${img.caption||''}" loading="lazy"
-                    style="width:100%;height:100%;object-fit:cover;transition:.3s ease"
-                    onmouseover="this.style.transform='scale(1.05)'"
-                    onmouseout="this.style.transform='scale(1)'"
-                    onerror="this.parentElement.style.display='none'">
-                </div>
-                ${img.caption?`<p class="text-muted small text-center mt-1 mb-0">${img.caption}</p>`:''}
-              </div>`).join('');
-          } else if (layout === 'abanico') {
-            renderAbanico(galeriaItems, grid);
-          } else if (layout === 'tira') {
-            renderTira(galeriaItems, grid);
-          }
-        }
+    var secGal = sec.galeria || {};
+    if(secGal.activa && galeriaItems.length) {
+      var s = document.getElementById('seccion-galeria');
+      s.classList.remove('d-none');
+      if(secGal.titulo)    document.getElementById('galeria-titulo').textContent    = secGal.titulo;
+      if(secGal.subtitulo) document.getElementById('galeria-subtitulo').textContent = secGal.subtitulo;
+      var grid   = document.getElementById('galeria-grid');
+      var layout = secGal.layout || 'mosaico';
+      if(layout === 'mosaico') {
+        var cols  = secGal.columnas || 3;
+        var colCl = cols===2 ? 'col-6 col-md-6' : cols===4 ? 'col-6 col-md-3' : 'col-6 col-md-4';
+        grid.innerHTML = galeriaItems.map(function(img,i) {
+          return '<div class="'+colCl+'">'
+            +'<div onclick="abrirLightbox('+i+')" style="cursor:pointer;overflow:hidden;border-radius:10px;aspect-ratio:4/3;background:#e2e8f0">'
+            +'<img src="'+img.url+'" alt="'+(img.caption||'')+'" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:.3s" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onerror="this.parentElement.style.display='none'">'
+            +'</div>'
+            +(img.caption?'<p class="text-muted small text-center mt-1 mb-0">'+img.caption+'</p>':'')
+            +'</div>';
+        }).join('');
+      } else if(layout === 'abanico') {
+        renderAbanico(galeriaItems, grid);
+      } else if(layout === 'tira') {
+        renderTira(galeriaItems, grid);
       }
-    } catch(e) {}
-  }
-
-      // Mostrar/ocultar secciones
-      const mapa = {
-        sobreNosotros: document.querySelector('section.py-5:not(.quick-access):not(.social-section):not(.cta-section)'),
-        noticias:      document.querySelector('section.py-5[style*="background:var(--color-light)"]'),
-        redes:         document.querySelector('section.social-section'),
-        matricula:     document.querySelector('section.cta-section'),
-      };
-      Object.entries(mapa).forEach(([k, el]) => {
-        if (el && sec[k] && sec[k].activa === false) el.style.display = 'none';
-      });
-
-      // Galería
-      const secGal = sec.galeria || {};
-      if (secGal.activa && galeriaItems.length) {
-        const s = document.getElementById('seccion-galeria');
-        s.classList.remove('d-none');
-        if (secGal.titulo)    document.getElementById('galeria-titulo').textContent    = secGal.titulo;
-        if (secGal.subtitulo) document.getElementById('galeria-subtitulo').textContent = secGal.subtitulo;
-        const layout = secGal.layout || 'mosaico';
-        const grid   = document.getElementById('galeria-grid');
-        if (layout === 'mosaico') {
-          const cols  = secGal.columnas || 3;
-          const colCl = cols===2 ? 'col-6 col-md-6' : cols===4 ? 'col-6 col-md-3' : 'col-6 col-md-4';
-          grid.innerHTML = galeriaItems.map((img,i) => `
-            <div class="${colCl}">
-              <div onclick="abrirLightbox(${i})" style="cursor:pointer;overflow:hidden;border-radius:10px;aspect-ratio:4/3;background:#e2e8f0">
-                <img src="${img.url}" alt="${img.caption||''}" loading="lazy"
-                  style="width:100%;height:100%;object-fit:cover;transition:.3s ease"
-                  onmouseover="this.style.transform='scale(1.05)'"
-                  onmouseout="this.style.transform='scale(1)'"
-                  onerror="this.parentElement.style.display='none'">
-              </div>
-              ${img.caption?`<p class="text-muted small text-center mt-1 mb-0">${img.caption}</p>`:''}
-            </div>`).join('');
-        } else if (layout === 'abanico') {
-          renderAbanico(galeriaItems, grid);
-        } else if (layout === 'tira') {
-          renderTira(galeriaItems, grid);
-        }
-      }
-    } catch(e) {}
-  }
-
-  function renderModulo(m) {
-    const FONDOS = {blanco:'background:#fff', gris:'background:#f7f9fc', azul:`background:var(--color-primary);color:#fff`, dorado:`background:var(--color-secondary);color:#1a1a1a`};
-    const fondo  = FONDOS[m.datos?.fondo] || 'background:#fff';
-    switch(m.tipo) {
-      case 'texto': return `
-        <section class="py-5" style="${fondo}">
-          <div class="container text-${m.datos.alineacion||'center'}">
-            ${m.datos.titulo?`<h2 class="section-title" ${m.datos.fondo==='azul'?'style="color:#fff"':''}>${m.datos.titulo}</h2>`:''}
-            <div style="max-width:800px;margin:0 auto;font-size:1.05rem;line-height:1.8">${(m.datos.contenido||'').replace(/\n/g,'<br>')}</div>
-          </div>
-        </section>`;
-      case 'imagen-texto': return `
-        <section class="py-5">
-          <div class="container">
-            <div class="row align-items-center g-5 ${m.datos.posicion==='derecha'?'flex-row-reverse':''}">
-              <div class="col-lg-5">
-                <img src="${m.datos.imagen||''}" class="img-fluid rounded-4 shadow" alt="${m.datos.titulo||''}" style="width:100%;object-fit:cover;max-height:360px">
-              </div>
-              <div class="col-lg-7">
-                ${m.datos.titulo?`<h2 class="section-title">${m.datos.titulo}</h2>`:''}
-                <div style="font-size:1.05rem;line-height:1.8;color:var(--color-muted)">${(m.datos.contenido||'').replace(/\n/g,'<br>')}</div>
-              </div>
-            </div>
-          </div>
-        </section>`;
-      case 'video': return `
-        <section class="py-5 bg-light">
-          <div class="container">
-            ${m.datos.titulo?`<h2 class="section-title text-center mb-4">${m.datos.titulo}</h2>`:''}
-            <div class="row justify-content-center">
-              <div class="col-lg-8">
-                <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow">
-                  <iframe src="https://www.youtube.com/embed/${m.datos.video}" allowfullscreen loading="lazy"></iframe>
-                </div>
-                ${m.datos.contenido?`<p class="text-center text-muted mt-3">${m.datos.contenido}</p>`:''}
-              </div>
-            </div>
-          </div>
-        </section>`;
-      case 'cuenta-regresiva': return `
-        <section class="py-5" style="background:linear-gradient(135deg,var(--color-dark),var(--color-primary))">
-          <div class="container text-center text-white">
-            <h2 class="mb-4" style="font-family:'Playfair Display',serif">${m.datos.titulo||'Próximo evento'}</h2>
-            <div class="d-flex justify-content-center gap-3 flex-wrap" data-countdown="${m.datos.fecha}" data-msg="${m.datos.mensaje||'¡El evento ha comenzado!'}">
-              ${['dias','horas','minutos','segundos'].map(u=>`
-                <div class="text-center p-4 rounded-4" style="background:rgba(255,255,255,.1);min-width:90px">
-                  <div class="fw-bold" style="font-size:2.5rem;font-family:'Playfair Display',serif" id="cd-${m.id}-${u}">--</div>
-                  <div style="font-size:.75rem;opacity:.7;text-transform:uppercase;letter-spacing:.1em">${u.charAt(0).toUpperCase()+u.slice(1)}</div>
-                </div>`).join('')}
-            </div>
-          </div>
-        </section>`.replace('id="cd-'+m.id+'-dias"','id="cd-'+m.id+'-dias"')
-         .replace(/cd-undefined/g,'cd-'+m.id);
-      case 'descarga': return `
-        <section class="py-5 bg-light">
-          <div class="container">
-            ${m.datos.titulo?`<h2 class="section-title text-center mb-4">${m.datos.titulo}</h2>`:''}
-            <div class="row g-3 justify-content-center">
-              ${(m.datos.archivos||[]).map(a=>`
-                <div class="col-md-5">
-                  <a href="${a.url}" target="_blank" class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm text-decoration-none hover-lift">
-                    <i class="fas fa-file-download fa-2x" style="color:var(--color-primary)"></i>
-                    <span class="fw-semibold">${a.nombre}</span>
-                    <i class="fas fa-external-link-alt ms-auto text-muted small"></i>
-                  </a>
-                </div>`).join('')}
-            </div>
-          </div>
-        </section>`;
-      case 'mapa': return `
-        <section class="py-5">
-          <div class="container">
-            ${m.datos.titulo?`<h2 class="section-title text-center mb-4">${m.datos.titulo}</h2>`:''}
-            <div class="ratio" style="--bs-aspect-ratio:40%;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-md)">
-              <iframe src="${m.datos.mapa}" allowfullscreen loading="lazy" style="border:0"></iframe>
-            </div>
-          </div>
-        </section>`;
-      case 'separador': return `
-        <div class="container"><hr style="border:none;border-top:2px solid var(--color-secondary);opacity:.3;margin:1rem 0"></div>`;
-      default: return '';
     }
-  }
+  }).catch(function(){});
+}
+cargarSecciones();
 
-  function iniciarCountdown(el) {
-    const target  = new Date(el.dataset.countdown).getTime();
-    const msg     = el.dataset.msg;
-    const modId   = el.closest('section')?.querySelector('[id^="cd-"]')?.id?.split('-')[1];
-    if (!modId) return;
-    function tick() {
-      const diff = target - Date.now();
-      if (diff <= 0) {
-        el.innerHTML = `<p class="fw-bold fs-4">${msg}</p>`;
-        return;
-      }
-      const d = Math.floor(diff/864e5);
-      const h = Math.floor((diff%864e5)/36e5);
-      const m = Math.floor((diff%36e5)/6e4);
-      const s = Math.floor((diff%6e4)/1e3);
-      [['dias',d],['horas',h],['minutos',m],['segundos',s]].forEach(([u,v])=>{
-        const e = document.getElementById('cd-'+modId+'-'+u);
-        if (e) e.textContent = String(v).padStart(2,'0');
-      });
-    }
-    tick();
-    setInterval(tick, 1000);
-  }
+// ── MÓDULOS ───────────────────────────────────────────────
+var FONDOS = {blanco:'background:#fff',gris:'background:#f7f9fc',azul:'background:var(--color-primary);color:#fff',dorado:'background:var(--color-secondary);color:#1a1a1a'};
 
-  function renderAbanico(items, container) {
-    const max   = Math.min(items.length, 7);
-    const spread = Math.min(28, 180 / max);
-    const mid   = (max - 1) / 2;
-    const cards  = items.slice(0, max).map((img, i) => {
-      const rot    = (i - mid) * spread;
-      const zIndex = max - Math.abs(i - mid);
-      return `<div class="fan-card-wrap" data-idx="${i}" style="transform:rotate(${rot}deg);z-index:${zIndex};transform-origin:50% 110%">
-        <img src="${img.url}" alt="${img.caption||''}" loading="lazy"
-          onclick="abrirLightbox(${i})"
-          onerror="this.parentElement.style.display='none'">
-        ${img.caption?`<span class="fan-cap">${img.caption}</span>`:''}
-      </div>`;
-    }).join('');
-    container.outerHTML = `<div id="galeria-grid" class="galeria-abanico col-12">
-      <div class="fan-stage" id="fan-stage">
-        <div class="fan-deck" id="fan-deck">${cards}</div>
-      </div>
-      <p class="text-center text-muted small mt-3">
-        <i class="fas fa-hand-pointer me-1"></i>Haz clic en una foto para verla completa
-      </p>
-    </div>`;
+function renderModulo(m) {
+  var d = m.datos || {};
+  var fondo = FONDOS[d.fondo] || 'background:#fff';
+  switch(m.tipo) {
+    case 'texto': return '<section class="py-5" style="'+fondo+'">'
+      +'<div class="container text-'+(d.alineacion||'center')+'">'
+      +(d.titulo?'<h2 class="section-title"'+(d.fondo==='azul'?' style="color:#fff"':'')+'>'+d.titulo+'</h2>':'')
+      +'<div style="max-width:800px;margin:0 auto;font-size:1.05rem;line-height:1.8">'+(d.contenido||'').replace(/
+/g,'<br>')+'</div>'
+      +'</div></section>';
+    case 'imagen-texto': return '<section class="py-5"><div class="container">'
+      +'<div class="row align-items-center g-5'+(d.posicion==='derecha'?' flex-row-reverse':'')+'">'
+      +'<div class="col-lg-5"><img src="'+(d.imagen||'')+'" class="img-fluid rounded-4 shadow" style="width:100%;object-fit:cover;max-height:360px"></div>'
+      +'<div class="col-lg-7">'+(d.titulo?'<h2 class="section-title">'+d.titulo+'</h2>':'')
+      +'<div style="font-size:1.05rem;line-height:1.8;color:var(--color-muted)">'+(d.contenido||'').replace(/
+/g,'<br>')+'</div>'
+      +'</div></div></div></section>';
+    case 'video': return '<section class="py-5 bg-light"><div class="container">'
+      +(d.titulo?'<h2 class="section-title text-center mb-4">'+d.titulo+'</h2>':'')
+      +'<div class="row justify-content-center"><div class="col-lg-8">'
+      +'<div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow">'
+      +'<iframe src="https://www.youtube.com/embed/'+d.video+'" allowfullscreen loading="lazy"></iframe>'
+      +'</div>'+(d.contenido?'<p class="text-center text-muted mt-3">'+d.contenido+'</p>':'')
+      +'</div></div></div></section>';
+    case 'cuenta-regresiva': return '<section class="py-5" style="background:linear-gradient(135deg,var(--color-dark),var(--color-primary))">'
+      +'<div class="container text-center text-white">'
+      +'<h2 class="mb-4" style="font-family:'Playfair Display',serif">'+(d.titulo||'Próximo evento')+'</h2>'
+      +'<div class="d-flex justify-content-center gap-3 flex-wrap" data-countdown="'+(d.fecha||'')+'" data-msg="'+(d.mensaje||'¡El evento ha comenzado!')+'">'
+      +['dias','horas','minutos','segundos'].map(function(u){
+        return '<div class="text-center p-4 rounded-4" style="background:rgba(255,255,255,.1);min-width:90px">'
+          +'<div class="fw-bold" style="font-size:2.5rem;font-family:'Playfair Display',serif" id="cd-'+m.id+'-'+u+'">--</div>'
+          +'<div style="font-size:.75rem;opacity:.7;text-transform:uppercase;letter-spacing:.1em">'+u.charAt(0).toUpperCase()+u.slice(1)+'</div>'
+          +'</div>';
+      }).join('')
+      +'</div></div></section>';
+    case 'descarga': return '<section class="py-5 bg-light"><div class="container">'
+      +(d.titulo?'<h2 class="section-title text-center mb-4">'+d.titulo+'</h2>':'')
+      +'<div class="row g-3 justify-content-center">'
+      +(d.archivos||[]).map(function(a){
+        return '<div class="col-md-5"><a href="'+a.url+'" target="_blank" class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm text-decoration-none hover-lift">'
+          +'<i class="fas fa-file-download fa-2x" style="color:var(--color-primary)"></i>'
+          +'<span class="fw-semibold">'+a.nombre+'</span>'
+          +'<i class="fas fa-external-link-alt ms-auto text-muted small"></i>'
+          +'</a></div>';
+      }).join('')
+      +'</div></div></section>';
+    case 'mapa': return '<section class="py-5"><div class="container">'
+      +(d.titulo?'<h2 class="section-title text-center mb-4">'+d.titulo+'</h2>':'')
+      +'<div class="ratio" style="--bs-aspect-ratio:40%;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-md)">'
+      +'<iframe src="'+d.mapa+'" allowfullscreen loading="lazy" style="border:0"></iframe>'
+      +'</div></div></section>';
+    case 'separador': return '<div class="container"><hr style="border:none;border-top:2px solid var(--color-secondary);opacity:.3;margin:1rem 0"></div>';
+    default: return '';
   }
+}
 
-  function renderTira(items, container) {
-    container.outerHTML = `<div id="galeria-grid" class="col-12">
-      <div style="display:flex;gap:10px;overflow-x:auto;padding:8px 0;scrollbar-width:thin">
-        ${items.map((img, i) => `
-          <div onclick="abrirLightbox(${i})" style="flex-shrink:0;width:200px;height:140px;border-radius:10px;overflow:hidden;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.1);transition:.2s"
-            onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-            <img src="${img.url}" alt="${img.caption||''}" loading="lazy"
-              style="width:100%;height:100%;object-fit:cover"
-              onerror="this.parentElement.style.display='none'">
-          </div>`).join('')}
-      </div>
-    </div>`;
-  }
-
-  function abrirLightbox(i) {
-    galeriaIdx = i;
-    const img = galeriaItems[i];
-    document.getElementById('lightbox-img').src = img.url;
-    document.getElementById('lightbox-caption').textContent = img.caption || '';
-    document.getElementById('lightbox').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-  function cerrarLightbox() {
-    document.getElementById('lightbox').style.display = 'none';
-    document.body.style.overflow = '';
-  }
-  function moverLightbox(dir) {
-    galeriaIdx = (galeriaIdx + dir + galeriaItems.length) % galeriaItems.length;
-    abrirLightbox(galeriaIdx);
-  }
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight') moverLightbox(1);
-    if (e.key === 'ArrowLeft')  moverLightbox(-1);
-    if (e.key === 'Escape')     cerrarLightbox();
+function iniciarCountdown(el) {
+  var target = new Date(el.dataset.countdown).getTime();
+  var msg    = el.dataset.msg;
+  var ids    = {};
+  el.querySelectorAll('[id^="cd-"]').forEach(function(e){
+    var parts = e.id.split('-'); ids[parts[parts.length-1]] = e.id;
   });
-
-  cargarSecciones();
-  const heroObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting) { animateCounters(); heroObserver.disconnect(); } });
-  });
-  const heroStats = document.querySelector('.hero-stats');
-  if(heroStats) heroObserver.observe(heroStats);
-
-  // Cargar noticias recientes
-  async function loadNoticiasHome() {
-    const container = document.getElementById('noticias-home');
-    try {
-      const data = await gasGet('getNoticias', { limit: 3 });
-      const noticias = data.noticias || [];
-      if (!noticias.length) {
-        container.innerHTML = `
-          <div class="col-12 text-center py-4 text-muted">
-            <i class="fas fa-newspaper fa-3x mb-2"></i>
-            <p>Pronto publicaremos noticias. Vuelve a visitar el sitio.</p>
-          </div>`;
-        return;
-      }
-      container.innerHTML = noticias.map(n => `
-        <div class="col-md-4 reveal">
-          <article class="news-card card">
-            ${n.imagen
-              ? `<img src="${n.imagen}" alt="${n.titulo}" class="card-img-top" style="height:200px;object-fit:cover">`
-              : `<div class="card-img-placeholder"><i class="fas fa-newspaper"></i></div>`}
-            <div class="card-body d-flex flex-column">
-              <div class="news-meta">
-                ${n.categoria ? `<span class="cat-badge">${n.categoria}</span>` : ''}
-                <span><i class="fas fa-calendar me-1"></i>${formatFecha(n.fecha)}</span>
-              </div>
-              <h5 class="card-title">${n.titulo}</h5>
-              <p class="card-text flex-grow-1">${truncate(n.resumen)}</p>
-              <a href="noticia.html?id=${n.id}" class="btn-read-more">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </article>
-        </div>`).join('');
-    } catch(e) {
-      container.innerHTML = `
-        <div class="col-12 text-center py-4 text-muted">
-          <i class="fas fa-newspaper fa-3x mb-2"></i>
-          <p>Las noticias estarán disponibles una vez configurado el sistema.</p>
-          <a href="admin.html" class="btn btn-sm btn-outline-primary">Ir al Admin</a>
-        </div>`;
-    }
+  function tick() {
+    var diff = target - Date.now();
+    if(diff <= 0) { el.innerHTML='<p class="fw-bold fs-4">'+msg+'</p>'; return; }
+    var vals = {dias:Math.floor(diff/864e5), horas:Math.floor((diff%864e5)/36e5), minutos:Math.floor((diff%36e5)/6e4), segundos:Math.floor((diff%6e4)/1e3)};
+    Object.keys(vals).forEach(function(k){ var e=document.getElementById(ids[k]); if(e) e.textContent=String(vals[k]).padStart(2,'0'); });
   }
-  loadNoticiasHome();
+  tick(); setInterval(tick, 1000);
+}
 
-  // Redes sociales
-  async function loadSocialLinks() {
-    try {
-      const data = await gasGet('getConfig');
-      const cfg = data.config || {};
-      if(cfg.facebook) {
-        document.getElementById('fb-link').href = cfg.facebook;
-        // Intentar embed del plugin de Facebook
-        const fbWidget = document.getElementById('fb-widget');
-        fbWidget.innerHTML = `
-          <div class="fb-page rounded-4 overflow-hidden" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)">
-            <div class="fb-page" data-href="${cfg.facebook}" data-tabs="timeline" data-width="400" data-height="300" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="false"></div>
-          </div>`;
-        // Load FB SDK
-        const script = document.createElement('script');
-        script.src = 'https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v18.0';
-        script.async = true; script.defer = true;
-        document.head.appendChild(script);
-        window.fbAsyncInit = function() { FB.init({ xfbml: true, version: 'v18.0' }); };
-      }
-      if(cfg.instagram) document.getElementById('ig-link').href = cfg.instagram;
-    } catch(e) {}
-  }
-  loadSocialLinks();
+// ── ABANICO ───────────────────────────────────────────────
+function renderAbanico(items, container) {
+  var max    = Math.min(items.length, 7);
+  var spread = Math.min(28, 180 / max);
+  var mid    = (max - 1) / 2;
+  var cards  = items.slice(0, max).map(function(img, i) {
+    var rot    = (i - mid) * spread;
+    var zIdx   = max - Math.abs(i - mid);
+    return '<div class="fan-card-wrap" style="transform:rotate('+rot+'deg);z-index:'+zIdx+';transform-origin:50% 110%">'
+      +'<img src="'+img.url+'" alt="'+(img.caption||'')+'" loading="lazy" onclick="abrirLightbox('+i+')" onerror="this.parentElement.style.display='none'">'
+      +(img.caption?'<span class="fan-cap">'+img.caption+'</span>':'')
+      +'</div>';
+  }).join('');
+  container.outerHTML = '<div id="galeria-grid" class="galeria-abanico col-12">'
+    +'<div class="fan-stage"><div class="fan-deck">'+cards+'</div></div>'
+    +'<p class="text-center text-muted small mt-3"><i class="fas fa-hand-pointer me-1"></i>Haz clic en una foto para verla completa</p>'
+    +'</div>';
+}
+
+// ── TIRA ──────────────────────────────────────────────────
+function renderTira(items, container) {
+  container.outerHTML = '<div id="galeria-grid" class="col-12">'
+    +'<div style="display:flex;gap:10px;overflow-x:auto;padding:8px 0;scrollbar-width:thin">'
+    +items.map(function(img,i){
+      return '<div onclick="abrirLightbox('+i+')" style="flex-shrink:0;width:200px;height:140px;border-radius:10px;overflow:hidden;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.1);transition:.2s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">'
+        +'<img src="'+img.url+'" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'">'
+        +'</div>';
+    }).join('')
+    +'</div></div>';
+}
+
+// ── LIGHTBOX ──────────────────────────────────────────────
+function abrirLightbox(i) {
+  galeriaIdx = i;
+  var img = galeriaItems[i];
+  document.getElementById('lightbox-img').src = img.url;
+  document.getElementById('lightbox-caption').textContent = img.caption || '';
+  document.getElementById('lightbox').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function cerrarLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function moverLightbox(dir) {
+  galeriaIdx = (galeriaIdx + dir + galeriaItems.length) % galeriaItems.length;
+  abrirLightbox(galeriaIdx);
+}
+document.addEventListener('keydown', function(e) {
+  if(e.key==='ArrowRight') moverLightbox(1);
+  if(e.key==='ArrowLeft')  moverLightbox(-1);
+  if(e.key==='Escape')     cerrarLightbox();
+});
 </script>
 </body>
 </html>
