@@ -279,7 +279,7 @@
       }
       container.innerHTML = plats.map((p,i) => `
         <div class="col-6 col-md-4 col-lg-2">
-          <a href="plataformas.html" class="platform-card reveal" title="${p.nombre}">
+          <a href="plataformas.html" class="platform-card" title="${p.nombre}">
             <div class="p-icon" style="background:${COLORS_HOME[i%COLORS_HOME.length]}">
               <i class="${ICONS_HOME[i%ICONS_HOME.length]}"></i>
             </div>
@@ -288,7 +288,7 @@
           </a>
         </div>`).join('') + `
         <div class="col-6 col-md-4 col-lg-2">
-          <a href="plataformas.html" class="platform-card reveal" style="border:2px dashed #e2e8f0">
+          <a href="plataformas.html" class="platform-card" style="border:2px dashed #e2e8f0">
             <div class="p-icon" style="background:#607d8b"><i class="fas fa-th"></i></div>
             <span class="p-name">Ver todas</span>
             <span class="p-desc">Más plataformas</span>
