@@ -192,6 +192,30 @@
   </div>
 </section>
 
+<!-- ── MÓDULOS PERSONALIZADOS ── -->
+<div id="modulos-container"></div>
+
+<!-- ── GALERÍA ── -->
+<section id="seccion-galeria" class="py-5 d-none">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="section-badge">Galería</span>
+      <h2 class="section-title" id="galeria-titulo">Galería Fotográfica</h2>
+      <p class="section-subtitle" id="galeria-subtitulo">Momentos de nuestra comunidad educativa</p>
+    </div>
+    <div id="galeria-grid" class="row g-2"></div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column" onclick="cerrarLightbox()">
+  <button onclick="cerrarLightbox()" style="position:absolute;top:1rem;right:1.5rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer">&times;</button>
+  <button onclick="event.stopPropagation();moverLightbox(-1)" style="position:absolute;left:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer">&#8249;</button>
+  <button onclick="event.stopPropagation();moverLightbox(1)"  style="position:absolute;right:1rem;background:none;border:none;color:white;font-size:2rem;cursor:pointer">&#8250;</button>
+  <img id="lightbox-img" src="" style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:8px">
+  <p id="lightbox-caption" style="color:rgba(255,255,255,.7);margin-top:.75rem;font-size:.9rem"></p>
+</div>
+
 <!-- ── REDES SOCIALES ── -->
 <section class="social-section py-5">
   <div class="container">
@@ -299,6 +323,233 @@
     }
   }
   loadPlataformasHome();
+
+  // Cargar secciones y galería
+  let galeriaItems = [], galeriaIdx = 0;
+
+  async function cargarSecciones() {
+    try {
+      const [ds, dg, dm] = await Promise.all([gasGet('getSecciones'), gasGet('getGaleria'), gasGet('getModulos')]);
+      const sec = ds.secciones || {};
+      galeriaItems = dg.galeria || [];
+      const modulos = (dm.modulos || []).filter(m => m.activo);
+
+      // Renderizar módulos personalizados
+      const mc = document.getElementById('modulos-container');
+      if (mc && modulos.length) {
+        mc.innerHTML = modulos.map(m => renderModulo(m)).join('');
+        // Iniciar cuentas regresivas
+        document.querySelectorAll('[data-countdown]').forEach(el => iniciarCountdown(el));
+      }
+
+      // Mostrar/ocultar secciones
+      const mapa = {
+        sobreNosotros: document.querySelector('section.py-5:not(.quick-access):not(.social-section):not(.cta-section)'),
+        noticias:      document.querySelector('section.py-5[style*="background:var(--color-light)"]'),
+        redes:         document.querySelector('section.social-section'),
+        matricula:     document.querySelector('section.cta-section'),
+      };
+      Object.entries(mapa).forEach(([k, el]) => {
+        if (el && sec[k] && sec[k].activa === false) el.style.display = 'none';
+      });
+
+      // Galería
+      const secGal = sec.galeria || {};
+      if (secGal.activa && galeriaItems.length) {
+        const s = document.getElementById('seccion-galeria');
+        s.classList.remove('d-none');
+        if (secGal.titulo)    document.getElementById('galeria-titulo').textContent    = secGal.titulo;
+        if (secGal.subtitulo) document.getElementById('galeria-subtitulo').textContent = secGal.subtitulo;
+        const layout = secGal.layout || 'mosaico';
+        const grid   = document.getElementById('galeria-grid');
+        if (layout === 'mosaico') {
+          const cols  = secGal.columnas || 3;
+          const colCl = cols===2 ? 'col-6 col-md-6' : cols===4 ? 'col-6 col-md-3' : 'col-6 col-md-4';
+          grid.innerHTML = galeriaItems.map((img,i) => `
+            <div class="${colCl}">
+              <div onclick="abrirLightbox(${i})" style="cursor:pointer;overflow:hidden;border-radius:10px;aspect-ratio:4/3;background:#e2e8f0">
+                <img src="${img.url}" alt="${img.caption||''}" loading="lazy"
+                  style="width:100%;height:100%;object-fit:cover;transition:.3s ease"
+                  onmouseover="this.style.transform='scale(1.05)'"
+                  onmouseout="this.style.transform='scale(1)'"
+                  onerror="this.parentElement.style.display='none'">
+              </div>
+              ${img.caption?`<p class="text-muted small text-center mt-1 mb-0">${img.caption}</p>`:''}
+            </div>`).join('');
+        } else if (layout === 'abanico') {
+          renderAbanico(galeriaItems, grid);
+        } else if (layout === 'tira') {
+          renderTira(galeriaItems, grid);
+        }
+      }
+    } catch(e) {}
+  }
+
+  function renderModulo(m) {
+    const FONDOS = {blanco:'background:#fff', gris:'background:#f7f9fc', azul:`background:var(--color-primary);color:#fff`, dorado:`background:var(--color-secondary);color:#1a1a1a`};
+    const fondo  = FONDOS[m.datos?.fondo] || 'background:#fff';
+    switch(m.tipo) {
+      case 'texto': return `
+        <section class="py-5" style="${fondo}">
+          <div class="container text-${m.datos.alineacion||'center'}">
+            ${m.datos.titulo?`<h2 class="section-title" ${m.datos.fondo==='azul'?'style="color:#fff"':''}>${m.datos.titulo}</h2>`:''}
+            <div style="max-width:800px;margin:0 auto;font-size:1.05rem;line-height:1.8">${(m.datos.contenido||'').replace(/\n/g,'<br>')}</div>
+          </div>
+        </section>`;
+      case 'imagen-texto': return `
+        <section class="py-5">
+          <div class="container">
+            <div class="row align-items-center g-5 ${m.datos.posicion==='derecha'?'flex-row-reverse':''}">
+              <div class="col-lg-5">
+                <img src="${m.datos.imagen||''}" class="img-fluid rounded-4 shadow" alt="${m.datos.titulo||''}" style="width:100%;object-fit:cover;max-height:360px">
+              </div>
+              <div class="col-lg-7">
+                ${m.datos.titulo?`<h2 class="section-title">${m.datos.titulo}</h2>`:''}
+                <div style="font-size:1.05rem;line-height:1.8;color:var(--color-muted)">${(m.datos.contenido||'').replace(/\n/g,'<br>')}</div>
+              </div>
+            </div>
+          </div>
+        </section>`;
+      case 'video': return `
+        <section class="py-5 bg-light">
+          <div class="container">
+            ${m.datos.titulo?`<h2 class="section-title text-center mb-4">${m.datos.titulo}</h2>`:''}
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow">
+                  <iframe src="https://www.youtube.com/embed/${m.datos.video}" allowfullscreen loading="lazy"></iframe>
+                </div>
+                ${m.datos.contenido?`<p class="text-center text-muted mt-3">${m.datos.contenido}</p>`:''}
+              </div>
+            </div>
+          </div>
+        </section>`;
+      case 'cuenta-regresiva': return `
+        <section class="py-5" style="background:linear-gradient(135deg,var(--color-dark),var(--color-primary))">
+          <div class="container text-center text-white">
+            <h2 class="mb-4" style="font-family:'Playfair Display',serif">${m.datos.titulo||'Próximo evento'}</h2>
+            <div class="d-flex justify-content-center gap-3 flex-wrap" data-countdown="${m.datos.fecha}" data-msg="${m.datos.mensaje||'¡El evento ha comenzado!'}">
+              ${['dias','horas','minutos','segundos'].map(u=>`
+                <div class="text-center p-4 rounded-4" style="background:rgba(255,255,255,.1);min-width:90px">
+                  <div class="fw-bold" style="font-size:2.5rem;font-family:'Playfair Display',serif" id="cd-${m.id}-${u}">--</div>
+                  <div style="font-size:.75rem;opacity:.7;text-transform:uppercase;letter-spacing:.1em">${u.charAt(0).toUpperCase()+u.slice(1)}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </section>`.replace('id="cd-'+m.id+'-dias"','id="cd-'+m.id+'-dias"')
+         .replace(/cd-undefined/g,'cd-'+m.id);
+      case 'descarga': return `
+        <section class="py-5 bg-light">
+          <div class="container">
+            ${m.datos.titulo?`<h2 class="section-title text-center mb-4">${m.datos.titulo}</h2>`:''}
+            <div class="row g-3 justify-content-center">
+              ${(m.datos.archivos||[]).map(a=>`
+                <div class="col-md-5">
+                  <a href="${a.url}" target="_blank" class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm text-decoration-none hover-lift">
+                    <i class="fas fa-file-download fa-2x" style="color:var(--color-primary)"></i>
+                    <span class="fw-semibold">${a.nombre}</span>
+                    <i class="fas fa-external-link-alt ms-auto text-muted small"></i>
+                  </a>
+                </div>`).join('')}
+            </div>
+          </div>
+        </section>`;
+      case 'mapa': return `
+        <section class="py-5">
+          <div class="container">
+            ${m.datos.titulo?`<h2 class="section-title text-center mb-4">${m.datos.titulo}</h2>`:''}
+            <div class="ratio" style="--bs-aspect-ratio:40%;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-md)">
+              <iframe src="${m.datos.mapa}" allowfullscreen loading="lazy" style="border:0"></iframe>
+            </div>
+          </div>
+        </section>`;
+      case 'separador': return `
+        <div class="container"><hr style="border:none;border-top:2px solid var(--color-secondary);opacity:.3;margin:1rem 0"></div>`;
+      default: return '';
+    }
+  }
+
+  function iniciarCountdown(el) {
+    const target  = new Date(el.dataset.countdown).getTime();
+    const msg     = el.dataset.msg;
+    const modId   = el.closest('section')?.querySelector('[id^="cd-"]')?.id?.split('-')[1];
+    if (!modId) return;
+    function tick() {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        el.innerHTML = `<p class="fw-bold fs-4">${msg}</p>`;
+        return;
+      }
+      const d = Math.floor(diff/864e5);
+      const h = Math.floor((diff%864e5)/36e5);
+      const m = Math.floor((diff%36e5)/6e4);
+      const s = Math.floor((diff%6e4)/1e3);
+      [['dias',d],['horas',h],['minutos',m],['segundos',s]].forEach(([u,v])=>{
+        const e = document.getElementById('cd-'+modId+'-'+u);
+        if (e) e.textContent = String(v).padStart(2,'0');
+      });
+    }
+    tick();
+    setInterval(tick, 1000);
+  }
+    const max   = Math.min(items.length, 7);
+    const spread = Math.min(28, 180 / max);
+    const mid   = (max - 1) / 2;
+    const cards  = items.slice(0, max).map((img, i) => {
+      const rot    = (i - mid) * spread;
+      const zIndex = max - Math.abs(i - mid);
+      return `<div class="fan-card-wrap" data-idx="${i}" style="transform:rotate(${rot}deg);z-index:${zIndex};transform-origin:50% 110%">
+        <img src="${img.url}" alt="${img.caption||''}" loading="lazy"
+          onclick="abrirLightbox(${i})"
+          onerror="this.parentElement.style.display='none'">
+        ${img.caption?`<span class="fan-cap">${img.caption}</span>`:''}
+      </div>`;
+    }).join('');
+    container.outerHTML = `<div id="galeria-grid" class="galeria-abanico col-12">
+      <div class="fan-stage" id="fan-stage">
+        <div class="fan-deck" id="fan-deck">${cards}</div>
+      </div>
+      <p class="text-center text-muted small mt-3">
+        <i class="fas fa-hand-pointer me-1"></i>Haz clic en una foto para verla completa
+      </p>
+    </div>`;
+  }
+
+  function renderTira(items, container) {
+    container.outerHTML = `<div id="galeria-grid" class="col-12">
+      <div style="display:flex;gap:10px;overflow-x:auto;padding:8px 0;scrollbar-width:thin">
+        ${items.map((img, i) => `
+          <div onclick="abrirLightbox(${i})" style="flex-shrink:0;width:200px;height:140px;border-radius:10px;overflow:hidden;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.1);transition:.2s"
+            onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+            <img src="${img.url}" alt="${img.caption||''}" loading="lazy"
+              style="width:100%;height:100%;object-fit:cover"
+              onerror="this.parentElement.style.display='none'">
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }
+    galeriaIdx = i;
+    const img = galeriaItems[i];
+    document.getElementById('lightbox-img').src = img.url;
+    document.getElementById('lightbox-caption').textContent = img.caption || '';
+    document.getElementById('lightbox').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function cerrarLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function moverLightbox(dir) {
+    galeriaIdx = (galeriaIdx + dir + galeriaItems.length) % galeriaItems.length;
+    abrirLightbox(galeriaIdx);
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') moverLightbox(1);
+    if (e.key === 'ArrowLeft')  moverLightbox(-1);
+    if (e.key === 'Escape')     cerrarLightbox();
+  });
+
+  cargarSecciones();
   const heroObserver = new IntersectionObserver((entries) => {
     entries.forEach(e => { if(e.isIntersecting) { animateCounters(); heroObserver.disconnect(); } });
   });

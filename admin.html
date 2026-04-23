@@ -52,6 +52,7 @@
 
       <div class="nav-section admin-only">Sistema</div>
       <a onclick="showTab('usuarios')" data-tab="usuarios" class="admin-only"><i class="fas fa-user-cog me-2"></i>Usuarios</a>
+      <a onclick="showTab('modulos')" data-tab="modulos" class="admin-only"><i class="fas fa-puzzle-piece me-2"></i>Módulos Extra</a>
       <a onclick="showTab('paginas')" data-tab="paginas" class="admin-only"><i class="fas fa-edit me-2"></i>Páginas</a>
       <a onclick="showTab('configuracion')" data-tab="configuracion" class="admin-only"><i class="fas fa-cog me-2"></i>Configuración</a>
       <a onclick="showTab('password')" data-tab="password"><i class="fas fa-key me-2"></i>Mi Contraseña</a>
@@ -350,6 +351,53 @@
         </div>
       </div>
 
+      <!-- MÓDULOS EXTRA -->
+      <div id="tab-modulos" class="tab-pane">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="admin-card">
+              <div class="card-header">Agregar Módulo</div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Tipo de módulo</label>
+                  <select id="mod-tipo" class="form-select" onchange="mostrarFormModulo()">
+                    <option value="">— Seleccionar tipo —</option>
+                    <option value="texto">📝 Bloque de texto</option>
+                    <option value="imagen-texto">🖼️ Imagen + texto</option>
+                    <option value="video">▶️ Video YouTube</option>
+                    <option value="cuenta-regresiva">⏱️ Cuenta regresiva</option>
+                    <option value="descarga">📥 Bloque de descarga</option>
+                    <option value="mapa">📍 Mapa</option>
+                    <option value="separador">— Separador</option>
+                  </select>
+                </div>
+                <div id="mod-form-container"></div>
+                <div id="mod-form-actions" class="d-none mt-3">
+                  <button class="btn btn-primary w-100" onclick="agregarModulo()"><i class="fas fa-plus me-2"></i>Agregar módulo</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="admin-card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Módulos activos en la página de inicio</span>
+                <button class="btn btn-sm btn-primary" onclick="guardarModulos()"><i class="fas fa-save me-1"></i>Guardar orden</button>
+              </div>
+              <div class="card-body p-0">
+                <div id="modulos-lista" class="p-3">
+                  <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="alert border-0 rounded-3 mt-3" style="background:#e8f4fd">
+              <i class="fas fa-info-circle me-2" style="color:#1B4F8A"></i>
+              Los módulos aparecen en la página principal <strong>debajo de las secciones fijas</strong>, en el orden que configures aquí. Puedes reordenarlos arrastrando.
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- PÁGINAS -->
       <div id="tab-paginas" class="tab-pane">
         <div class="admin-card mb-4">
@@ -437,8 +485,8 @@ function initApp() {
 if(currentUser && sessionToken) initApp();
 
 // ── TABS ─────────────────────────────────────────────────
-var TITULOS = {dashboard:'Dashboard',noticias:'Noticias',avisos:'Avisos',documentos:'Documentos',equipo:'Equipo',calendario:'Calendario',academico:'Académico',plataformas:'Plataformas',paginas:'Editar Páginas',contactos:'Mensajes',usuarios:'Usuarios',configuracion:'Configuración',password:'Mi Contraseña'};
-var LOADERS = {noticias:loadNoticias,avisos:loadAvisos,documentos:loadDocs,equipo:loadEquipo,calendario:loadCal,plataformas:loadPlataformasAdmin,contactos:loadContactos,usuarios:loadUsuarios,configuracion:loadConfigAdmin,academico:loadAcademico,paginas:loadPaginas};
+var TITULOS = {dashboard:'Dashboard',noticias:'Noticias',avisos:'Avisos',documentos:'Documentos',equipo:'Equipo',calendario:'Calendario',academico:'Académico',plataformas:'Plataformas',paginas:'Editar Páginas',modulos:'Módulos Extra',contactos:'Mensajes',usuarios:'Usuarios',configuracion:'Configuración',password:'Mi Contraseña'};
+var LOADERS = {noticias:loadNoticias,avisos:loadAvisos,documentos:loadDocs,equipo:loadEquipo,calendario:loadCal,plataformas:loadPlataformasAdmin,contactos:loadContactos,usuarios:loadUsuarios,configuracion:loadConfigAdmin,academico:loadAcademico,paginas:loadPaginas,modulos:loadModulos};
 
 function showTab(name) {
   document.querySelectorAll('.tab-pane').forEach(function(t){ t.classList.remove('active'); });
@@ -721,25 +769,91 @@ async function loadPaginaEditor() {
 function renderEditorPagina(pagina, c) {
   const EDITORS = {
     inicio: `
-      <div class="row g-4">
-        <div class="col-12"><h6 class="fw-bold text-muted text-uppercase small mb-3"><i class="fas fa-home me-1"></i> Sección Hero (portada)</h6></div>
-        <div class="col-md-6"><label class="form-label fw-semibold">Título principal</label><input type="text" class="form-control" id="p-hero-titulo" value="${esc(c.heroTitulo||'')}" placeholder="Formando ciudadanos para el futuro"></div>
-        <div class="col-md-6"><label class="form-label fw-semibold">Palabra destacada (en amarillo)</label><input type="text" class="form-control" id="p-hero-span" value="${esc(c.heroSpan||'')}" placeholder="futuro"></div>
-        <div class="col-12"><label class="form-label fw-semibold">Descripción (bajo el título)</label><textarea class="form-control" id="p-hero-desc" rows="2">${esc(c.heroDesc||'')}</textarea></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Estadística 1 — número</label><input type="number" class="form-control" id="p-stat1-n" value="${esc(c.stat1n||'8')}" placeholder="8"></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Estadística 1 — etiqueta</label><input type="text" class="form-control" id="p-stat1-l" value="${esc(c.stat1l||'Niveles')}" placeholder="Niveles"></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Sufijo (°, %, etc.)</label><input type="text" class="form-control" id="p-stat1-s" value="${esc(c.stat1s||'°')}" placeholder="°"></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Estadística 2 — número</label><input type="number" class="form-control" id="p-stat2-n" value="${esc(c.stat2n||'154')}"></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Estadística 2 — etiqueta</label><input type="text" class="form-control" id="p-stat2-l" value="${esc(c.stat2l||'Estudiantes')}"></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Sufijo 2</label><input type="text" class="form-control" id="p-stat2-s" value="${esc(c.stat2s||'')}"></div>
-        <div class="col-12"><hr><h6 class="fw-bold text-muted text-uppercase small mt-2 mb-3"><i class="fas fa-info-circle me-1"></i> Sección "Sobre Nosotros"</h6></div>
-        <div class="col-12"><label class="form-label fw-semibold">Título</label><input type="text" class="form-control" id="p-sobre-titulo" value="${esc(c.sobreTitulo||'')}" placeholder="Una escuela comprometida con la comunidad"></div>
-        <div class="col-12"><label class="form-label fw-semibold">Párrafo 1</label><textarea class="form-control" id="p-sobre-p1" rows="3">${esc(c.sobreP1||'')}</textarea></div>
-        <div class="col-12"><label class="form-label fw-semibold">Párrafo 2</label><textarea class="form-control" id="p-sobre-p2" rows="3">${esc(c.sobreP2||'')}</textarea></div>
-        <div class="col-12"><hr><h6 class="fw-bold text-muted text-uppercase small mt-2 mb-3"><i class="fas fa-graduation-cap me-1"></i> Sección Llamada a Matrícula</h6></div>
-        <div class="col-md-6"><label class="form-label fw-semibold">Título CTA</label><input type="text" class="form-control" id="p-cta-titulo" value="${esc(c.ctaTitulo||'')}" placeholder="¿Quieres matricular a tu hijo/a?"></div>
-        <div class="col-md-6"><label class="form-label fw-semibold">Texto CTA</label><input type="text" class="form-control" id="p-cta-texto" value="${esc(c.ctaTexto||'')}" placeholder="Conoce el proceso de matrícula..."></div>
-      </div>`,
+      <ul class="nav nav-tabs mb-4" id="inicio-tabs">
+        <li class="nav-item"><button class="nav-link active" onclick="inicioTab('textos',this)"><i class="fas fa-font me-1"></i>Textos</button></li>
+        <li class="nav-item"><button class="nav-link" onclick="inicioTab('secciones',this)"><i class="fas fa-th-large me-1"></i>Secciones</button></li>
+        <li class="nav-item"><button class="nav-link" onclick="inicioTab('galeria',this)"><i class="fas fa-images me-1"></i>Galería</button></li>
+      </ul>
+
+      <!-- TEXTOS -->
+      <div id="inicio-textos">
+        <h6 class="fw-bold text-muted text-uppercase small mb-3">Hero (portada)</h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-8"><label class="form-label fw-semibold">Título principal</label><input type="text" class="form-control" id="p-hero-titulo" value="${esc(c.heroTitulo||'')}" placeholder="Formando ciudadanos para el futuro"></div>
+          <div class="col-md-4"><label class="form-label fw-semibold">Palabra en amarillo</label><input type="text" class="form-control" id="p-hero-span" value="${esc(c.heroSpan||'')}" placeholder="futuro"></div>
+          <div class="col-12"><label class="form-label fw-semibold">Descripción</label><textarea class="form-control" id="p-hero-desc" rows="2">${esc(c.heroDesc||'')}</textarea></div>
+        </div>
+        <h6 class="fw-bold text-muted text-uppercase small mb-3">Estadísticas del hero</h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-2"><label class="form-label fw-semibold small">Número 1</label><input type="number" class="form-control" id="p-stat1-n" value="${esc(c.stat1n||'8')}"></div>
+          <div class="col-md-3"><label class="form-label fw-semibold small">Etiqueta 1</label><input type="text" class="form-control" id="p-stat1-l" value="${esc(c.stat1l||'Niveles')}"></div>
+          <div class="col-md-2"><label class="form-label fw-semibold small">Sufijo 1</label><input type="text" class="form-control" id="p-stat1-s" value="${esc(c.stat1s||'°')}"></div>
+          <div class="col-md-2"><label class="form-label fw-semibold small">Número 2</label><input type="number" class="form-control" id="p-stat2-n" value="${esc(c.stat2n||'154')}"></div>
+          <div class="col-md-3"><label class="form-label fw-semibold small">Etiqueta 2</label><input type="text" class="form-control" id="p-stat2-l" value="${esc(c.stat2l||'Estudiantes')}"></div>
+        </div>
+        <h6 class="fw-bold text-muted text-uppercase small mb-3">Sección "Sobre Nosotros"</h6>
+        <div class="row g-3 mb-4">
+          <div class="col-12"><label class="form-label fw-semibold">Título</label><input type="text" class="form-control" id="p-sobre-titulo" value="${esc(c.sobreTitulo||'')}" placeholder="Una escuela comprometida con la comunidad"></div>
+          <div class="col-12"><label class="form-label fw-semibold">Párrafo 1</label><textarea class="form-control" id="p-sobre-p1" rows="3">${esc(c.sobreP1||'')}</textarea></div>
+          <div class="col-12"><label class="form-label fw-semibold">Párrafo 2</label><textarea class="form-control" id="p-sobre-p2" rows="3">${esc(c.sobreP2||'')}</textarea></div>
+        </div>
+        <h6 class="fw-bold text-muted text-uppercase small mb-3">Llamada a Matrícula</h6>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label fw-semibold">Título</label><input type="text" class="form-control" id="p-cta-titulo" value="${esc(c.ctaTitulo||'')}"></div>
+          <div class="col-md-6"><label class="form-label fw-semibold">Texto</label><input type="text" class="form-control" id="p-cta-texto" value="${esc(c.ctaTexto||'')}"></div>
+        </div>
+      </div>
+
+      <!-- SECCIONES -->
+      <div id="inicio-secciones" class="d-none">
+        <p class="text-muted mb-4">Activa o desactiva secciones de la página principal. Los cambios se ven de inmediato.</p>
+        <div id="secciones-editor" class="d-flex flex-column gap-3"></div>
+      </div>
+
+      <!-- GALERÍA -->
+      <div id="inicio-galeria" class="d-none">
+        <div class="row g-3 mb-4">
+          <div class="col-md-6"><label class="form-label fw-semibold">Título de la galería</label><input type="text" class="form-control" id="gal-titulo" placeholder="Galería Fotográfica"></div>
+          <div class="col-md-6"><label class="form-label fw-semibold">Subtítulo</label><input type="text" class="form-control" id="gal-subtitulo" placeholder="Momentos de nuestra comunidad"></div>
+          <div class="col-md-5">
+            <label class="form-label fw-semibold">Diseño de la galería</label>
+            <select id="gal-layout" class="form-select" onchange="toggleColsOption()">
+              <option value="mosaico">Mosaico (cuadrícula)</option>
+              <option value="abanico">Abanico (naipes desplegables)</option>
+              <option value="tira">Tira horizontal (scroll)</option>
+            </select>
+          </div>
+          <div class="col-md-3" id="cols-option">
+            <label class="form-label fw-semibold">Columnas</label>
+            <select id="gal-cols" class="form-select">
+              <option value="2">2 columnas</option>
+              <option value="3" selected>3 columnas</option>
+              <option value="4">4 columnas</option>
+            </select>
+          </div>
+          <div class="col-md-4 d-flex align-items-end pb-1">
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" id="gal-activa" style="width:3em;height:1.5em">
+              <label class="form-check-label ms-2 fw-semibold" for="gal-activa">Mostrar en página principal</label>
+            </div>
+          </div>
+        </div>
+        <div class="card border-0 bg-light p-3 mb-3">
+          <h6 class="fw-semibold mb-2"><i class="fas fa-plus me-2"></i>Agregar foto</h6>
+          <div class="row g-2 align-items-end">
+            <div class="col-md-7"><label class="form-label small fw-semibold">URL de la imagen</label>
+              <input type="url" id="gal-nueva-url" class="form-control" placeholder="https://drive.google.com/... o https://imgur.com/...">
+              <small class="text-muted">Usa Google Drive (compartir → "Cualquier persona con el enlace") y copia el link directo</small>
+            </div>
+            <div class="col-md-3"><label class="form-label small fw-semibold">Descripción (opcional)</label><input type="text" id="gal-nueva-cap" class="form-control" placeholder="Acto de egreso 2024"></div>
+            <div class="col-md-2"><button class="btn btn-primary w-100" onclick="agregarFoto()"><i class="fas fa-plus me-1"></i>Agregar</button></div>
+          </div>
+        </div>
+        <div id="gal-lista" class="row g-3"></div>
+        <div class="mt-4">
+          <button class="btn btn-primary btn-lg px-5" onclick="guardarGaleria()"><i class="fas fa-save me-2"></i>Guardar Galería</button>
+        </div>
+      </div>`
     matricula: `
       <div class="row g-4">
         <div class="col-12"><h6 class="fw-bold text-muted text-uppercase small mb-3"><i class="fas fa-graduation-cap me-1"></i> Encabezado</h6></div>
@@ -819,6 +933,265 @@ async function savePagina() {
   const r = await gasAuth('savePagina', {pagina, contenido: JSON.stringify(contenido)});
   if(r.ok) showMsg('Página guardada. Los cambios se verán en el sitio inmediatamente.');
   else showMsg(r.error||'Error al guardar','danger');
+}
+
+// ── MÓDULOS EXTRA ─────────────────────────────────────────
+var modulosAdmin = [];
+
+const MOD_TIPOS = {
+  texto:           {label:'Bloque de texto',     icon:'fas fa-align-left',   color:'#1B4F8A'},
+  'imagen-texto':  {label:'Imagen + texto',      icon:'fas fa-image',        color:'#2A6B3C'},
+  video:           {label:'Video YouTube',       icon:'fab fa-youtube',      color:'#e74c3c'},
+  'cuenta-regresiva':{label:'Cuenta regresiva',  icon:'fas fa-hourglass-half',color:'#D4A843'},
+  descarga:        {label:'Descarga',            icon:'fas fa-file-download', color:'#9b59b6'},
+  mapa:            {label:'Mapa',                icon:'fas fa-map-marker-alt',color:'#e67e22'},
+  separador:       {label:'Separador',           icon:'fas fa-minus',        color:'#aaa'},
+};
+
+const MOD_FORMS = {
+  texto: `
+    <div class="mb-2"><label class="form-label fw-semibold small">Título (opcional)</label><input type="text" id="mf-titulo" class="form-control form-control-sm" placeholder="Ej: Bienvenidos a nuestra escuela"></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Contenido *</label><textarea id="mf-contenido" class="form-control form-control-sm" rows="4" placeholder="Escribe el texto aquí..."></textarea></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Alineación</label>
+      <select id="mf-alineacion" class="form-select form-select-sm"><option value="left">Izquierda</option><option value="center" selected>Centro</option><option value="right">Derecha</option></select></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Fondo</label>
+      <select id="mf-fondo" class="form-select form-select-sm"><option value="blanco">Blanco</option><option value="gris">Gris claro</option><option value="azul">Azul institucional</option><option value="dorado">Dorado</option></select></div>`,
+  'imagen-texto': `
+    <div class="mb-2"><label class="form-label fw-semibold small">Título</label><input type="text" id="mf-titulo" class="form-control form-control-sm"></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Texto</label><textarea id="mf-contenido" class="form-control form-control-sm" rows="3"></textarea></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">URL de la imagen</label><input type="url" id="mf-imagen" class="form-control form-control-sm" placeholder="https://..."></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Posición imagen</label>
+      <select id="mf-posicion" class="form-select form-select-sm"><option value="izquierda">Izquierda</option><option value="derecha">Derecha</option></select></div>`,
+  video: `
+    <div class="mb-2"><label class="form-label fw-semibold small">Título (opcional)</label><input type="text" id="mf-titulo" class="form-control form-control-sm"></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">URL o ID de YouTube *</label><input type="text" id="mf-video" class="form-control form-control-sm" placeholder="https://youtube.com/watch?v=... o solo el ID"></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Descripción</label><textarea id="mf-contenido" class="form-control form-control-sm" rows="2"></textarea></div>`,
+  'cuenta-regresiva': `
+    <div class="mb-2"><label class="form-label fw-semibold small">Título del evento *</label><input type="text" id="mf-titulo" class="form-control form-control-sm" placeholder="Ej: Inicio año escolar 2026"></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Fecha del evento *</label><input type="datetime-local" id="mf-fecha" class="form-control form-control-sm"></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Mensaje al llegar la fecha</label><input type="text" id="mf-mensaje" class="form-control form-control-sm" placeholder="¡El evento ya comenzó!"></div>`,
+  descarga: `
+    <div class="mb-2"><label class="form-label fw-semibold small">Título de la sección</label><input type="text" id="mf-titulo" class="form-control form-control-sm" placeholder="Ej: Documentos importantes"></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">Archivos (uno por línea: Nombre | URL)</label>
+      <textarea id="mf-archivos" class="form-control form-control-sm" rows="4" placeholder="Reglamento Interno | https://drive.google.com/...&#10;Calendario escolar | https://drive.google.com/..."></textarea></div>`,
+  mapa: `
+    <div class="mb-2"><label class="form-label fw-semibold small">Título (opcional)</label><input type="text" id="mf-titulo" class="form-control form-control-sm" placeholder="Cómo llegar"></div>
+    <div class="mb-2"><label class="form-label fw-semibold small">URL embed de Google Maps *</label>
+      <input type="url" id="mf-mapa" class="form-control form-control-sm" placeholder="https://www.google.com/maps/embed?pb=...">
+      <small class="text-muted">En Google Maps → Compartir → Insertar → copiar la URL del src</small></div>`,
+  separador: `<p class="text-muted small">Agrega una línea divisoria entre secciones.</p>`,
+};
+
+function mostrarFormModulo() {
+  const tipo = document.getElementById('mod-tipo').value;
+  const fc   = document.getElementById('mod-form-container');
+  const fa   = document.getElementById('mod-form-actions');
+  if (!tipo) { fc.innerHTML = ''; fa.classList.add('d-none'); return; }
+  fc.innerHTML = MOD_FORMS[tipo] || '';
+  fa.classList.remove('d-none');
+}
+
+function agregarModulo() {
+  const tipo = document.getElementById('mod-tipo').value;
+  if (!tipo) return;
+  const mod = { id: Date.now().toString(), tipo, activo: true, datos: {} };
+  const get  = id => { const e=document.getElementById(id); return e?e.value:''; };
+  if (tipo === 'texto') {
+    mod.datos = { titulo: get('mf-titulo'), contenido: get('mf-contenido'), alineacion: get('mf-alineacion'), fondo: get('mf-fondo') };
+    if (!mod.datos.contenido) { showMsg('El contenido es requerido','danger'); return; }
+  } else if (tipo === 'imagen-texto') {
+    mod.datos = { titulo: get('mf-titulo'), contenido: get('mf-contenido'), imagen: get('mf-imagen'), posicion: get('mf-posicion') };
+  } else if (tipo === 'video') {
+    const raw = get('mf-video');
+    const vid = raw.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1] || raw;
+    mod.datos = { titulo: get('mf-titulo'), video: vid, contenido: get('mf-contenido') };
+    if (!vid) { showMsg('URL de YouTube requerida','danger'); return; }
+  } else if (tipo === 'cuenta-regresiva') {
+    mod.datos = { titulo: get('mf-titulo'), fecha: get('mf-fecha'), mensaje: get('mf-mensaje') };
+    if (!mod.datos.titulo || !mod.datos.fecha) { showMsg('Título y fecha son requeridos','danger'); return; }
+  } else if (tipo === 'descarga') {
+    const lines = get('mf-archivos').split('\n').map(l=>l.trim()).filter(Boolean);
+    mod.datos = { titulo: get('mf-titulo'), archivos: lines.map(l=>{ const p=l.split('|'); return {nombre:(p[0]||'').trim(), url:(p[1]||'').trim()}; }).filter(a=>a.nombre) };
+  } else if (tipo === 'mapa') {
+    mod.datos = { titulo: get('mf-titulo'), mapa: get('mf-mapa') };
+    if (!mod.datos.mapa) { showMsg('URL del mapa requerida','danger'); return; }
+  }
+  modulosAdmin.push(mod);
+  renderModulosLista();
+  document.getElementById('mod-tipo').value = '';
+  document.getElementById('mod-form-container').innerHTML = '';
+  document.getElementById('mod-form-actions').classList.add('d-none');
+  showMsg('Módulo agregado. Presiona "Guardar orden" para publicar.');
+}
+
+async function loadModulos() {
+  const d = await gasGet('getModulos');
+  modulosAdmin = d.modulos || [];
+  renderModulosLista();
+}
+
+function renderModulosLista() {
+  const c = document.getElementById('modulos-lista');
+  if (!modulosAdmin.length) {
+    c.innerHTML = `<div class="text-center py-5 text-muted">
+      <i class="fas fa-puzzle-piece fa-3x mb-3 d-block"></i>
+      <p>Sin módulos aún. Agrega uno desde el panel izquierdo.</p>
+    </div>`;
+    return;
+  }
+  c.innerHTML = modulosAdmin.map((m, i) => {
+    const info = MOD_TIPOS[m.tipo] || {label:m.tipo, icon:'fas fa-square', color:'#aaa'};
+    const label = m.datos?.titulo || info.label;
+    return `<div class="d-flex align-items-center gap-3 p-3 mb-2 bg-light rounded-3 border mod-item" data-idx="${i}">
+      <div style="cursor:grab;color:#aaa;font-size:1.2rem"><i class="fas fa-grip-vertical"></i></div>
+      <div style="background:${info.color};width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="${info.icon} text-white small"></i>
+      </div>
+      <div class="flex-grow-1">
+        <div class="fw-semibold small">${label}</div>
+        <div class="text-muted" style="font-size:.75rem">${info.label}</div>
+      </div>
+      <div class="form-check form-switch mb-0 me-2">
+        <input class="form-check-input" type="checkbox" style="width:2em;height:1.1em" ${m.activo?'checked':''} onchange="modulosAdmin[${i}].activo=this.checked">
+      </div>
+      <div class="d-flex gap-1">
+        ${i>0?`<button class="btn btn-sm btn-outline-secondary" onclick="moverMod(${i},-1)" title="Subir"><i class="fas fa-arrow-up"></i></button>`:''}
+        ${i<modulosAdmin.length-1?`<button class="btn btn-sm btn-outline-secondary" onclick="moverMod(${i},1)" title="Bajar"><i class="fas fa-arrow-down"></i></button>`:''}
+        <button class="btn btn-sm btn-outline-danger" onclick="eliminarMod(${i})"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function moverMod(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= modulosAdmin.length) return;
+  [modulosAdmin[i], modulosAdmin[j]] = [modulosAdmin[j], modulosAdmin[i]];
+  renderModulosLista();
+}
+
+function eliminarMod(i) {
+  if (!confirm('¿Eliminar este módulo?')) return;
+  modulosAdmin.splice(i, 1);
+  renderModulosLista();
+}
+
+async function guardarModulos() {
+  const r = await gasAuth('saveModulos', { modulos: JSON.stringify(modulosAdmin) });
+  if (r.ok) showMsg('Módulos guardados. Se verán en el sitio inmediatamente.');
+  else showMsg(r.error || 'Error al guardar','danger');
+}
+
+// ── GALERÍA Y SECCIONES ───────────────────────────────────
+var galeriaAdmin = [];
+var seccionesAdmin = {};
+var SECCIONES_INFO = {
+  hero:          {label:'Hero (portada)',            icon:'fas fa-home'},
+  plataformas:   {label:'Plataformas Digitales',     icon:'fas fa-th'},
+  sobreNosotros: {label:'Sobre Nosotros',            icon:'fas fa-school'},
+  noticias:      {label:'Últimas Noticias',          icon:'fas fa-newspaper'},
+  galeria:       {label:'Galería Fotográfica',       icon:'fas fa-images'},
+  redes:         {label:'Redes Sociales',            icon:'fab fa-facebook'},
+  matricula:     {label:'Llamada a Matrícula (CTA)', icon:'fas fa-graduation-cap'},
+};
+
+function inicioTab(name, btn) {
+  ['inicio-textos','inicio-secciones','inicio-galeria'].forEach(function(id){ document.getElementById(id).classList.add('d-none'); });
+  document.getElementById('inicio-'+name).classList.remove('d-none');
+  document.querySelectorAll('#inicio-tabs .nav-link').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  if(name==='secciones') renderSeccionesEditor();
+  if(name==='galeria')   renderGaleriaEditor();
+}
+
+async function renderSeccionesEditor() {
+  const d = await gasGet('getSecciones');
+  seccionesAdmin = d.secciones||{};
+  document.getElementById('secciones-editor').innerHTML = Object.entries(SECCIONES_INFO).map(function([k,info]){
+    const sec=seccionesAdmin[k]||{}, activa=sec.activa!==false;
+    return `<div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3">
+      <div class="d-flex align-items-center gap-3">
+        <div style="background:var(--color-primary);width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center"><i class="${info.icon} text-white small"></i></div>
+        <span class="fw-semibold">${info.label}</span>
+        ${k==='hero'?'<span class="badge bg-secondary small">Siempre visible</span>':''}
+      </div>
+      ${k!=='hero'?`<div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" style="width:2.5em;height:1.3em" ${activa?'checked':''} onchange="toggleSeccion('${k}',this.checked)"></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function toggleSeccion(key, activa) {
+  const d=await gasGet('getSecciones'); seccionesAdmin=d.secciones||{};
+  if(!seccionesAdmin[key]) seccionesAdmin[key]={};
+  seccionesAdmin[key].activa=activa;
+  await gasAuth('saveSecciones',{secciones:JSON.stringify(seccionesAdmin)});
+  showMsg(activa?'Sección activada.':'Sección desactivada.');
+}
+
+async function renderGaleriaEditor() {
+  const [dg,ds]=await Promise.all([gasGet('getGaleria'),gasGet('getSecciones')]);
+  galeriaAdmin=dg.galeria||[]; const secGal=(ds.secciones||{}).galeria||{};
+  document.getElementById('gal-titulo').value    = secGal.titulo||'';
+  document.getElementById('gal-subtitulo').value = secGal.subtitulo||'';
+  document.getElementById('gal-cols').value      = String(secGal.columnas||3);
+  document.getElementById('gal-layout').value    = secGal.layout||'mosaico';
+  document.getElementById('gal-activa').checked  = secGal.activa===true;
+  toggleColsOption();
+  renderGaleriaLista();
+}
+
+function toggleColsOption() {
+  const layout = document.getElementById('gal-layout').value;
+  document.getElementById('cols-option').style.display = layout==='mosaico' ? '' : 'none';
+}
+
+function renderGaleriaLista() {
+  const c=document.getElementById('gal-lista');
+  if(!galeriaAdmin.length){ c.innerHTML='<div class="col-12 text-center text-muted py-4"><i class="fas fa-images fa-3x mb-2 d-block"></i>Sin fotos aún.</div>'; return; }
+  c.innerHTML=galeriaAdmin.map(function(img,i){ return `
+    <div class="col-md-3 col-6"><div class="card border-0 shadow-sm overflow-hidden">
+      <img src="${img.url}" style="height:120px;object-fit:cover;width:100%" alt="">
+      <div class="card-body p-2">
+        <input type="text" class="form-control form-control-sm mb-1" value="${esc(img.caption||'')}" placeholder="Descripción" onchange="galeriaAdmin[${i}].caption=this.value">
+        <div class="d-flex gap-1">
+          ${i>0?`<button class="btn btn-sm btn-outline-secondary" onclick="moverFoto(${i},-1)"><i class="fas fa-arrow-left"></i></button>`:''}
+          ${i<galeriaAdmin.length-1?`<button class="btn btn-sm btn-outline-secondary" onclick="moverFoto(${i},1)"><i class="fas fa-arrow-right"></i></button>`:''}
+          <button class="btn btn-sm btn-outline-danger ms-auto" onclick="eliminarFoto(${i})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    </div></div>`; }).join('');
+}
+
+function convertirUrlDrive(url) {
+  const m=url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? `https://drive.google.com/uc?export=view&id=${m[1]}` : url;
+}
+
+function agregarFoto() {
+  const url=document.getElementById('gal-nueva-url').value.trim();
+  const cap=document.getElementById('gal-nueva-cap').value.trim();
+  if(!url){showMsg('Ingresa una URL','danger');return;}
+  galeriaAdmin.push({url:convertirUrlDrive(url),caption:cap});
+  document.getElementById('gal-nueva-url').value=''; document.getElementById('gal-nueva-cap').value='';
+  renderGaleriaLista();
+}
+function eliminarFoto(i){if(!confirm('¿Eliminar?'))return;galeriaAdmin.splice(i,1);renderGaleriaLista();}
+function moverFoto(i,dir){const j=i+dir;if(j<0||j>=galeriaAdmin.length)return;[galeriaAdmin[i],galeriaAdmin[j]]=[galeriaAdmin[j],galeriaAdmin[i]];renderGaleriaLista();}
+
+async function guardarGaleria() {
+  const rg=await gasAuth('saveGaleria',{galeria:JSON.stringify(galeriaAdmin)});
+  if(!rg.ok){showMsg('Error guardando galería','danger');return;}
+  const d=await gasGet('getSecciones'); const secs=d.secciones||{};
+  secs.galeria={
+    activa:    document.getElementById('gal-activa').checked,
+    titulo:    document.getElementById('gal-titulo').value,
+    subtitulo: document.getElementById('gal-subtitulo').value,
+    layout:    document.getElementById('gal-layout').value,
+    columnas:  parseInt(document.getElementById('gal-cols').value||3),
+  };
+  const rs=await gasAuth('saveSecciones',{secciones:JSON.stringify(secs)});
+  if(rs.ok) showMsg('Galería guardada.');
+  else showMsg('Error','danger');
 }
 
 function cambiarPassword() {
