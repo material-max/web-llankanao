@@ -27,8 +27,8 @@
           <i class="fas fa-map-marker-alt"></i>
           Linares, Región del Maule
         </div>
-        <h1>Formando ciudadanos para el <span>futuro</span></h1>
-        <p class="lead">Escuela Básica Llankanao M.F.M.S. — comprometida con la educación de calidad, los valores y el desarrollo integral de cada estudiante.</p>
+        <h1 id="hero-titulo">Formando ciudadanos para el <span id="hero-span">futuro</span></h1>
+        <p class="lead" id="hero-desc">Escuela Básica Llankanao M.F.M.S. — comprometida con la educación de calidad, los valores y el desarrollo integral de cada estudiante.</p>
         <div class="hero-btns">
           <a href="matricula.html" class="btn-hero-primary">
             <i class="fas fa-graduation-cap"></i> Proceso de Matrícula
@@ -39,12 +39,12 @@
         </div>
         <div class="hero-stats">
           <div class="stat-item">
-            <span class="stat-number" data-count="8" data-suffix="°">0°</span>
-            <span class="stat-label">Niveles</span>
+            <span class="stat-number" id="stat1-n" data-count="8" data-suffix="°">0°</span>
+            <span class="stat-label" id="stat1-l">Niveles</span>
           </div>
           <div class="stat-item">
-            <span class="stat-number" data-count="154">0</span>
-            <span class="stat-label">Estudiantes</span>
+            <span class="stat-number" id="stat2-n" data-count="154">0</span>
+            <span class="stat-label" id="stat2-l">Estudiantes</span>
           </div>
           <div class="stat-item">
             <span class="stat-number" data-count="100" data-suffix="%">0%</span>
@@ -135,9 +135,9 @@
     <div class="row align-items-center g-5">
       <div class="col-lg-6 reveal">
         <span class="section-badge">Nuestra Institución</span>
-        <h2 class="section-title">Una escuela comprometida con la comunidad</h2>
-        <p class="text-muted mb-3">La Escuela Básica Llankanao M.F.M.S. es una institución educativa de la ciudad de Linares, comprometida con la formación integral de niños y niñas de la Región del Maule.</p>
-        <p class="text-muted mb-4">Con años de trayectoria, hemos formado a generaciones de estudiantes entregando valores, conocimientos y habilidades para la vida. El nombre "Llankanao" tiene raíces en la cultura local que nos da identidad.</p>
+        <h2 class="section-title" id="sobre-titulo">Una escuela comprometida con la comunidad</h2>
+        <p class="text-muted mb-3" id="sobre-p1">La Escuela Básica Llankanao M.F.M.S. es una institución educativa de la ciudad de Linares, comprometida con la formación integral de niños y niñas de la Región del Maule.</p>
+        <p class="text-muted mb-4" id="sobre-p2">Con años de trayectoria, hemos formado a generaciones de estudiantes entregando valores, conocimientos y habilidades para la vida. El nombre "Llankanao" tiene raíces en la cultura local que nos da identidad.</p>
         <div class="row g-3 mb-4">
           <div class="col-6">
             <div class="d-flex align-items-center gap-2">
@@ -269,8 +269,8 @@
 <!-- ── CTA MATRÍCULA ── -->
 <section class="cta-section py-5">
   <div class="container text-center">
-    <h2 class="fw-bold mb-3" style="font-family:'Playfair Display',serif;color:var(--color-dark);font-size:2rem">¿Quieres matricular a tu hijo/a?</h2>
-    <p class="mb-4" style="color:rgba(0,0,0,.65);font-size:1.05rem">Conoce el proceso de matrícula y los documentos requeridos para incorporarse a nuestra comunidad educativa.</p>
+    <h2 class="fw-bold mb-3" id="cta-titulo" style="font-family:'Playfair Display',serif;color:var(--color-dark);font-size:2rem">¿Quieres matricular a tu hijo/a?</h2>
+    <p class="mb-4" id="cta-texto" style="color:rgba(0,0,0,.65);font-size:1.05rem">Conoce el proceso de matrícula y los documentos requeridos para incorporarse a nuestra comunidad educativa.</p>
     <div class="d-flex gap-3 justify-content-center flex-wrap">
       <a href="matricula.html" class="btn btn-dark btn-lg px-5">
         <i class="fas fa-graduation-cap me-2"></i>Ver proceso de Matrícula
@@ -289,6 +289,23 @@
 <script>
   initComponents('index');
   loadAvisos();
+
+  // Cargar contenido editable de la página
+  gasGet('getPagina', {pagina:'inicio'}).then(d => {
+    const c = d.contenido;
+    if(!c) return;
+    if(c.heroTitulo) { const t=document.getElementById('hero-titulo'); if(t) t.innerHTML=c.heroTitulo+(c.heroSpan?` <span>${c.heroSpan}</span>`:''); }
+    if(c.heroDesc)   { const e=document.getElementById('hero-desc');   if(e) e.textContent=c.heroDesc; }
+    if(c.stat1n)     { const e=document.getElementById('stat1-n'); if(e){e.dataset.count=c.stat1n;e.dataset.suffix=c.stat1s||'';} }
+    if(c.stat1l)     { const e=document.getElementById('stat1-l'); if(e) e.textContent=c.stat1l; }
+    if(c.stat2n)     { const e=document.getElementById('stat2-n'); if(e){e.dataset.count=c.stat2n;e.dataset.suffix=c.stat2s||'';} }
+    if(c.stat2l)     { const e=document.getElementById('stat2-l'); if(e) e.textContent=c.stat2l; }
+    if(c.sobreTitulo){ const e=document.getElementById('sobre-titulo'); if(e) e.textContent=c.sobreTitulo; }
+    if(c.sobreP1)    { const e=document.getElementById('sobre-p1');     if(e) e.textContent=c.sobreP1; }
+    if(c.sobreP2)    { const e=document.getElementById('sobre-p2');     if(e) e.textContent=c.sobreP2; }
+    if(c.ctaTitulo)  { const e=document.getElementById('cta-titulo');   if(e) e.textContent=c.ctaTitulo; }
+    if(c.ctaTexto)   { const e=document.getElementById('cta-texto');    if(e) e.textContent=c.ctaTexto; }
+  }).catch(()=>{});
 
   // Contadores al entrar en pantalla
   const heroObserver = new IntersectionObserver((entries) => {

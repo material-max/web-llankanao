@@ -52,6 +52,7 @@
 
       <div class="nav-section admin-only">Sistema</div>
       <a onclick="showTab('usuarios')" data-tab="usuarios" class="admin-only"><i class="fas fa-user-cog me-2"></i>Usuarios</a>
+      <a onclick="showTab('paginas')" data-tab="paginas" class="admin-only"><i class="fas fa-edit me-2"></i>Páginas</a>
       <a onclick="showTab('configuracion')" data-tab="configuracion" class="admin-only"><i class="fas fa-cog me-2"></i>Configuración</a>
       <a onclick="showTab('password')" data-tab="password"><i class="fas fa-key me-2"></i>Mi Contraseña</a>
       <a onclick="doLogout()" style="color:rgba(255,100,100,.8)!important"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a>
@@ -349,6 +350,23 @@
         </div>
       </div>
 
+      <!-- PÁGINAS -->
+      <div id="tab-paginas" class="tab-pane">
+        <div class="admin-card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Editar Páginas del Sitio</span>
+            <select id="pagina-selector" class="form-select form-select-sm w-auto" onchange="loadPaginaEditor()">
+              <option value="inicio">Página de Inicio</option>
+              <option value="matricula">Matrícula</option>
+              <option value="nosotros">Nosotros</option>
+            </select>
+          </div>
+          <div class="card-body" id="pagina-editor-body">
+            <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm"></div> Cargando...</div>
+          </div>
+        </div>
+      </div>
+
       <!-- CONTRASEÑA -->
       <div id="tab-password" class="tab-pane">
         <div class="row justify-content-center"><div class="col-lg-5">
@@ -419,8 +437,8 @@ function initApp() {
 if(currentUser && sessionToken) initApp();
 
 // ── TABS ─────────────────────────────────────────────────
-var TITULOS = {dashboard:'Dashboard',noticias:'Noticias',avisos:'Avisos',documentos:'Documentos',equipo:'Equipo',calendario:'Calendario',academico:'Académico',plataformas:'Plataformas',contactos:'Mensajes',usuarios:'Usuarios',configuracion:'Configuración',password:'Mi Contraseña'};
-var LOADERS = {noticias:loadNoticias,avisos:loadAvisos,documentos:loadDocs,equipo:loadEquipo,calendario:loadCal,plataformas:loadPlataformasAdmin,contactos:loadContactos,usuarios:loadUsuarios,configuracion:loadConfigAdmin,academico:loadAcademico};
+var TITULOS = {dashboard:'Dashboard',noticias:'Noticias',avisos:'Avisos',documentos:'Documentos',equipo:'Equipo',calendario:'Calendario',academico:'Académico',plataformas:'Plataformas',paginas:'Editar Páginas',contactos:'Mensajes',usuarios:'Usuarios',configuracion:'Configuración',password:'Mi Contraseña'};
+var LOADERS = {noticias:loadNoticias,avisos:loadAvisos,documentos:loadDocs,equipo:loadEquipo,calendario:loadCal,plataformas:loadPlataformasAdmin,contactos:loadContactos,usuarios:loadUsuarios,configuracion:loadConfigAdmin,academico:loadAcademico,paginas:loadPaginas};
 
 function showTab(name) {
   document.querySelectorAll('.tab-pane').forEach(function(t){ t.classList.remove('active'); });
@@ -681,7 +699,128 @@ function loadConfigAdmin() { gasGet('getConfig').then(function(d){ var cfg=d.con
 function cfgTab(name,btn) { ['cfg-escuela','cfg-redes','cfg-contacto-cfg'].forEach(function(id){ document.getElementById(id).classList.add('d-none'); }); document.getElementById('cfg-'+name).classList.remove('d-none'); document.querySelectorAll('#cfg-tabs .nav-link').forEach(function(b){ b.classList.remove('active'); }); btn.classList.add('active'); }
 function saveConfig() { var data={}; ['nombre','slogan','logo','facebook','instagram','direccion','telefono','email'].forEach(function(k){ data[k]=document.getElementById('cfg-'+k).value; }); gasAuth('saveConfig',{config:JSON.stringify(data)}).then(function(r){ if(r.ok) showMsg('Configuración guardada.'); else showMsg(r.error||'Error','danger'); }); }
 
-// ── CONTRASEÑA ────────────────────────────────────────────
+// ── PÁGINAS ───────────────────────────────────────────────
+var paginasData = {};
+
+function loadPaginas() { loadPaginaEditor(); }
+
+async function loadPaginaEditor() {
+  const pagina = document.getElementById('pagina-selector').value;
+  const body = document.getElementById('pagina-editor-body');
+  body.innerHTML = '<div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm"></div></div>';
+  try {
+    const d = await gasGet('getPagina', {pagina});
+    const c = d.contenido || {};
+    paginasData[pagina] = c;
+    body.innerHTML = renderEditorPagina(pagina, c);
+  } catch(e) {
+    body.innerHTML = '<div class="alert alert-danger">Error al cargar</div>';
+  }
+}
+
+function renderEditorPagina(pagina, c) {
+  const EDITORS = {
+    inicio: `
+      <div class="row g-4">
+        <div class="col-12"><h6 class="fw-bold text-muted text-uppercase small mb-3"><i class="fas fa-home me-1"></i> Sección Hero (portada)</h6></div>
+        <div class="col-md-6"><label class="form-label fw-semibold">Título principal</label><input type="text" class="form-control" id="p-hero-titulo" value="${esc(c.heroTitulo||'')}" placeholder="Formando ciudadanos para el futuro"></div>
+        <div class="col-md-6"><label class="form-label fw-semibold">Palabra destacada (en amarillo)</label><input type="text" class="form-control" id="p-hero-span" value="${esc(c.heroSpan||'')}" placeholder="futuro"></div>
+        <div class="col-12"><label class="form-label fw-semibold">Descripción (bajo el título)</label><textarea class="form-control" id="p-hero-desc" rows="2">${esc(c.heroDesc||'')}</textarea></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Estadística 1 — número</label><input type="number" class="form-control" id="p-stat1-n" value="${esc(c.stat1n||'8')}" placeholder="8"></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Estadística 1 — etiqueta</label><input type="text" class="form-control" id="p-stat1-l" value="${esc(c.stat1l||'Niveles')}" placeholder="Niveles"></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Sufijo (°, %, etc.)</label><input type="text" class="form-control" id="p-stat1-s" value="${esc(c.stat1s||'°')}" placeholder="°"></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Estadística 2 — número</label><input type="number" class="form-control" id="p-stat2-n" value="${esc(c.stat2n||'154')}"></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Estadística 2 — etiqueta</label><input type="text" class="form-control" id="p-stat2-l" value="${esc(c.stat2l||'Estudiantes')}"></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Sufijo 2</label><input type="text" class="form-control" id="p-stat2-s" value="${esc(c.stat2s||'')}"></div>
+        <div class="col-12"><hr><h6 class="fw-bold text-muted text-uppercase small mt-2 mb-3"><i class="fas fa-info-circle me-1"></i> Sección "Sobre Nosotros"</h6></div>
+        <div class="col-12"><label class="form-label fw-semibold">Título</label><input type="text" class="form-control" id="p-sobre-titulo" value="${esc(c.sobreTitulo||'')}" placeholder="Una escuela comprometida con la comunidad"></div>
+        <div class="col-12"><label class="form-label fw-semibold">Párrafo 1</label><textarea class="form-control" id="p-sobre-p1" rows="3">${esc(c.sobreP1||'')}</textarea></div>
+        <div class="col-12"><label class="form-label fw-semibold">Párrafo 2</label><textarea class="form-control" id="p-sobre-p2" rows="3">${esc(c.sobreP2||'')}</textarea></div>
+        <div class="col-12"><hr><h6 class="fw-bold text-muted text-uppercase small mt-2 mb-3"><i class="fas fa-graduation-cap me-1"></i> Sección Llamada a Matrícula</h6></div>
+        <div class="col-md-6"><label class="form-label fw-semibold">Título CTA</label><input type="text" class="form-control" id="p-cta-titulo" value="${esc(c.ctaTitulo||'')}" placeholder="¿Quieres matricular a tu hijo/a?"></div>
+        <div class="col-md-6"><label class="form-label fw-semibold">Texto CTA</label><input type="text" class="form-control" id="p-cta-texto" value="${esc(c.ctaTexto||'')}" placeholder="Conoce el proceso de matrícula..."></div>
+      </div>`,
+    matricula: `
+      <div class="row g-4">
+        <div class="col-12"><h6 class="fw-bold text-muted text-uppercase small mb-3"><i class="fas fa-graduation-cap me-1"></i> Encabezado</h6></div>
+        <div class="col-md-6"><label class="form-label fw-semibold">Título</label><input type="text" class="form-control" id="p-mat-titulo" value="${esc(c.titulo||'')}" placeholder="Proceso de Matrícula"></div>
+        <div class="col-md-6"><label class="form-label fw-semibold">Subtítulo</label><input type="text" class="form-control" id="p-mat-sub" value="${esc(c.subtitulo||'')}" placeholder="Información para incorporar..."></div>
+        <div class="col-12"><hr><h6 class="fw-bold text-muted text-uppercase small mt-2 mb-3">Documentos requeridos</h6>
+          <p class="text-muted small">Un documento por línea</p>
+          <textarea class="form-control" id="p-mat-docs" rows="7" placeholder="Certificado de Nacimiento&#10;Cartola de vacunas&#10;...">${(c.documentos||[]).join('\n')}</textarea>
+        </div>
+        <div class="col-12"><hr><h6 class="fw-bold text-muted text-uppercase small mt-2 mb-3">Períodos</h6>
+          <p class="text-muted small">Formato: Etiqueta | Valor (una por línea)</p>
+          <textarea class="form-control" id="p-mat-periodos" rows="4" placeholder="Matrícula ordinaria | Noviembre - Diciembre&#10;Matrícula extraordinaria | Enero - Febrero">${(c.periodos||[]).map(p=>p.label+'|'+p.valor).join('\n')}</textarea>
+        </div>
+        <div class="col-md-6"><label class="form-label fw-semibold">Horario de atención</label><input type="text" class="form-control" id="p-mat-horario" value="${esc(c.horario||'')}" placeholder="Lunes a Viernes 08:00 - 16:00 hrs"></div>
+        <div class="col-md-6"><label class="form-label fw-semibold">Título sección final</label><input type="text" class="form-control" id="p-mat-cta-t" value="${esc(c.ctaTitulo||'')}" placeholder="¿Listo para matricularse?"></div>
+        <div class="col-12"><label class="form-label fw-semibold">Texto sección final</label><input type="text" class="form-control" id="p-mat-cta-txt" value="${esc(c.ctaTexto||'')}" placeholder="Visítenos en nuestra secretaría..."></div>
+        <div class="col-12"><label class="form-label fw-semibold">Información adicional (HTML permitido)</label><textarea class="form-control" id="p-mat-extra" rows="3" placeholder="Puede agregar texto adicional, listas, etc.">${esc(c.infoExtra||'')}</textarea></div>
+      </div>`,
+    nosotros: `
+      <div class="row g-4">
+        <div class="col-12"><label class="form-label fw-semibold">Título de la sección Historia</label><input type="text" class="form-control" id="p-nos-titulo" value="${esc(c.historiaTitulo||'')}" placeholder="Nuestra Historia"></div>
+        <div class="col-12"><label class="form-label fw-semibold">Párrafo 1</label><textarea class="form-control" id="p-nos-p1" rows="3">${esc(c.historiaP1||'')}</textarea></div>
+        <div class="col-12"><label class="form-label fw-semibold">Párrafo 2</label><textarea class="form-control" id="p-nos-p2" rows="3">${esc(c.historiaP2||'')}</textarea></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Misión</label><textarea class="form-control" id="p-nos-mision" rows="3">${esc(c.mision||'')}</textarea></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Visión</label><textarea class="form-control" id="p-nos-vision" rows="3">${esc(c.vision||'')}</textarea></div>
+        <div class="col-md-4"><label class="form-label fw-semibold">Valores (separados por coma)</label><textarea class="form-control" id="p-nos-valores" rows="3">${esc(c.valores||'')}</textarea></div>
+      </div>`
+  };
+  return (EDITORS[pagina]||'<p class="text-muted">Editor no disponible</p>') + 
+    '<div class="mt-4"><button class="btn btn-primary btn-lg px-5" onclick="savePagina()"><i class="fas fa-save me-2"></i>Guardar Cambios</button></div>';
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+async function savePagina() {
+  const pagina = document.getElementById('pagina-selector').value;
+  let contenido = {};
+  if(pagina==='inicio') {
+    contenido = {
+      heroTitulo: document.getElementById('p-hero-titulo').value,
+      heroSpan:   document.getElementById('p-hero-span').value,
+      heroDesc:   document.getElementById('p-hero-desc').value,
+      stat1n: document.getElementById('p-stat1-n').value,
+      stat1l: document.getElementById('p-stat1-l').value,
+      stat1s: document.getElementById('p-stat1-s').value,
+      stat2n: document.getElementById('p-stat2-n').value,
+      stat2l: document.getElementById('p-stat2-l').value,
+      stat2s: document.getElementById('p-stat2-s').value,
+      sobreTitulo: document.getElementById('p-sobre-titulo').value,
+      sobreP1: document.getElementById('p-sobre-p1').value,
+      sobreP2: document.getElementById('p-sobre-p2').value,
+      ctaTitulo: document.getElementById('p-cta-titulo').value,
+      ctaTexto:  document.getElementById('p-cta-texto').value,
+    };
+  } else if(pagina==='matricula') {
+    const docs = document.getElementById('p-mat-docs').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    const periodos = document.getElementById('p-mat-periodos').value.split('\n').map(l=>{ const p=l.split('|'); return {label:(p[0]||'').trim(),valor:(p[1]||'').trim()}; }).filter(p=>p.label);
+    contenido = {
+      titulo:    document.getElementById('p-mat-titulo').value,
+      subtitulo: document.getElementById('p-mat-sub').value,
+      documentos: docs, periodos,
+      horario:   document.getElementById('p-mat-horario').value,
+      ctaTitulo: document.getElementById('p-mat-cta-t').value,
+      ctaTexto:  document.getElementById('p-mat-cta-txt').value,
+      infoExtra: document.getElementById('p-mat-extra').value,
+    };
+  } else if(pagina==='nosotros') {
+    contenido = {
+      historiaTitulo: document.getElementById('p-nos-titulo').value,
+      historiaP1:     document.getElementById('p-nos-p1').value,
+      historiaP2:     document.getElementById('p-nos-p2').value,
+      mision:  document.getElementById('p-nos-mision').value,
+      vision:  document.getElementById('p-nos-vision').value,
+      valores: document.getElementById('p-nos-valores').value,
+    };
+  }
+  const r = await gasAuth('savePagina', {pagina, contenido: JSON.stringify(contenido)});
+  if(r.ok) showMsg('Página guardada. Los cambios se verán en el sitio inmediatamente.');
+  else showMsg(r.error||'Error al guardar','danger');
+}
+
 function cambiarPassword() {
   var actual=document.getElementById('p-actual').value, nueva=document.getElementById('p-nueva').value, confirmar=document.getElementById('p-confirmar').value;
   var msg=document.getElementById('pass-msg');
