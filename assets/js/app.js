@@ -5,7 +5,7 @@
 
 // ── CONFIGURACIÓN GAS ──────────────────────────────────────
 // Después de desplegar el Google Apps Script, pegar la URL aquí:
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzz66ymknRvzYJfn5jU8MMRiFvM_kxWuE5f7D6tzofILlTNfv8sJQUe8NeOKy0N_7BtsQ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwzCoKspyEdxj_KfAy7l1UyQbKXKaMXO1w5iil9sHJ4MmQj4oXDf29ocdPYZa9rPsDdtA/exec';
 
 // Configuración local (se sobreescribe con datos del GAS si está disponible)
 const SITE_CONFIG = {
