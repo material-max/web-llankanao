@@ -88,7 +88,7 @@
 </section>
 
 <!-- ── SOBRE NOSOTROS ── -->
-<section class="py-5">
+<section class="py-5 sobre-nosotros-section">
   <div class="container">
     <div class="row align-items-center g-5">
       <div class="col-lg-6 reveal">
@@ -169,7 +169,7 @@
 </section>
 
 <!-- ── NOTICIAS ── -->
-<section class="py-5" style="background:var(--color-light)">
+<section class="py-5 noticias-section" style="background:var(--color-light)">
   <div class="container">
     <div class="d-flex justify-content-between align-items-end mb-4">
       <div>
@@ -324,23 +324,80 @@
   }
   loadPlataformasHome();
 
-  // Cargar secciones y galería
+  // Cargar secciones, galería y módulos — cada llamada independiente
   let galeriaItems = [], galeriaIdx = 0;
 
   async function cargarSecciones() {
-    try {
-      const [ds, dg, dm] = await Promise.all([gasGet('getSecciones'), gasGet('getGaleria'), gasGet('getModulos')]);
-      const sec = ds.secciones || {};
-      galeriaItems = dg.galeria || [];
-      const modulos = (dm.modulos || []).filter(m => m.activo);
+    // Cada llamada es independiente — si una falla no rompe las demás
+    const [ds, dg, dm] = await Promise.allSettled([
+      gasGet('getSecciones'),
+      gasGet('getGaleria'),
+      gasGet('getModulos')
+    ]);
 
-      // Renderizar módulos personalizados
+    const sec      = ds.status==='fulfilled' ? (ds.value.secciones||{}) : {};
+    galeriaItems   = dg.status==='fulfilled' ? (dg.value.galeria||[])   : [];
+    const modulos  = dm.status==='fulfilled' ? (dm.value.modulos||[]).filter(m=>m.activo) : [];
+
+    // Módulos personalizados
+    try {
       const mc = document.getElementById('modulos-container');
       if (mc && modulos.length) {
-        mc.innerHTML = modulos.map(m => renderModulo(m)).join('');
-        // Iniciar cuentas regresivas
-        document.querySelectorAll('[data-countdown]').forEach(el => iniciarCountdown(el));
+        mc.innerHTML = modulos.map(m => { try { return renderModulo(m); } catch(e){ return ''; } }).join('');
+        document.querySelectorAll('[data-countdown]').forEach(el => { try { iniciarCountdown(el); } catch(e){} });
       }
+    } catch(e) {}
+
+    // Mostrar/ocultar secciones fijas
+    try {
+      const seccMap = [
+        ['sobreNosotros', '.sobre-nosotros-section'],
+        ['noticias',      '.noticias-section'],
+        ['redes',         '.social-section'],
+        ['matricula',     '.cta-section'],
+      ];
+      seccMap.forEach(([k, sel]) => {
+        if (sec[k] && sec[k].activa === false) {
+          const el = document.querySelector(sel);
+          if (el) el.style.display = 'none';
+        }
+      });
+    } catch(e) {}
+
+    // Galería
+    try {
+      const secGal = sec.galeria || {};
+      if (secGal.activa && galeriaItems.length) {
+        const s = document.getElementById('seccion-galeria');
+        if (s) {
+          s.classList.remove('d-none');
+          if (secGal.titulo)    document.getElementById('galeria-titulo').textContent    = secGal.titulo;
+          if (secGal.subtitulo) document.getElementById('galeria-subtitulo').textContent = secGal.subtitulo;
+          const layout = secGal.layout || 'mosaico';
+          const grid   = document.getElementById('galeria-grid');
+          if (layout === 'mosaico') {
+            const cols  = secGal.columnas || 3;
+            const colCl = cols===2?'col-6 col-md-6':cols===4?'col-6 col-md-3':'col-6 col-md-4';
+            grid.innerHTML = galeriaItems.map((img,i) => `
+              <div class="${colCl}">
+                <div onclick="abrirLightbox(${i})" style="cursor:pointer;overflow:hidden;border-radius:10px;aspect-ratio:4/3;background:#e2e8f0">
+                  <img src="${img.url}" alt="${img.caption||''}" loading="lazy"
+                    style="width:100%;height:100%;object-fit:cover;transition:.3s ease"
+                    onmouseover="this.style.transform='scale(1.05)'"
+                    onmouseout="this.style.transform='scale(1)'"
+                    onerror="this.parentElement.style.display='none'">
+                </div>
+                ${img.caption?`<p class="text-muted small text-center mt-1 mb-0">${img.caption}</p>`:''}
+              </div>`).join('');
+          } else if (layout === 'abanico') {
+            renderAbanico(galeriaItems, grid);
+          } else if (layout === 'tira') {
+            renderTira(galeriaItems, grid);
+          }
+        }
+      }
+    } catch(e) {}
+  }
 
       // Mostrar/ocultar secciones
       const mapa = {
@@ -492,6 +549,8 @@
     tick();
     setInterval(tick, 1000);
   }
+
+  function renderAbanico(items, container) {
     const max   = Math.min(items.length, 7);
     const spread = Math.min(28, 180 / max);
     const mid   = (max - 1) / 2;
@@ -528,6 +587,8 @@
       </div>
     </div>`;
   }
+
+  function abrirLightbox(i) {
     galeriaIdx = i;
     const img = galeriaItems[i];
     document.getElementById('lightbox-img').src = img.url;
