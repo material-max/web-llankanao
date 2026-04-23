@@ -33,7 +33,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--color-text);backgrou
 .navbar{background:#fff!important;box-shadow:var(--shadow-sm);padding:.75rem 0;transition:var(--transition)}
 .navbar.scrolled{box-shadow:var(--shadow-md)}
 .navbar-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-.navbar-brand img{height:52px;width:52px;border-radius:50%;object-fit:cover;border:2px solid var(--color-secondary)}
+.navbar-brand img{
+  height:48px;
+  width:48px;
+  min-width:48px;
+  border-radius:50%;
+  object-fit:contain;
+  background:var(--color-primary);
+  border:2px solid var(--color-secondary);
+  flex-shrink:0;
+  padding:2px;
+}
 .navbar-brand .brand-text .brand-name{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--color-primary);line-height:1.1}
 .navbar-brand .brand-text .brand-sub{font-size:.7rem;color:var(--color-muted);letter-spacing:.05em}
 .nav-link{font-weight:500;color:var(--color-text)!important;padding:.5rem .9rem!important;border-radius:8px;transition:var(--transition)}
