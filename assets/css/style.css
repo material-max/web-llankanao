@@ -34,15 +34,16 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--color-text);backgrou
 .navbar.scrolled{box-shadow:var(--shadow-md)}
 .navbar-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
 .navbar-brand img{
-  height:48px;
-  width:48px;
-  min-width:48px;
-  border-radius:50%;
+  height:48px !important;
+  width:48px !important;
+  min-width:48px !important;
+  max-width:48px !important;
+  border-radius:50% !important;
   object-fit:contain;
   background:var(--color-primary);
   border:2px solid var(--color-secondary);
   flex-shrink:0;
-  padding:2px;
+  display:block;
 }
 .navbar-brand .brand-text .brand-name{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--color-primary);line-height:1.1}
 .navbar-brand .brand-text .brand-sub{font-size:.7rem;color:var(--color-muted);letter-spacing:.05em}
