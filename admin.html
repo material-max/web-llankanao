@@ -7,77 +7,78 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
   <style>
-    .tab-pane { display: none; } .tab-pane.active { display: block; }
-    .sidebar-nav a { cursor: pointer; }
-    .img-preview { max-width: 100px; max-height: 100px; object-fit: cover; border-radius: 8px; display: none; }
-    #admin-app.d-none { display: none!important; }
+    .tab-pane{display:none}.tab-pane.active{display:block}
+    .sidebar-nav a{cursor:pointer}
+    .role-badge{font-size:.65rem;padding:.2rem .5rem;border-radius:50px;font-weight:700}
   </style>
 </head>
 <body>
 
-<!-- ── LOGIN ── -->
+<!-- LOGIN -->
 <div id="login-screen" class="admin-login-page">
   <div class="login-card">
     <img src="assets/img/logo.png" class="login-logo" alt="Logo" onerror="this.src='assets/img/logo.svg'">
     <h4 class="text-center fw-bold mb-1">Panel de Administración</h4>
     <p class="text-center text-muted mb-4 small">Escuela Llankanao M.F.M.S.</p>
     <div id="login-error" class="alert alert-danger d-none"></div>
-    <div class="mb-3"><label class="form-label fw-semibold">Usuario</label><input type="text" id="login-user" class="form-control form-control-lg" placeholder="admin"></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Usuario</label><input type="text" id="login-user" class="form-control form-control-lg"></div>
     <div class="mb-3"><label class="form-label fw-semibold">Contraseña</label><input type="password" id="login-pass" class="form-control form-control-lg" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="btn btn-primary btn-lg w-100" id="login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt me-2"></i>Ingresar</button>
-    <p class="text-center text-muted mt-3 small">Acceso restringido al personal autorizado</p>
   </div>
 </div>
 
-<!-- ── MAIN APP ── -->
+<!-- APP -->
 <div id="admin-app" class="admin-layout d-none">
-
-  <!-- Sidebar -->
-  <aside class="admin-sidebar" id="sidebar">
+  <aside class="admin-sidebar">
     <div class="logo-area">
       <div class="school-name">Escuela Llankanao</div>
-      <div class="admin-label">Panel Administrativo</div>
+      <div class="admin-label" id="sidebar-rol-label">Panel Admin</div>
     </div>
     <nav class="sidebar-nav mt-2">
       <div class="nav-section">Principal</div>
       <a onclick="showTab('dashboard')" data-tab="dashboard"><i class="fas fa-th-large me-2"></i>Dashboard</a>
-      <div class="nav-section">Contenido</div>
-      <a onclick="showTab('noticias')" data-tab="noticias"><i class="fas fa-newspaper me-2"></i>Noticias <span id="badge-noticias" class="badge bg-primary ms-auto"></span></a>
-      <a onclick="showTab('documentos')" data-tab="documentos"><i class="fas fa-file-alt me-2"></i>Documentos</a>
-      <a onclick="showTab('equipo')" data-tab="equipo"><i class="fas fa-users me-2"></i>Equipo</a>
-      <a onclick="showTab('avisos')" data-tab="avisos"><i class="fas fa-bell me-2"></i>Avisos</a>
-      <div class="nav-section">Gestión</div>
-      <a onclick="showTab('contactos')" data-tab="contactos"><i class="fas fa-inbox me-2"></i>Mensajes <span id="badge-contactos" class="badge bg-danger ms-auto"></span></a>
-      <a onclick="showTab('plataformas')" data-tab="plataformas"><i class="fas fa-th me-2"></i>Plataformas</a>
-      <a onclick="showTab('configuracion')" data-tab="configuracion"><i class="fas fa-cog me-2"></i>Configuración</a>
-      <div class="nav-section">Cuenta</div>
-      <a onclick="showTab('password')" data-tab="password"><i class="fas fa-key me-2"></i>Contraseña</a>
+
+      <div class="nav-section">Publicaciones</div>
+      <a onclick="showTab('noticias')" data-tab="noticias" id="menu-noticias"><i class="fas fa-newspaper me-2"></i>Noticias <span id="badge-noticias" class="badge bg-primary ms-auto"></span></a>
+      <a onclick="showTab('avisos')" data-tab="avisos" id="menu-avisos"><i class="fas fa-bell me-2"></i>Avisos</a>
+
+      <div class="nav-section admin-only">Gestión</div>
+      <a onclick="showTab('documentos')" data-tab="documentos" class="admin-only"><i class="fas fa-file-alt me-2"></i>Documentos</a>
+      <a onclick="showTab('equipo')" data-tab="equipo" class="admin-only"><i class="fas fa-users me-2"></i>Equipo</a>
+      <a onclick="showTab('calendario')" data-tab="calendario" class="admin-only"><i class="fas fa-calendar me-2"></i>Calendario</a>
+      <a onclick="showTab('academico')" data-tab="academico" class="admin-only"><i class="fas fa-graduation-cap me-2"></i>Académico</a>
+      <a onclick="showTab('plataformas')" data-tab="plataformas" class="admin-only"><i class="fas fa-th me-2"></i>Plataformas</a>
+      <a onclick="showTab('contactos')" data-tab="contactos" class="admin-only"><i class="fas fa-inbox me-2"></i>Mensajes <span id="badge-contactos" class="badge bg-danger ms-auto"></span></a>
+
+      <div class="nav-section admin-only">Sistema</div>
+      <a onclick="showTab('usuarios')" data-tab="usuarios" class="admin-only"><i class="fas fa-user-cog me-2"></i>Usuarios</a>
+      <a onclick="showTab('configuracion')" data-tab="configuracion" class="admin-only"><i class="fas fa-cog me-2"></i>Configuración</a>
+      <a onclick="showTab('password')" data-tab="password"><i class="fas fa-key me-2"></i>Mi Contraseña</a>
       <a onclick="doLogout()" style="color:rgba(255,100,100,.8)!important"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a>
     </nav>
-    <div class="p-3 mt-3" style="font-size:.75rem;color:rgba(255,255,255,.3)">
-      <a href="../index.html" target="_blank" style="color:rgba(255,255,255,.4);text-decoration:none"><i class="fas fa-external-link-alt me-1"></i>Ver sitio web</a>
+    <div class="p-3 mt-2" style="font-size:.75rem">
+      <a href="index.html" target="_blank" style="color:rgba(255,255,255,.4);text-decoration:none"><i class="fas fa-external-link-alt me-1"></i>Ver sitio web</a>
     </div>
   </aside>
 
-  <!-- Main -->
   <main class="admin-main">
     <div class="admin-topbar">
       <h5 class="mb-0 fw-bold" id="topbar-title">Dashboard</h5>
       <div class="d-flex align-items-center gap-3">
-        <span class="text-muted small" id="topbar-user"></span>
-        <button class="btn btn-sm btn-outline-danger" onclick="doLogout()"><i class="fas fa-sign-out-alt me-1"></i>Salir</button>
+        <span id="topbar-user" class="text-muted small"></span>
+        <span id="topbar-rol" class="role-badge"></span>
+        <button class="btn btn-sm btn-outline-danger" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
       </div>
     </div>
-
     <div class="admin-content">
-      <div id="global-msg" class="d-none"></div>
+      <div id="global-msg" class="d-none mb-3"></div>
 
       <!-- DASHBOARD -->
       <div id="tab-dashboard" class="tab-pane active">
         <div class="row g-4 mb-4" id="dash-stats"></div>
         <div class="row g-4">
-          <div class="col-lg-6"><div class="admin-card"><div class="card-header">Últimas Noticias</div><div class="card-body p-0" id="dash-noticias"><div class="p-3 text-muted">Cargando...</div></div></div></div>
-          <div class="col-lg-6"><div class="admin-card"><div class="card-header">Mensajes Recientes</div><div class="card-body p-0" id="dash-contactos"><div class="p-3 text-muted">Cargando...</div></div></div></div>
+          <div class="col-lg-6"><div class="admin-card"><div class="card-header">Últimas Noticias</div><div id="dash-noticias" class="p-3 text-muted">Cargando...</div></div></div>
+          <div class="col-lg-6"><div class="admin-card"><div class="card-header">Mensajes Recientes</div><div id="dash-contactos" class="p-3 text-muted">Cargando...</div></div></div>
         </div>
       </div>
 
@@ -85,36 +86,53 @@
       <div id="tab-noticias" class="tab-pane">
         <div class="row g-4">
           <div class="col-lg-5">
-            <div class="admin-card"><div class="card-header" id="noticia-form-title">Nueva Noticia</div>
+            <div class="admin-card"><div class="card-header" id="n-form-title">Nueva Noticia</div>
             <div class="card-body">
-              <form id="noticia-form">
-                <input type="hidden" id="n-id">
-                <div class="mb-3"><label class="form-label fw-semibold">Título *</label><input type="text" id="n-titulo" class="form-control" required></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Resumen</label><textarea id="n-resumen" class="form-control" rows="2"></textarea></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Contenido *</label><textarea id="n-contenido" class="form-control" rows="6" required></textarea></div>
-                <div class="row g-3 mb-3">
-                  <div class="col-6"><label class="form-label fw-semibold">Categoría</label>
-                    <select id="n-categoria" class="form-select"><option>Noticias</option><option>Eventos</option><option>Logros</option><option>Avisos</option><option>Actividades</option></select>
-                  </div>
-                  <div class="col-6"><label class="form-label fw-semibold">Estado</label>
-                    <select id="n-estado" class="form-select"><option value="publicado">Publicado</option><option value="borrador">Borrador</option></select>
-                  </div>
-                </div>
-                <div class="mb-3"><label class="form-label fw-semibold">URL de imagen (opcional)</label><input type="url" id="n-imagen" class="form-control" placeholder="https://..."><small class="text-muted">Link de imagen de Google Drive, Imgur, etc.</small></div>
-                <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-primary" id="n-save-btn">Guardar</button>
-                  <button type="button" class="btn btn-outline-secondary" onclick="resetNoticiaForm()">Limpiar</button>
-                </div>
-              </form>
+              <input type="hidden" id="n-id">
+              <div class="mb-3"><label class="form-label fw-semibold">Título *</label><input type="text" id="n-titulo" class="form-control" required></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Resumen</label><textarea id="n-resumen" class="form-control" rows="2"></textarea></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Contenido *</label><textarea id="n-contenido" class="form-control" rows="6"></textarea></div>
+              <div class="row g-3 mb-3">
+                <div class="col-6"><label class="form-label fw-semibold">Categoría</label>
+                  <select id="n-categoria" class="form-select"><option>Noticias</option><option>Eventos</option><option>Logros</option><option>Actividades</option><option>Avisos</option></select></div>
+                <div class="col-6"><label class="form-label fw-semibold">Estado</label>
+                  <select id="n-estado" class="form-select"><option value="publicado">Publicado</option><option value="borrador">Borrador</option></select></div>
+              </div>
+              <div class="mb-3"><label class="form-label fw-semibold">URL imagen</label><input type="url" id="n-imagen" class="form-control" placeholder="https://..."><small class="text-muted">Link de Google Drive, Imgur, etc.</small></div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary" id="n-save-btn" onclick="saveNoticia()">Guardar</button>
+                <button class="btn btn-outline-secondary" onclick="resetNoticiaForm()">Limpiar</button>
+              </div>
             </div></div>
           </div>
           <div class="col-lg-7">
             <div class="admin-card"><div class="card-header d-flex justify-content-between align-items-center">
               <span>Noticias</span>
               <input type="text" id="n-buscar" class="form-control form-control-sm w-auto" placeholder="Buscar..." oninput="filtrarNoticias()">
-            </div>
-            <div class="card-body p-0" id="noticias-table"><div class="p-4 text-center text-muted">Cargando...</div></div>
-            </div>
+            </div><div class="card-body p-0" id="noticias-table"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVISOS -->
+      <div id="tab-avisos" class="tab-pane">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="admin-card"><div class="card-header" id="av-form-title">Nuevo Aviso</div>
+            <div class="card-body">
+              <input type="hidden" id="av-id">
+              <div class="mb-3"><label class="form-label fw-semibold">Texto del aviso *</label><textarea id="av-texto" class="form-control" rows="3"></textarea><small class="text-muted">Aparece como banner en el sitio</small></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Tipo</label>
+                <select id="av-tipo" class="form-select"><option value="info">Informativo (azul)</option><option value="warning">Advertencia (amarillo)</option><option value="success">Positivo (verde)</option><option value="danger">Urgente (rojo)</option></select></div>
+              <div class="mb-3 form-check"><input type="checkbox" id="av-activo" class="form-check-input" checked><label class="form-check-label" for="av-activo">Activar aviso</label></div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary" onclick="saveAviso()">Guardar</button>
+                <button class="btn btn-outline-secondary" onclick="resetAvForm()">Limpiar</button>
+              </div>
+            </div></div>
+          </div>
+          <div class="col-lg-7">
+            <div class="admin-card"><div class="card-header">Avisos</div><div class="card-body p-0" id="avisos-table"></div></div>
           </div>
         </div>
       </div>
@@ -123,28 +141,21 @@
       <div id="tab-documentos" class="tab-pane">
         <div class="row g-4">
           <div class="col-lg-5">
-            <div class="admin-card"><div class="card-header" id="doc-form-title">Nuevo Documento</div>
+            <div class="admin-card"><div class="card-header">Nuevo Documento</div>
             <div class="card-body">
-              <form id="doc-form">
-                <input type="hidden" id="d-id">
-                <div class="mb-3"><label class="form-label fw-semibold">Nombre *</label><input type="text" id="d-nombre" class="form-control" required></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Categoría</label>
-                  <select id="d-categoria" class="form-select"><option>Transparencia</option><option>Presupuesto</option><option>Reglamentos</option><option>Informes</option><option>PME</option><option>Otro</option></select>
-                </div>
-                <div class="mb-3"><label class="form-label fw-semibold">Fecha</label><input type="date" id="d-fecha" class="form-control"></div>
-                <div class="mb-3"><label class="form-label fw-semibold">URL del archivo *</label><input type="url" id="d-url" class="form-control" placeholder="https://drive.google.com/..."><small class="text-muted">Link de Google Drive (acceso público)</small></div>
-                <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-primary" id="d-save-btn">Guardar</button>
-                  <button type="button" class="btn btn-outline-secondary" onclick="resetDocForm()">Limpiar</button>
-                </div>
-              </form>
+              <input type="hidden" id="d-id">
+              <div class="mb-3"><label class="form-label fw-semibold">Nombre *</label><input type="text" id="d-nombre" class="form-control"></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Categoría</label>
+                <select id="d-categoria" class="form-select"><option>Transparencia</option><option>Presupuesto</option><option>Reglamentos</option><option>Informes</option><option>PME</option><option>Otro</option></select></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Fecha</label><input type="date" id="d-fecha" class="form-control"></div>
+              <div class="mb-3"><label class="form-label fw-semibold">URL Google Drive *</label><input type="url" id="d-url" class="form-control"></div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary" onclick="saveDoc()">Guardar</button>
+                <button class="btn btn-outline-secondary" onclick="resetDocForm()">Limpiar</button>
+              </div>
             </div></div>
           </div>
-          <div class="col-lg-7">
-            <div class="admin-card"><div class="card-header">Documentos</div>
-            <div class="card-body p-0" id="docs-table"><div class="p-4 text-center text-muted">Cargando...</div></div>
-            </div>
-          </div>
+          <div class="col-lg-7"><div class="admin-card"><div class="card-header">Documentos</div><div class="card-body p-0" id="docs-table"></div></div></div>
         </div>
       </div>
 
@@ -154,69 +165,101 @@
           <div class="col-lg-5">
             <div class="admin-card"><div class="card-header" id="eq-form-title">Nuevo Miembro</div>
             <div class="card-body">
-              <form id="eq-form">
-                <input type="hidden" id="eq-id">
-                <div class="mb-3"><label class="form-label fw-semibold">Nombre completo *</label><input type="text" id="eq-nombre" class="form-control" required></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Cargo *</label><input type="text" id="eq-cargo" class="form-control" placeholder="Ej: Director, Profesora de Matemáticas..." required></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Tipo</label>
-                  <select id="eq-tipo" class="form-select"><option>Directivo</option><option>Docente</option><option>Asistente de la Educación</option><option>Administrativo</option><option>Otro</option></select>
-                </div>
-                <div class="mb-3"><label class="form-label fw-semibold">Especialidad / Mención</label><input type="text" id="eq-especialidad" class="form-control"></div>
-                <div class="mb-3"><label class="form-label fw-semibold">URL foto (opcional)</label><input type="url" id="eq-foto" class="form-control" placeholder="https://..."></div>
-                <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-primary" id="eq-save-btn">Guardar</button>
-                  <button type="button" class="btn btn-outline-secondary" onclick="resetEqForm()">Limpiar</button>
-                </div>
-              </form>
+              <input type="hidden" id="eq-id">
+              <div class="mb-3"><label class="form-label fw-semibold">Nombre *</label><input type="text" id="eq-nombre" class="form-control"></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Cargo *</label><input type="text" id="eq-cargo" class="form-control"></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Tipo</label>
+                <select id="eq-tipo" class="form-select"><option>Directivo</option><option>Docente</option><option>Asistente de la Educación</option><option>Administrativo</option><option>Otro</option></select></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Especialidad</label><input type="text" id="eq-esp" class="form-control"></div>
+              <div class="mb-3"><label class="form-label fw-semibold">URL foto</label><input type="url" id="eq-foto" class="form-control" placeholder="https://..."></div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary" onclick="saveEquipo()">Guardar</button>
+                <button class="btn btn-outline-secondary" onclick="resetEqForm()">Limpiar</button>
+              </div>
             </div></div>
           </div>
-          <div class="col-lg-7">
-            <div class="admin-card"><div class="card-header">Equipo</div>
-            <div class="card-body p-0" id="equipo-table"><div class="p-4 text-center text-muted">Cargando...</div></div>
-            </div>
-          </div>
+          <div class="col-lg-7"><div class="admin-card"><div class="card-header">Equipo</div><div class="card-body p-0" id="equipo-table"></div></div></div>
         </div>
       </div>
 
-      <!-- AVISOS -->
-      <div id="tab-avisos" class="tab-pane">
+      <!-- CALENDARIO -->
+      <div id="tab-calendario" class="tab-pane">
         <div class="row g-4">
           <div class="col-lg-5">
-            <div class="admin-card"><div class="card-header">Nuevo Aviso</div>
+            <div class="admin-card"><div class="card-header" id="cal-form-title">Nuevo Evento</div>
             <div class="card-body">
-              <form id="av-form">
-                <input type="hidden" id="av-id">
-                <div class="mb-3"><label class="form-label fw-semibold">Texto del aviso *</label><textarea id="av-texto" class="form-control" rows="3" required></textarea><small class="text-muted">Aparece en el banner del sitio</small></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Tipo</label>
-                  <select id="av-tipo" class="form-select"><option value="info">Informativo (azul)</option><option value="warning">Advertencia (amarillo)</option><option value="success">Positivo (verde)</option><option value="danger">Urgente (rojo)</option></select>
-                </div>
-                <div class="mb-3 form-check"><input type="checkbox" id="av-activo" class="form-check-input" checked><label for="av-activo" class="form-check-label">Activar aviso</label></div>
-                <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-primary">Guardar</button>
-                  <button type="button" class="btn btn-outline-secondary" onclick="resetAvForm()">Limpiar</button>
-                </div>
-              </form>
+              <input type="hidden" id="cal-id">
+              <div class="mb-3"><label class="form-label fw-semibold">Título *</label><input type="text" id="cal-titulo" class="form-control"></div>
+              <div class="row g-3 mb-3">
+                <div class="col-6"><label class="form-label fw-semibold">Fecha inicio *</label><input type="date" id="cal-fecha" class="form-control"></div>
+                <div class="col-6"><label class="form-label fw-semibold">Fecha fin</label><input type="date" id="cal-fecha-fin" class="form-control"></div>
+              </div>
+              <div class="mb-3"><label class="form-label fw-semibold">Tipo</label>
+                <select id="cal-tipo" class="form-select">
+                  <option value="evento">Evento institucional</option>
+                  <option value="academico">Actividad académica</option>
+                  <option value="evaluacion">Evaluación</option>
+                  <option value="feriado">Feriado</option>
+                  <option value="vacaciones">Vacaciones</option>
+                </select></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Descripción</label><textarea id="cal-desc" class="form-control" rows="2"></textarea></div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary" onclick="saveCal()">Guardar</button>
+                <button class="btn btn-outline-secondary" onclick="resetCalForm()">Limpiar</button>
+              </div>
             </div></div>
           </div>
-          <div class="col-lg-7">
-            <div class="admin-card"><div class="card-header">Avisos activos</div>
-            <div class="card-body p-0" id="avisos-table"><div class="p-4 text-center text-muted">Cargando...</div></div>
-            </div>
-          </div>
+          <div class="col-lg-7"><div class="admin-card"><div class="card-header">Eventos del Calendario</div><div class="card-body p-0" id="cal-table"></div></div></div>
         </div>
       </div>
 
-      <!-- CONTACTOS -->
-      <div id="tab-contactos" class="tab-pane">
-        <div id="contacto-detalle" class="d-none">
-          <div class="admin-card mb-4"><div class="card-header d-flex justify-content-between"><span id="det-asunto">Mensaje</span><button class="btn btn-sm btn-outline-secondary" onclick="cerrarDetalle()"><i class="fas fa-arrow-left me-1"></i>Volver</button></div>
-          <div class="card-body" id="det-body"></div></div>
-        </div>
-        <div id="contacto-lista">
-          <div class="admin-card"><div class="card-header d-flex justify-content-between align-items-center">
-            <span>Mensajes <span id="badge-no-leidos" class="badge bg-danger ms-2 d-none"></span></span>
+      <!-- ACADÉMICO -->
+      <div id="tab-academico" class="tab-pane">
+        <div class="admin-card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Configuración Académica</span>
+            <button class="btn btn-primary btn-sm" onclick="saveAcademico()"><i class="fas fa-save me-1"></i>Guardar Todo</button>
           </div>
-          <div class="card-body p-0" id="contactos-list"><div class="p-4 text-center text-muted">Cargando...</div></div>
+          <div class="card-body">
+            <ul class="nav nav-tabs mb-4" id="acad-tabs">
+              <li class="nav-item"><button class="nav-link active" onclick="acadTab('niveles',this)">Niveles</button></li>
+              <li class="nav-item"><button class="nav-link" onclick="acadTab('asignaturas',this)">Asignaturas</button></li>
+              <li class="nav-item"><button class="nav-link" onclick="acadTab('programas',this)">Programas</button></li>
+              <li class="nav-item"><button class="nav-link" onclick="acadTab('horario',this)">Horario</button></li>
+            </ul>
+
+            <div id="acad-niveles">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="text-muted mb-0 small">Edita nombre, descripción y foto de cada nivel</p>
+                <button class="btn btn-sm btn-outline-primary" onclick="addNivel()"><i class="fas fa-plus me-1"></i>Agregar Nivel</button>
+              </div>
+              <div id="niveles-container"></div>
+            </div>
+
+            <div id="acad-asignaturas" class="d-none">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="text-muted mb-0 small">Agrega o edita las asignaturas del plan de estudios</p>
+                <button class="btn btn-sm btn-outline-primary" onclick="addAsig()"><i class="fas fa-plus me-1"></i>Agregar</button>
+              </div>
+              <div id="asig-container"></div>
+            </div>
+
+            <div id="acad-programas" class="d-none">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="text-muted mb-0 small">Programas especiales de la escuela</p>
+                <button class="btn btn-sm btn-outline-primary" onclick="addPrograma()"><i class="fas fa-plus me-1"></i>Agregar</button>
+              </div>
+              <div id="prog-container"></div>
+            </div>
+
+            <div id="acad-horario" class="d-none">
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-semibold">Jornada mañana</label><input type="text" id="h-manana" class="form-control" placeholder="08:00 – 13:30"></div>
+                <div class="col-md-6"><label class="form-label fw-semibold">Almuerzo</label><input type="text" id="h-almuerzo" class="form-control" placeholder="13:30 – 14:30"></div>
+                <div class="col-md-6"><label class="form-label fw-semibold">Jornada tarde</label><input type="text" id="h-tarde" class="form-control" placeholder="14:30 – 16:30"></div>
+                <div class="col-md-6"><label class="form-label fw-semibold">Días hábiles</label><input type="text" id="h-dias" class="form-control" placeholder="Lunes a Viernes"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -224,12 +267,49 @@
       <!-- PLATAFORMAS -->
       <div id="tab-plataformas" class="tab-pane">
         <div class="admin-card">
-          <div class="card-header">Plataformas y Accesos Rápidos</div>
+          <div class="card-header">Plataformas y Accesos</div>
           <div class="card-body">
-            <p class="text-muted mb-4">Configure las URLs de sus plataformas. Aparecerán en la sección de accesos del sitio.</p>
+            <p class="text-muted mb-3 small">Puedes proteger el acceso a cada plataforma con una clave opcional. Si la dejas vacía, el acceso es directo.</p>
             <div id="plat-container"></div>
-            <button type="button" class="btn btn-outline-primary mb-4" onclick="addPlat()"><i class="fas fa-plus me-2"></i>Agregar Plataforma</button>
-            <div><button class="btn btn-primary btn-lg px-5" onclick="savePlataformas()"><i class="fas fa-save me-2"></i>Guardar Plataformas</button></div>
+            <button class="btn btn-outline-primary mb-4" onclick="addPlat()"><i class="fas fa-plus me-2"></i>Agregar Plataforma</button>
+            <div><button class="btn btn-primary px-5" onclick="savePlataformas()"><i class="fas fa-save me-2"></i>Guardar</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACTOS -->
+      <div id="tab-contactos" class="tab-pane">
+        <div id="contacto-detalle" class="d-none">
+          <div class="admin-card mb-4"><div class="card-header d-flex justify-content-between"><span id="det-asunto"></span><button class="btn btn-sm btn-outline-secondary" onclick="cerrarDetalle()"><i class="fas fa-arrow-left me-1"></i>Volver</button></div>
+          <div class="card-body" id="det-body"></div></div>
+        </div>
+        <div id="contacto-lista"><div class="admin-card"><div class="card-header">Mensajes</div><div class="card-body p-0" id="contactos-list"></div></div></div>
+      </div>
+
+      <!-- USUARIOS -->
+      <div id="tab-usuarios" class="tab-pane">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="admin-card"><div class="card-header">Nuevo / Editar Usuario</div>
+            <div class="card-body">
+              <div class="mb-3"><label class="form-label fw-semibold">Usuario *</label><input type="text" id="u-usuario" class="form-control" placeholder="sin espacios"></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Nombre completo</label><input type="text" id="u-nombre" class="form-control"></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Contraseña <small class="text-muted">(dejar vacío para no cambiar)</small></label><input type="password" id="u-password" class="form-control"></div>
+              <div class="mb-3"><label class="form-label fw-semibold">Rol</label>
+                <select id="u-rol" class="form-select">
+                  <option value="editor">Editor — puede publicar noticias y avisos</option>
+                  <option value="admin">Admin — acceso completo</option>
+                </select></div>
+              <button class="btn btn-primary w-100" onclick="saveUsuario()"><i class="fas fa-save me-2"></i>Guardar Usuario</button>
+            </div></div>
+          </div>
+          <div class="col-lg-7">
+            <div class="admin-card"><div class="card-header">Usuarios del Sistema</div><div class="card-body p-0" id="usuarios-table"></div></div>
+            <div class="alert border-0 rounded-3 mt-3" style="background:#fff8e1">
+              <i class="fas fa-info-circle me-2" style="color:#D4A843"></i>
+              <strong>Editor:</strong> Solo puede publicar noticias y avisos.<br>
+              <strong>Admin:</strong> Acceso completo a todos los módulos.
+            </div>
           </div>
         </div>
       </div>
@@ -246,15 +326,15 @@
             </ul>
             <div id="cfg-escuela">
               <div class="row g-3">
-                <div class="col-md-6"><label class="form-label fw-semibold">Nombre de la Escuela</label><input type="text" id="cfg-nombre" class="form-control"></div>
+                <div class="col-md-6"><label class="form-label fw-semibold">Nombre</label><input type="text" id="cfg-nombre" class="form-control"></div>
                 <div class="col-md-6"><label class="form-label fw-semibold">Slogan</label><input type="text" id="cfg-slogan" class="form-control"></div>
-                <div class="col-12"><label class="form-label fw-semibold">URL del Logo (Google Drive u otro)</label><input type="url" id="cfg-logo" class="form-control" placeholder="https://..."></div>
+                <div class="col-12"><label class="form-label fw-semibold">URL Logo</label><input type="url" id="cfg-logo" class="form-control" placeholder="https://raw.githubusercontent.com/..."></div>
               </div>
             </div>
             <div id="cfg-redes" class="d-none">
               <div class="row g-3">
-                <div class="col-md-6"><label class="form-label fw-semibold"><i class="fab fa-facebook me-2 text-primary"></i>Facebook</label><input type="url" id="cfg-facebook" class="form-control" placeholder="https://facebook.com/..."></div>
-                <div class="col-md-6"><label class="form-label fw-semibold"><i class="fab fa-instagram me-2" style="color:#e4405f"></i>Instagram</label><input type="url" id="cfg-instagram" class="form-control" placeholder="https://instagram.com/..."></div>
+                <div class="col-md-6"><label class="form-label fw-semibold"><i class="fab fa-facebook me-1 text-primary"></i>Facebook</label><input type="url" id="cfg-facebook" class="form-control"></div>
+                <div class="col-md-6"><label class="form-label fw-semibold"><i class="fab fa-instagram me-1" style="color:#e4405f"></i>Instagram</label><input type="url" id="cfg-instagram" class="form-control"></div>
               </div>
             </div>
             <div id="cfg-contacto-cfg" class="d-none">
@@ -264,300 +344,350 @@
                 <div class="col-md-6"><label class="form-label fw-semibold">Email</label><input type="email" id="cfg-email" class="form-control"></div>
               </div>
             </div>
-            <div class="mt-4">
-              <button class="btn btn-primary btn-lg px-5" onclick="saveConfig()"><i class="fas fa-save me-2"></i>Guardar Configuración</button>
-            </div>
+            <div class="mt-4"><button class="btn btn-primary btn-lg px-5" onclick="saveConfig()"><i class="fas fa-save me-2"></i>Guardar</button></div>
           </div>
         </div>
       </div>
 
-      <!-- CAMBIAR CONTRASEÑA -->
+      <!-- CONTRASEÑA -->
       <div id="tab-password" class="tab-pane">
-        <div class="row justify-content-center">
-          <div class="col-lg-6">
-            <div class="admin-card">
-              <div class="card-header"><i class="fas fa-key me-2 text-warning"></i>Cambiar Contraseña de Admin</div>
-              <div class="card-body">
-                <div id="pass-msg" class="d-none"></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Contraseña actual</label><input type="password" id="p-actual" class="form-control"></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Nueva contraseña</label><input type="password" id="p-nueva" class="form-control"><small class="text-muted">Mínimo 8 caracteres</small></div>
-                <div class="mb-3"><label class="form-label fw-semibold">Confirmar nueva contraseña</label><input type="password" id="p-confirmar" class="form-control"></div>
-                <button class="btn btn-warning w-100" onclick="cambiarPassword()"><i class="fas fa-save me-2"></i>Actualizar Contraseña</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="row justify-content-center"><div class="col-lg-5">
+          <div class="admin-card"><div class="card-header">Cambiar Mi Contraseña</div>
+          <div class="card-body">
+            <div id="pass-msg" class="d-none mb-3"></div>
+            <div class="mb-3"><label class="form-label fw-semibold">Contraseña actual</label><input type="password" id="p-actual" class="form-control"></div>
+            <div class="mb-3"><label class="form-label fw-semibold">Nueva contraseña</label><input type="password" id="p-nueva" class="form-control"></div>
+            <div class="mb-3"><label class="form-label fw-semibold">Confirmar</label><input type="password" id="p-confirmar" class="form-control"></div>
+            <button class="btn btn-warning w-100" onclick="cambiarPassword()"><i class="fas fa-save me-2"></i>Actualizar Contraseña</button>
+          </div></div>
+        </div></div>
       </div>
 
-    </div>
+    </div><!-- admin-content -->
   </main>
-</div>
+</div><!-- admin-app -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/app.js"></script>
 <script>
-// ── AUTH ──────────────────────────────────────────────────
-let currentUser = sessionStorage.getItem('admin_user');
-let sessionToken = sessionStorage.getItem('admin_token');
+// ── STATE ─────────────────────────────────────────────────
+var currentUser  = sessionStorage.getItem('admin_user');
+var sessionToken = sessionStorage.getItem('admin_token');
+var currentRol   = sessionStorage.getItem('admin_rol') || 'editor';
+var academicoData = null;
 
+// ── AUTH ─────────────────────────────────────────────────
 function doLogin() {
-  const user = document.getElementById('login-user').value.trim();
-  const pass = document.getElementById('login-pass').value;
-  const btn = document.getElementById('login-btn');
-  if(!user||!pass) { showLoginError('Ingresa usuario y contraseña.'); return; }
-  btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Ingresando...';
-  gasPost('login', { usuario: user, password: pass }).then(r => {
+  var user = document.getElementById('login-user').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var btn  = document.getElementById('login-btn');
+  if(!user||!pass) { showLoginErr('Ingresa usuario y contraseña.'); return; }
+  btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Ingresando...';
+  gasGet('login', { usuario: user, password: pass }).then(function(r) {
     if(r.ok) {
-      currentUser = user; sessionToken = r.token;
-      sessionStorage.setItem('admin_user', user);
-      sessionStorage.setItem('admin_token', r.token);
-      document.getElementById('login-screen').classList.add('d-none');
-      document.getElementById('admin-app').classList.remove('d-none');
-      document.getElementById('topbar-user').textContent = user;
-      loadDashboard();
-    } else { showLoginError(r.error || 'Credenciales incorrectas.'); btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt me-2"></i>Ingresar'; }
-  }).catch(() => { showLoginError('Error de conexión. Verifique la URL del GAS.'); btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt me-2"></i>Ingresar'; });
+      currentUser=user; sessionToken=r.token; currentRol=r.rol||'editor';
+      sessionStorage.setItem('admin_user',user);
+      sessionStorage.setItem('admin_token',r.token);
+      sessionStorage.setItem('admin_rol',r.rol||'editor');
+      initApp();
+    } else {
+      showLoginErr(r.error||'Credenciales incorrectas');
+      btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt me-2"></i>Ingresar';
+    }
+  }).catch(function(){ showLoginErr('Error de conexión. Verifica la URL del GAS.'); btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt me-2"></i>Ingresar'; });
 }
 
-function showLoginError(msg) { const el=document.getElementById('login-error'); el.textContent=msg; el.classList.remove('d-none'); }
+function showLoginErr(msg) { var e=document.getElementById('login-error'); e.textContent=msg; e.classList.remove('d-none'); }
 function doLogout() { sessionStorage.clear(); location.reload(); }
 
-if(currentUser && sessionToken) {
+function initApp() {
   document.getElementById('login-screen').classList.add('d-none');
   document.getElementById('admin-app').classList.remove('d-none');
   document.getElementById('topbar-user').textContent = currentUser;
-  setTimeout(loadDashboard, 100);
+  var rolLabel = currentRol === 'admin' ? 'Administrador' : 'Editor';
+  var rolColor = currentRol === 'admin' ? 'background:#D4A843;color:#1a1a1a' : 'background:rgba(255,255,255,.15);color:#fff';
+  document.getElementById('topbar-rol').textContent = rolLabel;
+  document.getElementById('topbar-rol').style = rolColor;
+  document.getElementById('sidebar-rol-label').textContent = rolLabel;
+  // Ocultar secciones admin si es editor
+  if(currentRol !== 'admin') {
+    document.querySelectorAll('.admin-only').forEach(function(el){ el.style.display='none'; });
+  }
+  loadDashboard();
 }
 
-// ── TABS ──────────────────────────────────────────────────
+if(currentUser && sessionToken) initApp();
+
+// ── TABS ─────────────────────────────────────────────────
+var TITULOS = {dashboard:'Dashboard',noticias:'Noticias',avisos:'Avisos',documentos:'Documentos',equipo:'Equipo',calendario:'Calendario',academico:'Académico',plataformas:'Plataformas',contactos:'Mensajes',usuarios:'Usuarios',configuracion:'Configuración',password:'Mi Contraseña'};
+var LOADERS = {noticias:loadNoticias,avisos:loadAvisos,documentos:loadDocs,equipo:loadEquipo,calendario:loadCal,plataformas:loadPlataformasAdmin,contactos:loadContactos,usuarios:loadUsuarios,configuracion:loadConfigAdmin,academico:loadAcademico};
+
 function showTab(name) {
-  document.querySelectorAll('.tab-pane').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(a=>a.classList.remove('active'));
-  document.getElementById('tab-'+name)?.classList.add('active');
-  document.querySelector(`.sidebar-nav a[data-tab="${name}"]`)?.classList.add('active');
-  const titles = {dashboard:'Dashboard',noticias:'Gestión de Noticias',documentos:'Gestión de Documentos',equipo:'Gestión de Equipo',avisos:'Gestión de Avisos',contactos:'Mensajes de Contacto',plataformas:'Plataformas',configuracion:'Configuración',password:'Cambiar Contraseña'};
-  document.getElementById('topbar-title').textContent = titles[name]||name;
-  if(name==='noticias') loadNoticias();
-  if(name==='documentos') loadDocumentos();
-  if(name==='equipo') loadEquipo();
-  if(name==='avisos') loadAvisosAdmin();
-  if(name==='contactos') loadContactos();
-  if(name==='plataformas') loadPlataformasAdmin();
-  if(name==='configuracion') loadConfigAdmin();
+  document.querySelectorAll('.tab-pane').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(function(a){ a.classList.remove('active'); });
+  var t = document.getElementById('tab-'+name); if(t) t.classList.add('active');
+  var a = document.querySelector('.sidebar-nav a[data-tab="'+name+'"]'); if(a) a.classList.add('active');
+  document.getElementById('topbar-title').textContent = TITULOS[name]||name;
+  if(LOADERS[name]) LOADERS[name]();
 }
 
-function showGlobalMsg(msg, type='success') {
-  const el = document.getElementById('global-msg');
-  el.className = `alert alert-${type} alert-dismissible mb-3`;
-  el.innerHTML = msg + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+function showMsg(msg, type) {
+  type = type||'success';
+  var el=document.getElementById('global-msg');
+  el.className='alert alert-'+type+' alert-dismissible';
+  el.innerHTML=msg+'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
   el.classList.remove('d-none');
-  setTimeout(() => el.classList.add('d-none'), 4000);
+  setTimeout(function(){ el.classList.add('d-none'); }, 4000);
 }
 
-function gasAuth(action, data={}) { return gasPost(action, {...data, token: sessionToken}); }
+function gasAuth(action, data) {
+  data = data||{};
+  data.token = sessionToken;
+  return gasGet(action, data);
+}
 
 // ── DASHBOARD ────────────────────────────────────────────
-async function loadDashboard() {
+function loadDashboard() {
   showTab('dashboard');
-  try {
-    const [n, d, e, c] = await Promise.all([gasGet('getNoticias',{limit:100}), gasGet('getDocumentos'), gasGet('getEquipo'), gasGet('getContactos',{token:sessionToken})]);
-    const noticias = n.noticias||[]; const docs = d.documentos||[]; const equipo = e.equipo||[]; const contactos = c.contactos||[];
-    const noLeidos = contactos.filter(c=>!c.leido).length;
-    if(noLeidos) { document.getElementById('badge-contactos').textContent = noLeidos; document.getElementById('badge-no-leidos').textContent = noLeidos; document.getElementById('badge-no-leidos').classList.remove('d-none'); }
-    document.getElementById('badge-noticias').textContent = noticias.length || '';
-
-    document.getElementById('dash-stats').innerHTML = [
-      ['Noticias',noticias.length,'fas fa-newspaper','#1B4F8A','noticias'],
-      ['Documentos',docs.length,'fas fa-file-alt','#2A6B3C','documentos'],
-      ['Equipo',equipo.length,'fas fa-users','#D4A843','equipo'],
-      [`Mensajes${noLeidos?` (${noLeidos} nuevo${noLeidos>1?'s':''})`:``}`,contactos.length,'fas fa-inbox',noLeidos?'#e74c3c':'#9b59b6','contactos'],
-    ].map(s=>`<div class="col-md-3 col-sm-6"><div class="stat-admin-card hover-lift" onclick="showTab('${s[4]}')" style="cursor:pointer"><div class="stat-admin-icon" style="background:${s[3]}"><i class="${s[2]}"></i></div><div><div style="font-size:1.8rem;font-weight:700;line-height:1">${s[1]}</div><div class="text-muted small">${s[0]}</div></div></div></div>`).join('');
-
-    document.getElementById('dash-noticias').innerHTML = noticias.slice(0,5).map(n=>`<div class="d-flex align-items-center gap-3 p-3 border-bottom"><div class="flex-grow-1"><div class="fw-semibold small">${n.titulo}</div><small class="text-muted">${formatFecha(n.fecha)}</small></div><span class="badge bg-${n.estado==='publicado'?'success':'secondary'}">${n.estado}</span></div>`).join('') || '<div class="p-3 text-muted">Sin noticias</div>';
-    document.getElementById('dash-contactos').innerHTML = contactos.slice(0,5).map(c=>`<div class="d-flex align-items-center gap-3 p-3 border-bottom ${!c.leido?'bg-light':''}"><div class="flex-grow-1"><div class="fw-semibold small">${c.nombre}</div><small class="text-muted">${c.asunto||'Sin asunto'}</small></div><small class="text-muted">${formatFecha(c.fecha)}</small></div>`).join('') || '<div class="p-3 text-muted">Sin mensajes</div>';
-  } catch(e) { console.error(e); }
+  Promise.all([
+    gasGet('getNoticias',{limit:100}),
+    gasGet('getDocumentos'),
+    gasGet('getEquipo'),
+    gasAuth('getContactos')
+  ]).then(function(res) {
+    var noticias=res[0].noticias||[], docs=res[1].documentos||[], equipo=res[2].equipo||[], contactos=res[3].contactos||[];
+    var noLeidos = contactos.filter(function(c){ return c.leido!=='true'; }).length;
+    document.getElementById('badge-contactos').textContent = noLeidos||'';
+    document.getElementById('badge-noticias').textContent  = noticias.length||'';
+    var stats = currentRol==='admin'
+      ? [['Noticias',noticias.length,'fas fa-newspaper','#1B4F8A','noticias'],['Documentos',docs.length,'fas fa-file-alt','#2A6B3C','documentos'],['Equipo',equipo.length,'fas fa-users','#D4A843','equipo'],['Mensajes'+(noLeidos?' ('+noLeidos+')':''),contactos.length,'fas fa-inbox',noLeidos?'#e74c3c':'#9b59b6','contactos']]
+      : [['Noticias',noticias.length,'fas fa-newspaper','#1B4F8A','noticias']];
+    document.getElementById('dash-stats').innerHTML = stats.map(function(s){
+      return '<div class="col-md-3 col-sm-6"><div class="stat-admin-card hover-lift" onclick="showTab(\''+s[4]+'\')" style="cursor:pointer"><div class="stat-admin-icon" style="background:'+s[3]+'"><i class="'+s[2]+'"></i></div><div><div style="font-size:1.8rem;font-weight:700;line-height:1">'+s[1]+'</div><div class="text-muted small">'+s[0]+'</div></div></div></div>';
+    }).join('');
+    document.getElementById('dash-noticias').innerHTML = noticias.slice(0,5).map(function(n){ return '<div class="d-flex align-items-center gap-3 p-3 border-bottom"><div class="flex-grow-1"><div class="fw-semibold small">'+n.titulo+'</div><small class="text-muted">'+n.fecha+'</small></div><span class="badge bg-'+(n.estado==='publicado'?'success':'secondary')+'">'+n.estado+'</span></div>'; }).join('')||'<div class="p-3 text-muted">Sin noticias</div>';
+    document.getElementById('dash-contactos').innerHTML = contactos.slice(0,5).map(function(c){ return '<div class="d-flex align-items-center gap-3 p-3 border-bottom '+(c.leido!=='true'?'bg-light':'')+'"><div class="flex-grow-1"><div class="fw-semibold small">'+c.nombre+'</div><small class="text-muted">'+(c.asunto||'Sin asunto')+'</small></div><small class="text-muted">'+c.fecha.substring(0,10)+'</small></div>'; }).join('')||'<div class="p-3 text-muted">Sin mensajes</div>';
+  }).catch(function(){});
 }
 
 // ── NOTICIAS ─────────────────────────────────────────────
-let allNoticias = [];
-async function loadNoticias() {
-  const data = await gasGet('getNoticias',{limit:200});
-  allNoticias = data.noticias||[];
-  renderNoticiasTable();
+var allNoticias=[];
+function loadNoticias() {
+  gasGet('getNoticias',{limit:200}).then(function(d){ allNoticias=d.noticias||[]; renderNoticiasTable(); });
 }
 function filtrarNoticias() { renderNoticiasTable(document.getElementById('n-buscar').value.toLowerCase()); }
-function renderNoticiasTable(q='') {
-  const list = q ? allNoticias.filter(n=>n.titulo?.toLowerCase().includes(q)) : allNoticias;
-  document.getElementById('noticias-table').innerHTML = list.length ? `
-    <div class="table-responsive"><table class="table table-hover align-middle mb-0">
-      <thead class="table-light"><tr><th>Título</th><th>Categoría</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
-      <tbody>${list.map(n=>`<tr><td class="fw-semibold">${truncate(n.titulo,50)}</td><td><small>${n.categoria||''}</small></td><td><span class="badge bg-${n.estado==='publicado'?'success':'secondary'}">${n.estado}</span></td><td><small>${n.fecha||''}</small></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editNoticia('${n.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteNoticia('${n.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-      </tbody></table></div>` : '<div class="p-4 text-center text-muted">Sin noticias registradas</div>';
+function renderNoticiasTable(q) {
+  q=q||'';
+  var list = q ? allNoticias.filter(function(n){ return n.titulo.toLowerCase().includes(q); }) : allNoticias;
+  document.getElementById('noticias-table').innerHTML = list.length
+    ? '<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Título</th><th>Cat.</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>'+
+      list.map(function(n){ return '<tr><td class="fw-semibold small">'+truncate(n.titulo,45)+'</td><td><small>'+n.categoria+'</small></td><td><span class="badge bg-'+(n.estado==='publicado'?'success':'secondary')+'">'+n.estado+'</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editNoticia(\''+n.id+'\')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="delNoticia(\''+n.id+'\')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('')+
+      '</tbody></table></div>'
+    : '<div class="p-4 text-center text-muted">Sin noticias</div>';
 }
 function editNoticia(id) {
-  const n = allNoticias.find(x=>x.id===id); if(!n) return;
-  document.getElementById('n-id').value=n.id; document.getElementById('n-titulo').value=n.titulo||''; document.getElementById('n-resumen').value=n.resumen||''; document.getElementById('n-contenido').value=n.contenido||''; document.getElementById('n-categoria').value=n.categoria||'Noticias'; document.getElementById('n-estado').value=n.estado||'publicado'; document.getElementById('n-imagen').value=n.imagen||'';
-  document.getElementById('noticia-form-title').textContent='Editar Noticia'; document.getElementById('n-save-btn').textContent='Actualizar';
-  document.querySelector('#tab-noticias').scrollIntoView({behavior:'smooth'});
+  var n=allNoticias.find(function(x){ return x.id===id; }); if(!n) return;
+  document.getElementById('n-id').value=n.id; document.getElementById('n-titulo').value=n.titulo||''; document.getElementById('n-resumen').value=n.resumen||''; document.getElementById('n-contenido').value=n.contenido||''; document.getElementById('n-categoria').value=n.categoria||''; document.getElementById('n-estado').value=n.estado||'publicado'; document.getElementById('n-imagen').value=n.imagen||'';
+  document.getElementById('n-form-title').textContent='Editar Noticia'; document.getElementById('n-save-btn').textContent='Actualizar';
 }
-function resetNoticiaForm() { document.getElementById('noticia-form').reset(); document.getElementById('n-id').value=''; document.getElementById('noticia-form-title').textContent='Nueva Noticia'; document.getElementById('n-save-btn').textContent='Guardar'; }
-document.getElementById('noticia-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = document.getElementById('n-save-btn'); btn.disabled=true; btn.textContent='Guardando...';
-  const data = {id:document.getElementById('n-id').value||null,titulo:document.getElementById('n-titulo').value,resumen:document.getElementById('n-resumen').value,contenido:document.getElementById('n-contenido').value,categoria:document.getElementById('n-categoria').value,estado:document.getElementById('n-estado').value,imagen:document.getElementById('n-imagen').value,fecha:new Date().toISOString().split('T')[0]};
-  const r = await gasAuth('saveNoticia', data);
-  if(r.ok) { showGlobalMsg('Noticia guardada correctamente.'); resetNoticiaForm(); loadNoticias(); } else { showGlobalMsg(r.error||'Error al guardar.','danger'); }
-  btn.disabled=false; btn.textContent='Guardar';
-});
-async function deleteNoticia(id) {
-  if(!confirm('¿Eliminar esta noticia?')) return;
-  const r = await gasAuth('deleteNoticia',{id}); if(r.ok) { showGlobalMsg('Noticia eliminada.'); loadNoticias(); } else showGlobalMsg('Error al eliminar.','danger');
+function resetNoticiaForm() { ['n-id','n-titulo','n-resumen','n-contenido','n-imagen'].forEach(function(i){ document.getElementById(i).value=''; }); document.getElementById('n-estado').value='publicado'; document.getElementById('n-form-title').textContent='Nueva Noticia'; document.getElementById('n-save-btn').textContent='Guardar'; }
+function saveNoticia() {
+  var btn=document.getElementById('n-save-btn'); btn.disabled=true; btn.textContent='Guardando...';
+  gasAuth('saveNoticia',{id:document.getElementById('n-id').value||null,titulo:document.getElementById('n-titulo').value,resumen:document.getElementById('n-resumen').value,contenido:document.getElementById('n-contenido').value,categoria:document.getElementById('n-categoria').value,estado:document.getElementById('n-estado').value,imagen:document.getElementById('n-imagen').value,fecha:new Date().toISOString().split('T')[0]})
+    .then(function(r){ if(r.ok){showMsg('Noticia guardada.');resetNoticiaForm();loadNoticias();}else showMsg(r.error||'Error','danger'); btn.disabled=false; btn.textContent='Guardar'; });
 }
-
-// ── DOCUMENTOS ───────────────────────────────────────────
-let allDocs = [];
-async function loadDocumentos() {
-  const data = await gasGet('getDocumentos'); allDocs = data.documentos||[]; renderDocsTable();
-}
-function renderDocsTable() {
-  document.getElementById('docs-table').innerHTML = allDocs.length ? `
-    <div class="table-responsive"><table class="table table-hover align-middle mb-0">
-      <thead class="table-light"><tr><th>Nombre</th><th>Categoría</th><th>Fecha</th><th>Acciones</th></tr></thead>
-      <tbody>${allDocs.map(d=>`<tr><td class="fw-semibold">${truncate(d.nombre,50)}</td><td><span class="badge bg-secondary">${d.categoria||''}</span></td><td><small>${d.fecha||''}</small></td><td><div class="d-flex gap-1">${d.url?`<a href="${d.url}" target="_blank" class="btn btn-sm btn-outline-success"><i class="fas fa-external-link-alt"></i></a>`:''}<button class="btn btn-sm btn-outline-primary" onclick="editDoc('${d.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteDoc('${d.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-      </tbody></table></div>` : '<div class="p-4 text-center text-muted">Sin documentos publicados</div>';
-}
-function editDoc(id) {
-  const d = allDocs.find(x=>x.id===id); if(!d) return;
-  document.getElementById('d-id').value=d.id; document.getElementById('d-nombre').value=d.nombre||''; document.getElementById('d-categoria').value=d.categoria||'Transparencia'; document.getElementById('d-fecha').value=d.fecha||''; document.getElementById('d-url').value=d.url||'';
-  document.getElementById('doc-form-title').textContent='Editar Documento'; document.getElementById('d-save-btn').textContent='Actualizar';
-}
-function resetDocForm() { document.getElementById('doc-form').reset(); document.getElementById('d-id').value=''; document.getElementById('doc-form-title').textContent='Nuevo Documento'; document.getElementById('d-save-btn').textContent='Guardar'; }
-document.getElementById('doc-form').addEventListener('submit', async e => {
-  e.preventDefault(); const btn=document.getElementById('d-save-btn'); btn.disabled=true;
-  const data={id:document.getElementById('d-id').value||null,nombre:document.getElementById('d-nombre').value,categoria:document.getElementById('d-categoria').value,fecha:document.getElementById('d-fecha').value,url:document.getElementById('d-url').value};
-  const r=await gasAuth('saveDocumento',data); if(r.ok){showGlobalMsg('Documento guardado.');resetDocForm();loadDocumentos();}else showGlobalMsg(r.error||'Error.','danger'); btn.disabled=false; btn.textContent='Guardar';
-});
-async function deleteDoc(id) { if(!confirm('¿Eliminar?')) return; const r=await gasAuth('deleteDocumento',{id}); if(r.ok){showGlobalMsg('Eliminado.');loadDocumentos();}else showGlobalMsg('Error.','danger'); }
-
-// ── EQUIPO ───────────────────────────────────────────────
-let allEquipo = [];
-async function loadEquipo() { const data=await gasGet('getEquipo'); allEquipo=data.equipo||[]; renderEquipoTable(); }
-function renderEquipoTable() {
-  document.getElementById('equipo-table').innerHTML = allEquipo.length ? `
-    <div class="table-responsive"><table class="table table-hover align-middle mb-0">
-      <thead class="table-light"><tr><th>Nombre</th><th>Cargo</th><th>Tipo</th><th>Acciones</th></tr></thead>
-      <tbody>${allEquipo.map(m=>`<tr><td class="fw-semibold">${m.nombre}</td><td><small>${m.cargo}</small></td><td><span class="badge bg-secondary small">${m.cargo_tipo||''}</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editEq('${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteEq('${m.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-      </tbody></table></div>` : '<div class="p-4 text-center text-muted">Sin miembros registrados</div>';
-}
-function editEq(id) {
-  const m=allEquipo.find(x=>x.id===id); if(!m) return;
-  document.getElementById('eq-id').value=m.id; document.getElementById('eq-nombre').value=m.nombre||''; document.getElementById('eq-cargo').value=m.cargo||''; document.getElementById('eq-tipo').value=m.cargo_tipo||'Otro'; document.getElementById('eq-especialidad').value=m.especialidad||''; document.getElementById('eq-foto').value=m.foto||'';
-  document.getElementById('eq-form-title').textContent='Editar Miembro'; document.getElementById('eq-save-btn').textContent='Actualizar';
-}
-function resetEqForm() { document.getElementById('eq-form').reset(); document.getElementById('eq-id').value=''; document.getElementById('eq-form-title').textContent='Nuevo Miembro'; document.getElementById('eq-save-btn').textContent='Guardar'; }
-document.getElementById('eq-form').addEventListener('submit', async e => {
-  e.preventDefault(); const btn=document.getElementById('eq-save-btn'); btn.disabled=true;
-  const data={id:document.getElementById('eq-id').value||null,nombre:document.getElementById('eq-nombre').value,cargo:document.getElementById('eq-cargo').value,cargo_tipo:document.getElementById('eq-tipo').value,especialidad:document.getElementById('eq-especialidad').value,foto:document.getElementById('eq-foto').value};
-  const r=await gasAuth('saveEquipo',data); if(r.ok){showGlobalMsg('Miembro guardado.');resetEqForm();loadEquipo();}else showGlobalMsg(r.error||'Error.','danger'); btn.disabled=false; btn.textContent='Guardar';
-});
-async function deleteEq(id) { if(!confirm('¿Eliminar miembro?')) return; const r=await gasAuth('deleteEquipo',{id}); if(r.ok){showGlobalMsg('Eliminado.');loadEquipo();}else showGlobalMsg('Error.','danger'); }
+function delNoticia(id) { if(!confirm('¿Eliminar?')) return; gasAuth('deleteNoticia',{id}).then(function(r){ if(r.ok){showMsg('Eliminada.');loadNoticias();}else showMsg('Error','danger'); }); }
 
 // ── AVISOS ───────────────────────────────────────────────
-let allAvisos = [];
-async function loadAvisosAdmin() { const data=await gasGet('getAvisos'); allAvisos=data.avisos||[]; renderAvisosTable(); }
-function renderAvisosTable() {
-  document.getElementById('avisos-table').innerHTML = allAvisos.length ? `
-    <div class="table-responsive"><table class="table table-hover align-middle mb-0">
-      <thead class="table-light"><tr><th>Aviso</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead>
-      <tbody>${allAvisos.map(a=>`<tr><td><small class="fw-semibold">${truncate(a.texto,60)}</small></td><td><span class="badge bg-${a.tipo||'info'}">${a.tipo||'info'}</span></td><td><button class="btn btn-sm ${a.activo?'btn-success':'btn-outline-secondary'}" onclick="toggleAviso('${a.id}')">${a.activo?'Activo':'Inactivo'}</button></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editAv('${a.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteAv('${a.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`).join('')}
-      </tbody></table></div>` : '<div class="p-4 text-center text-muted">Sin avisos creados</div>';
+var allAvisos=[];
+function loadAvisos() {
+  gasGet('getAvisos').then(function(d){ allAvisos=d.avisos||[]; renderAvisosTable(); });
 }
-function editAv(id) { const a=allAvisos.find(x=>x.id===id); if(!a) return; document.getElementById('av-id').value=a.id; document.getElementById('av-texto').value=a.texto||''; document.getElementById('av-tipo').value=a.tipo||'info'; document.getElementById('av-activo').checked=!!a.activo; }
-function resetAvForm() { document.getElementById('av-form').reset(); document.getElementById('av-id').value=''; document.getElementById('av-activo').checked=true; }
-document.getElementById('av-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const data={id:document.getElementById('av-id').value||null,texto:document.getElementById('av-texto').value,tipo:document.getElementById('av-tipo').value,activo:document.getElementById('av-activo').checked};
-  const r=await gasAuth('saveAviso',data); if(r.ok){showGlobalMsg('Aviso guardado.');resetAvForm();loadAvisosAdmin();}else showGlobalMsg(r.error||'Error.','danger');
-});
-async function toggleAviso(id) { const r=await gasAuth('toggleAviso',{id}); if(r.ok) loadAvisosAdmin(); }
-async function deleteAv(id) { if(!confirm('¿Eliminar aviso?')) return; const r=await gasAuth('deleteAviso',{id}); if(r.ok){showGlobalMsg('Eliminado.');loadAvisosAdmin();}else showGlobalMsg('Error.','danger'); }
+function renderAvisosTable() {
+  document.getElementById('avisos-table').innerHTML = allAvisos.length
+    ? '<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Aviso</th><th>Tipo</th><th>Estado</th><th>Acc.</th></tr></thead><tbody>'+
+      allAvisos.map(function(a){ return '<tr><td class="small">'+truncate(a.texto,50)+'</td><td><span class="badge bg-'+a.tipo+'">'+a.tipo+'</span></td><td><button class="btn btn-sm '+(a.activo==='true'?'btn-success':'btn-outline-secondary')+'" onclick="toggleAv(\''+a.id+'\')">'+( a.activo==='true'?'Activo':'Inactivo')+'</button></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editAv(\''+a.id+'\')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="delAv(\''+a.id+'\')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('')+
+      '</tbody></table></div>'
+    : '<div class="p-4 text-center text-muted">Sin avisos</div>';
+}
+function editAv(id) { var a=allAvisos.find(function(x){ return x.id===id; }); if(!a) return; document.getElementById('av-id').value=a.id; document.getElementById('av-texto').value=a.texto||''; document.getElementById('av-tipo').value=a.tipo||'info'; document.getElementById('av-activo').checked=a.activo==='true'; document.getElementById('av-form-title').textContent='Editar Aviso'; }
+function resetAvForm() { document.getElementById('av-id').value=''; document.getElementById('av-texto').value=''; document.getElementById('av-tipo').value='info'; document.getElementById('av-activo').checked=true; document.getElementById('av-form-title').textContent='Nuevo Aviso'; }
+function saveAviso() { gasAuth('saveAviso',{id:document.getElementById('av-id').value||null,texto:document.getElementById('av-texto').value,tipo:document.getElementById('av-tipo').value,activo:document.getElementById('av-activo').checked}).then(function(r){ if(r.ok){showMsg('Aviso guardado.');resetAvForm();loadAvisos();}else showMsg(r.error||'Error','danger'); }); }
+function toggleAv(id) { gasAuth('toggleAviso',{id}).then(function(){ loadAvisos(); }); }
+function delAv(id) { if(!confirm('¿Eliminar?')) return; gasAuth('deleteAviso',{id}).then(function(r){ if(r.ok){showMsg('Eliminado.');loadAvisos();}else showMsg('Error','danger'); }); }
+
+// ── DOCUMENTOS ───────────────────────────────────────────
+var allDocs=[];
+function loadDocs() { gasGet('getDocumentos').then(function(d){ allDocs=d.documentos||[]; renderDocsTable(); }); }
+function renderDocsTable() {
+  document.getElementById('docs-table').innerHTML = allDocs.length
+    ? '<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Nombre</th><th>Cat.</th><th>Fecha</th><th>Acc.</th></tr></thead><tbody>'+
+      allDocs.map(function(d){ return '<tr><td class="fw-semibold small">'+truncate(d.nombre,40)+'</td><td><span class="badge bg-secondary small">'+d.categoria+'</span></td><td><small>'+d.fecha+'</small></td><td><div class="d-flex gap-1">'+(d.url?'<a href="'+d.url+'" target="_blank" class="btn btn-sm btn-outline-success"><i class="fas fa-external-link-alt"></i></a>':'')+'<button class="btn btn-sm btn-outline-primary" onclick="editDoc(\''+d.id+'\')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="delDoc(\''+d.id+'\')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('')+
+      '</tbody></table></div>'
+    : '<div class="p-4 text-center text-muted">Sin documentos</div>';
+}
+function editDoc(id) { var d=allDocs.find(function(x){ return x.id===id; }); if(!d) return; document.getElementById('d-id').value=d.id; document.getElementById('d-nombre').value=d.nombre||''; document.getElementById('d-categoria').value=d.categoria||'Transparencia'; document.getElementById('d-fecha').value=d.fecha||''; document.getElementById('d-url').value=d.url||''; }
+function resetDocForm() { ['d-id','d-nombre','d-fecha','d-url'].forEach(function(i){ document.getElementById(i).value=''; }); }
+function saveDoc() { gasAuth('saveDocumento',{id:document.getElementById('d-id').value||null,nombre:document.getElementById('d-nombre').value,categoria:document.getElementById('d-categoria').value,fecha:document.getElementById('d-fecha').value,url:document.getElementById('d-url').value}).then(function(r){ if(r.ok){showMsg('Guardado.');resetDocForm();loadDocs();}else showMsg(r.error||'Error','danger'); }); }
+function delDoc(id) { if(!confirm('¿Eliminar?')) return; gasAuth('deleteDocumento',{id}).then(function(r){ if(r.ok){showMsg('Eliminado.');loadDocs();}else showMsg('Error','danger'); }); }
+
+// ── EQUIPO ───────────────────────────────────────────────
+var allEquipo=[];
+function loadEquipo() { gasGet('getEquipo').then(function(d){ allEquipo=d.equipo||[]; renderEquipoTable(); }); }
+function renderEquipoTable() {
+  document.getElementById('equipo-table').innerHTML = allEquipo.length
+    ? '<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Nombre</th><th>Cargo</th><th>Tipo</th><th>Acc.</th></tr></thead><tbody>'+
+      allEquipo.map(function(m){ return '<tr><td class="fw-semibold small">'+m.nombre+'</td><td><small>'+m.cargo+'</small></td><td><span class="badge bg-secondary small">'+m.cargo_tipo+'</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editEq(\''+m.id+'\')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="delEq(\''+m.id+'\')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('')+
+      '</tbody></table></div>'
+    : '<div class="p-4 text-center text-muted">Sin miembros</div>';
+}
+function editEq(id) { var m=allEquipo.find(function(x){ return x.id===id; }); if(!m) return; document.getElementById('eq-id').value=m.id; document.getElementById('eq-nombre').value=m.nombre||''; document.getElementById('eq-cargo').value=m.cargo||''; document.getElementById('eq-tipo').value=m.cargo_tipo||'Otro'; document.getElementById('eq-esp').value=m.especialidad||''; document.getElementById('eq-foto').value=m.foto||''; document.getElementById('eq-form-title').textContent='Editar Miembro'; }
+function resetEqForm() { ['eq-id','eq-nombre','eq-cargo','eq-esp','eq-foto'].forEach(function(i){ document.getElementById(i).value=''; }); document.getElementById('eq-form-title').textContent='Nuevo Miembro'; }
+function saveEquipo() { gasAuth('saveEquipo',{id:document.getElementById('eq-id').value||null,nombre:document.getElementById('eq-nombre').value,cargo:document.getElementById('eq-cargo').value,cargo_tipo:document.getElementById('eq-tipo').value,especialidad:document.getElementById('eq-esp').value,foto:document.getElementById('eq-foto').value}).then(function(r){ if(r.ok){showMsg('Guardado.');resetEqForm();loadEquipo();}else showMsg(r.error||'Error','danger'); }); }
+function delEq(id) { if(!confirm('¿Eliminar?')) return; gasAuth('deleteEquipo',{id}).then(function(r){ if(r.ok){showMsg('Eliminado.');loadEquipo();}else showMsg('Error','danger'); }); }
+
+// ── CALENDARIO ────────────────────────────────────────────
+var allCal=[];
+var TIPOS_CAL = {evento:'primary',academico:'success',evaluacion:'warning',feriado:'danger',vacaciones:'info'};
+function loadCal() { gasGet('getCalendario').then(function(d){ allCal=d.eventos||[]; renderCalTable(); }); }
+function renderCalTable() {
+  document.getElementById('cal-table').innerHTML = allCal.length
+    ? '<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Título</th><th>Fecha</th><th>Tipo</th><th>Acc.</th></tr></thead><tbody>'+
+      allCal.map(function(e){ return '<tr><td class="fw-semibold small">'+e.titulo+'</td><td><small>'+e.fecha+(e.fecha_fin?' → '+e.fecha_fin:'')+'</small></td><td><span class="badge bg-'+(TIPOS_CAL[e.tipo]||'secondary')+'">'+e.tipo+'</span></td><td><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="editCal(\''+e.id+'\')"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="delCal(\''+e.id+'\')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('')+
+      '</tbody></table></div>'
+    : '<div class="p-4 text-center text-muted">Sin eventos. Agrega el calendario del año.</div>';
+}
+function editCal(id) { var e=allCal.find(function(x){ return x.id===id; }); if(!e) return; document.getElementById('cal-id').value=e.id; document.getElementById('cal-titulo').value=e.titulo||''; document.getElementById('cal-fecha').value=e.fecha||''; document.getElementById('cal-fecha-fin').value=e.fecha_fin||''; document.getElementById('cal-tipo').value=e.tipo||'evento'; document.getElementById('cal-desc').value=e.descripcion||''; document.getElementById('cal-form-title').textContent='Editar Evento'; }
+function resetCalForm() { ['cal-id','cal-titulo','cal-fecha','cal-fecha-fin','cal-desc'].forEach(function(i){ document.getElementById(i).value=''; }); document.getElementById('cal-tipo').value='evento'; document.getElementById('cal-form-title').textContent='Nuevo Evento'; }
+function saveCal() { gasAuth('saveCalendario',{id:document.getElementById('cal-id').value||null,titulo:document.getElementById('cal-titulo').value,fecha:document.getElementById('cal-fecha').value,fecha_fin:document.getElementById('cal-fecha-fin').value,tipo:document.getElementById('cal-tipo').value,descripcion:document.getElementById('cal-desc').value}).then(function(r){ if(r.ok){showMsg('Guardado.');resetCalForm();loadCal();}else showMsg(r.error||'Error','danger'); }); }
+function delCal(id) { if(!confirm('¿Eliminar?')) return; gasAuth('deleteCalendario',{id}).then(function(r){ if(r.ok){showMsg('Eliminado.');loadCal();}else showMsg('Error','danger'); }); }
+
+// ── ACADÉMICO ─────────────────────────────────────────────
+function loadAcademico() {
+  gasGet('getAcademico').then(function(d){
+    academicoData = d.academico || {};
+    renderNiveles(); renderAsignaturas(); renderProgramas(); renderHorario();
+  });
+}
+function acadTab(name, btn) {
+  ['acad-niveles','acad-asignaturas','acad-programas','acad-horario'].forEach(function(id){ document.getElementById(id).classList.add('d-none'); });
+  document.getElementById('acad-'+name).classList.remove('d-none');
+  document.querySelectorAll('#acad-tabs .nav-link').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+function renderNiveles() {
+  var niveles = academicoData.niveles||[];
+  document.getElementById('niveles-container').innerHTML = niveles.map(function(n,i){
+    return '<div class="card border-0 shadow-sm mb-2 p-3 nivel-row"><div class="row g-3 align-items-center"><div class="col-md-3"><input type="text" class="form-control form-control-sm" placeholder="Nombre" value="'+escHtml(n.nombre||'')+'" data-nivel="'+i+'" data-field="nombre"></div><div class="col-md-5"><input type="text" class="form-control form-control-sm" placeholder="Descripción" value="'+escHtml(n.descripcion||'')+'" data-nivel="'+i+'" data-field="descripcion"></div><div class="col-md-3"><input type="url" class="form-control form-control-sm" placeholder="URL foto" value="'+escHtml(n.foto||'')+'" data-nivel="'+i+'" data-field="foto"></div><div class="col-md-1"><button class="btn btn-sm btn-outline-danger" onclick="removeNivel('+i+')"><i class="fas fa-times"></i></button></div></div></div>';
+  }).join('');
+  document.querySelectorAll('[data-nivel]').forEach(function(el){ el.addEventListener('input', function(){ academicoData.niveles[this.dataset.nivel][this.dataset.field]=this.value; }); });
+}
+function addNivel() { academicoData.niveles.push({nombre:'',descripcion:'',foto:''}); renderNiveles(); }
+function removeNivel(i) { academicoData.niveles.splice(i,1); renderNiveles(); }
+
+function renderAsignaturas() {
+  var asigs = academicoData.asignaturas||[];
+  document.getElementById('asig-container').innerHTML = asigs.map(function(a,i){
+    return '<div class="d-flex align-items-center gap-3 mb-2 p-3 bg-light rounded-3"><input type="text" class="form-control form-control-sm" placeholder="Nombre" value="'+escHtml(a.nombre||'')+'" onchange="academicoData.asignaturas['+i+'].nombre=this.value"><input type="text" class="form-control form-control-sm" placeholder="Ícono FA (fas fa-book)" value="'+escHtml(a.icono||'')+'" onchange="academicoData.asignaturas['+i+'].icono=this.value"><input type="color" class="form-control form-control-sm form-control-color" value="'+(a.color||'#1B4F8A')+'" onchange="academicoData.asignaturas['+i+'].color=this.value" title="Color"><button class="btn btn-sm btn-outline-danger" onclick="academicoData.asignaturas.splice('+i+',1);renderAsignaturas()"><i class="fas fa-times"></i></button></div>';
+  }).join('');
+}
+function addAsig() { academicoData.asignaturas.push({nombre:'',icono:'fas fa-book',color:'#1B4F8A'}); renderAsignaturas(); }
+
+function renderProgramas() {
+  var progs = academicoData.programas||[];
+  document.getElementById('prog-container').innerHTML = progs.map(function(p,i){
+    return '<div class="d-flex align-items-center gap-3 mb-2 p-3 bg-light rounded-3"><input type="text" class="form-control form-control-sm" placeholder="Nombre" value="'+escHtml(p.nombre||'')+'" style="max-width:120px" onchange="academicoData.programas['+i+'].nombre=this.value"><input type="text" class="form-control form-control-sm" placeholder="Descripción" value="'+escHtml(p.descripcion||'')+'" onchange="academicoData.programas['+i+'].descripcion=this.value"><button class="btn btn-sm btn-outline-danger" onclick="academicoData.programas.splice('+i+',1);renderProgramas()"><i class="fas fa-times"></i></button></div>';
+  }).join('');
+}
+function addPrograma() { academicoData.programas.push({nombre:'',descripcion:''}); renderProgramas(); }
+
+function renderHorario() {
+  var h = academicoData.horario||{};
+  document.getElementById('h-manana').value   = h.manana||'';
+  document.getElementById('h-almuerzo').value = h.almuerzo||'';
+  document.getElementById('h-tarde').value    = h.tarde||'';
+  document.getElementById('h-dias').value     = h.dias||'';
+}
+
+function saveAcademico() {
+  if(!academicoData) return;
+  academicoData.horario = { manana:document.getElementById('h-manana').value, almuerzo:document.getElementById('h-almuerzo').value, tarde:document.getElementById('h-tarde').value, dias:document.getElementById('h-dias').value };
+  gasAuth('saveAcademico',{academico:JSON.stringify(academicoData)}).then(function(r){ if(r.ok) showMsg('Académico guardado.'); else showMsg(r.error||'Error','danger'); });
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+// ── PLATAFORMAS ──────────────────────────────────────────
+function loadPlataformasAdmin() {
+  gasGet('getConfig').then(function(d){
+    var plats = (d.config||{}).plataformas||[{nombre:'',url:'',clave:'',descripcion:''}];
+    renderPlats(plats);
+  });
+}
+function renderPlats(plats) {
+  document.getElementById('plat-container').innerHTML = plats.map(function(p,i){
+    return '<div class="card border-0 shadow-sm mb-3 p-3 plat-row"><div class="row g-2 align-items-end"><div class="col-md-3"><label class="form-label fw-semibold small">Nombre</label><input type="text" name="p-nombre" class="form-control form-control-sm" value="'+escHtml(p.nombre||'')+'"></div><div class="col-md-3"><label class="form-label fw-semibold small">URL</label><input type="url" name="p-url" class="form-control form-control-sm" value="'+escHtml(p.url||'')+'" placeholder="https://..."></div><div class="col-md-2"><label class="form-label fw-semibold small">Clave acceso <span class="text-muted">(opcional)</span></label><input type="text" name="p-clave" class="form-control form-control-sm" value="'+escHtml(p.clave||'')+'" placeholder="Sin clave = libre"></div><div class="col-md-3"><label class="form-label fw-semibold small">Descripción</label><input type="text" name="p-desc" class="form-control form-control-sm" value="'+escHtml(p.descripcion||'')+'"></div><div class="col-md-1 d-flex align-items-end pb-1"><button class="btn btn-sm btn-outline-danger" onclick="this.closest(\'.plat-row\').remove()"><i class="fas fa-times"></i></button></div></div></div>';
+  }).join('');
+}
+function addPlat() { var c=document.getElementById('plat-container'); var d=document.createElement('div'); d.className='card border-0 shadow-sm mb-3 p-3 plat-row'; d.innerHTML='<div class="row g-2 align-items-end"><div class="col-md-3"><input type="text" name="p-nombre" class="form-control form-control-sm" placeholder="Nombre"></div><div class="col-md-3"><input type="url" name="p-url" class="form-control form-control-sm" placeholder="https://..."></div><div class="col-md-2"><input type="text" name="p-clave" class="form-control form-control-sm" placeholder="Clave opcional"></div><div class="col-md-3"><input type="text" name="p-desc" class="form-control form-control-sm" placeholder="Descripción"></div><div class="col-md-1 d-flex align-items-end pb-1"><button class="btn btn-sm btn-outline-danger" onclick="this.closest(\'.plat-row\').remove()"><i class="fas fa-times"></i></button></div></div>'; c.appendChild(d); }
+function savePlataformas() {
+  var rows = document.querySelectorAll('.plat-row');
+  var plats = Array.from(rows).map(function(r){ return {nombre:r.querySelector('[name="p-nombre"]').value.trim(),url:r.querySelector('[name="p-url"]').value.trim(),clave:r.querySelector('[name="p-clave"]').value.trim(),descripcion:r.querySelector('[name="p-desc"]').value.trim()}; }).filter(function(p){ return p.nombre&&p.url; });
+  gasAuth('savePlataformas',{plataformas:JSON.stringify(plats)}).then(function(r){ if(r.ok) showMsg('Plataformas guardadas.'); else showMsg(r.error||'Error','danger'); });
+}
 
 // ── CONTACTOS ────────────────────────────────────────────
-let allContactos = [];
-async function loadContactos() {
-  const data=await gasAuth('getContactos'); allContactos=data.contactos||[];
-  const noLeidos=allContactos.filter(c=>!c.leido).length;
-  document.getElementById('badge-contactos').textContent=noLeidos||''; document.getElementById('badge-no-leidos').textContent=noLeidos; document.getElementById('badge-no-leidos').classList.toggle('d-none',!noLeidos);
-  document.getElementById('contactos-list').innerHTML = allContactos.length ? allContactos.map(c=>`
-    <div class="d-flex align-items-center gap-3 p-3 border-bottom ${!c.leido?'bg-light':''}" style="cursor:pointer" onclick="verContacto('${c.id}')">
-      <div class="flex-shrink-0">${!c.leido?`<span class="badge bg-danger">Nuevo</span>`:`<i class="fas fa-envelope-open text-muted"></i>`}</div>
-      <div class="flex-grow-1 min-width-0">
-        <div class="d-flex justify-content-between"><span class="fw-semibold">${c.nombre}</span><small class="text-muted">${c.fecha||''}</small></div>
-        <small class="text-muted text-truncate d-block">${c.asunto||'Sin asunto'} — ${truncate(c.mensaje,60)}</small>
-      </div>
-      <button class="btn btn-sm btn-outline-danger ms-2" onclick="event.stopPropagation();deleteContacto('${c.id}')"><i class="fas fa-trash"></i></button>
-    </div>`).join('') : '<div class="p-4 text-center text-muted">No hay mensajes</div>';
+var allContactos=[];
+function loadContactos() {
+  gasAuth('getContactos').then(function(d){ allContactos=d.contactos||[];
+    var noLeidos=allContactos.filter(function(c){ return c.leido!=='true'; }).length;
+    document.getElementById('badge-contactos').textContent=noLeidos||'';
+    document.getElementById('contactos-list').innerHTML=allContactos.length
+      ? allContactos.map(function(c){ return '<div class="d-flex align-items-center gap-3 p-3 border-bottom '+(c.leido!=='true'?'bg-light':'')+'" style="cursor:pointer" onclick="verContacto(\''+c.id+'\')">'+(c.leido!=='true'?'<span class="badge bg-danger flex-shrink-0">Nuevo</span>':'<i class="fas fa-envelope-open text-muted flex-shrink-0"></i>')+'<div class="flex-grow-1"><div class="d-flex justify-content-between"><span class="fw-semibold small">'+c.nombre+'</span><small class="text-muted">'+c.fecha.substring(0,10)+'</small></div><small class="text-muted">'+(c.asunto||'Sin asunto')+' — '+truncate(c.mensaje,50)+'</small></div><button class="btn btn-sm btn-outline-danger ms-2" onclick="event.stopPropagation();delContacto(\''+c.id+'\')"><i class="fas fa-trash"></i></button></div>'; }).join('')
+      : '<div class="p-4 text-center text-muted">No hay mensajes</div>';
+  });
 }
 function verContacto(id) {
-  const c=allContactos.find(x=>x.id===id); if(!c) return;
-  if(!c.leido) { gasAuth('marcarLeidoContacto',{id}); c.leido=true; }
+  var c=allContactos.find(function(x){ return x.id===id; }); if(!c) return;
+  if(c.leido!=='true') { gasAuth('marcarLeidoContacto',{id}); c.leido='true'; }
   document.getElementById('det-asunto').textContent=c.asunto||'Mensaje de '+c.nombre;
-  document.getElementById('det-body').innerHTML=`
-    <div class="row g-3 mb-4"><div class="col-md-4"><strong>De:</strong> ${c.nombre}</div><div class="col-md-4"><strong>Email:</strong> <a href="mailto:${c.email}">${c.email}</a></div><div class="col-md-4"><strong>Fecha:</strong> ${c.fecha||''}</div></div>
-    <div class="p-4 bg-light rounded-3 mb-3">${c.mensaje?.replace(/\n/g,'<br>')||''}</div>
-    <a href="mailto:${c.email}?subject=Re: ${encodeURIComponent(c.asunto||'')}" class="btn btn-primary"><i class="fas fa-reply me-2"></i>Responder por Email</a>`;
+  document.getElementById('det-body').innerHTML='<div class="row g-3 mb-4"><div class="col-md-4"><strong>De:</strong> '+c.nombre+'</div><div class="col-md-4"><strong>Email:</strong> <a href="mailto:'+c.email+'">'+c.email+'</a></div><div class="col-md-4"><strong>Fecha:</strong> '+c.fecha.substring(0,10)+'</div></div><div class="p-4 bg-light rounded-3 mb-3">'+(c.mensaje||'').replace(/\n/g,'<br>')+'</div><a href="mailto:'+c.email+'?subject=Re: '+encodeURIComponent(c.asunto||'')+'" class="btn btn-primary"><i class="fas fa-reply me-2"></i>Responder por Email</a>';
   document.getElementById('contacto-lista').classList.add('d-none');
   document.getElementById('contacto-detalle').classList.remove('d-none');
 }
 function cerrarDetalle() { document.getElementById('contacto-detalle').classList.add('d-none'); document.getElementById('contacto-lista').classList.remove('d-none'); loadContactos(); }
-async function deleteContacto(id) { if(!confirm('¿Eliminar mensaje?')) return; const r=await gasAuth('deleteContacto',{id}); if(r.ok){showGlobalMsg('Eliminado.');loadContactos();}else showGlobalMsg('Error.','danger'); }
+function delContacto(id) { if(!confirm('¿Eliminar mensaje?')) return; gasAuth('deleteContacto',{id}).then(function(r){ if(r.ok){showMsg('Eliminado.');loadContactos();}else showMsg('Error','danger'); }); }
 
-// ── PLATAFORMAS ──────────────────────────────────────────
-async function loadPlataformasAdmin() {
-  const data=await gasGet('getConfig'); const plats=(data.config||{}).plataformas||[{nombre:'',url:'',descripcion:''}];
-  renderPlatsAdmin(plats);
+// ── USUARIOS ─────────────────────────────────────────────
+function loadUsuarios() {
+  gasAuth('getUsuarios').then(function(d){
+    var usuarios=d.usuarios||[];
+    document.getElementById('usuarios-table').innerHTML = usuarios.length
+      ? '<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Acciones</th></tr></thead><tbody>'+
+        usuarios.map(function(u){ return '<tr><td class="fw-semibold">'+u.usuario+'</td><td>'+u.nombre+'</td><td><span class="badge '+(u.rol==='admin'?'bg-warning text-dark':'bg-secondary')+'">'+u.rol+'</span></td><td>'+(u.usuario!=='admin'?'<button class="btn btn-sm btn-outline-danger" onclick="delUsuario(\''+u.usuario+'\')"><i class="fas fa-trash"></i></button>':'<span class="text-muted small">Principal</span>')+'</td></tr>'; }).join('')+
+        '</tbody></table></div>'
+      : '<div class="p-4 text-center text-muted">Sin usuarios</div>';
+  });
 }
-function renderPlatsAdmin(plats) {
-  document.getElementById('plat-container').innerHTML = plats.map((p,i)=>`
-    <div class="row g-3 align-items-end mb-3 plat-row">
-      <div class="col-md-3"><label class="form-label fw-semibold small">Nombre</label><input type="text" name="plat-nombre" class="form-control" value="${p.nombre||''}"></div>
-      <div class="col-md-4"><label class="form-label fw-semibold small">URL</label><input type="url" name="plat-url" class="form-control" value="${p.url||''}" placeholder="https://..."></div>
-      <div class="col-md-4"><label class="form-label fw-semibold small">Descripción</label><input type="text" name="plat-desc" class="form-control" value="${p.descripcion||''}"></div>
-      <div class="col-md-1 pb-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.plat-row').remove()"><i class="fas fa-times"></i></button></div>
-    </div>`).join('');
+function saveUsuario() {
+  var usuario=document.getElementById('u-usuario').value.trim(), nombre=document.getElementById('u-nombre').value.trim(), password=document.getElementById('u-password').value, rol=document.getElementById('u-rol').value;
+  if(!usuario) { showMsg('El nombre de usuario es requerido','danger'); return; }
+  gasAuth('saveUsuario',{usuario,nombre,password:password||null,rol}).then(function(r){ if(r.ok){showMsg('Usuario guardado.');loadUsuarios();document.getElementById('u-usuario').value='';document.getElementById('u-nombre').value='';document.getElementById('u-password').value='';}else showMsg(r.error||'Error','danger'); });
 }
-function addPlat() { const c=document.getElementById('plat-container'); const d=document.createElement('div'); d.className='row g-3 align-items-end mb-3 plat-row'; d.innerHTML=`<div class="col-md-3"><input type="text" name="plat-nombre" class="form-control" placeholder="Nombre"></div><div class="col-md-4"><input type="url" name="plat-url" class="form-control" placeholder="https://..."></div><div class="col-md-4"><input type="text" name="plat-desc" class="form-control" placeholder="Descripción"></div><div class="col-md-1 pb-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.plat-row').remove()"><i class="fas fa-times"></i></button></div>`; c.appendChild(d); }
-async function savePlataformas() {
-  const rows=document.querySelectorAll('.plat-row');
-  const plats=[...rows].map(r=>({nombre:r.querySelector('[name="plat-nombre"]').value.trim(),url:r.querySelector('[name="plat-url"]').value.trim(),descripcion:r.querySelector('[name="plat-desc"]').value.trim()})).filter(p=>p.nombre&&p.url);
-  const r=await gasAuth('savePlataformas',{plataformas:plats}); if(r.ok) showGlobalMsg('Plataformas guardadas.'); else showGlobalMsg('Error.','danger');
-}
+function delUsuario(usuario) { if(!confirm('¿Eliminar usuario '+usuario+'?')) return; gasAuth('deleteUsuario',{usuario}).then(function(r){ if(r.ok){showMsg('Eliminado.');loadUsuarios();}else showMsg(r.error||'Error','danger'); }); }
 
 // ── CONFIGURACIÓN ─────────────────────────────────────────
-async function loadConfigAdmin() {
-  const data=await gasGet('getConfig'); const cfg=data.config||{};
-  ['nombre','slogan','logo','facebook','instagram','direccion','telefono','email'].forEach(k=>{ const el=document.getElementById('cfg-'+k); if(el) el.value=cfg[k]||''; });
-}
-function cfgTab(name, btn) {
-  ['cfg-escuela','cfg-redes','cfg-contacto-cfg'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('d-none');});
-  document.getElementById('cfg-'+name)?.classList.remove('d-none');
-  document.querySelectorAll('#cfg-tabs .nav-link').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-async function saveConfig() {
-  const data={nombre:document.getElementById('cfg-nombre').value,slogan:document.getElementById('cfg-slogan').value,logo:document.getElementById('cfg-logo').value,facebook:document.getElementById('cfg-facebook').value,instagram:document.getElementById('cfg-instagram').value,direccion:document.getElementById('cfg-direccion').value,telefono:document.getElementById('cfg-telefono').value,email:document.getElementById('cfg-email').value};
-  const r=await gasAuth('saveConfig',{config:data}); if(r.ok) showGlobalMsg('Configuración guardada.'); else showGlobalMsg('Error.','danger');
-}
+function loadConfigAdmin() { gasGet('getConfig').then(function(d){ var cfg=d.config||{}; ['nombre','slogan','logo','facebook','instagram','direccion','telefono','email'].forEach(function(k){ var el=document.getElementById('cfg-'+k); if(el) el.value=cfg[k]||''; }); }); }
+function cfgTab(name,btn) { ['cfg-escuela','cfg-redes','cfg-contacto-cfg'].forEach(function(id){ document.getElementById(id).classList.add('d-none'); }); document.getElementById('cfg-'+name).classList.remove('d-none'); document.querySelectorAll('#cfg-tabs .nav-link').forEach(function(b){ b.classList.remove('active'); }); btn.classList.add('active'); }
+function saveConfig() { var data={}; ['nombre','slogan','logo','facebook','instagram','direccion','telefono','email'].forEach(function(k){ data[k]=document.getElementById('cfg-'+k).value; }); gasAuth('saveConfig',{config:JSON.stringify(data)}).then(function(r){ if(r.ok) showMsg('Configuración guardada.'); else showMsg(r.error||'Error','danger'); }); }
 
 // ── CONTRASEÑA ────────────────────────────────────────────
-async function cambiarPassword() {
-  const actual=document.getElementById('p-actual').value, nueva=document.getElementById('p-nueva').value, confirmar=document.getElementById('p-confirmar').value;
-  const msgEl=document.getElementById('pass-msg');
-  if(nueva.length<8) { msgEl.className='alert alert-danger'; msgEl.textContent='La nueva contraseña debe tener al menos 8 caracteres.'; msgEl.classList.remove('d-none'); return; }
-  if(nueva!==confirmar) { msgEl.className='alert alert-danger'; msgEl.textContent='Las contraseñas no coinciden.'; msgEl.classList.remove('d-none'); return; }
-  const r=await gasAuth('cambiarPassword',{passwordActual:actual,passwordNueva:nueva});
-  msgEl.className=`alert alert-${r.ok?'success':'danger'}`; msgEl.textContent=r.ok?'Contraseña actualizada correctamente.':r.error||'Error.'; msgEl.classList.remove('d-none');
-  if(r.ok) { document.getElementById('p-actual').value=''; document.getElementById('p-nueva').value=''; document.getElementById('p-confirmar').value=''; }
+function cambiarPassword() {
+  var actual=document.getElementById('p-actual').value, nueva=document.getElementById('p-nueva').value, confirmar=document.getElementById('p-confirmar').value;
+  var msg=document.getElementById('pass-msg');
+  if(nueva.length<8){msg.className='alert alert-danger';msg.textContent='Mínimo 8 caracteres';msg.classList.remove('d-none');return;}
+  if(nueva!==confirmar){msg.className='alert alert-danger';msg.textContent='Las contraseñas no coinciden';msg.classList.remove('d-none');return;}
+  gasAuth('cambiarPassword',{passwordActual:actual,passwordNueva:nueva}).then(function(r){ msg.className='alert alert-'+(r.ok?'success':'danger'); msg.textContent=r.ok?'Contraseña actualizada.':r.error||'Error'; msg.classList.remove('d-none'); if(r.ok){document.getElementById('p-actual').value='';document.getElementById('p-nueva').value='';document.getElementById('p-confirmar').value='';} });
 }
 </script>
 </body></html>

@@ -1,80 +1,109 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plataformas — Escuela Llankanao</title>
-  <link rel="icon" href="assets/img/favicon.png" type="image/png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Plataformas — Escuela Llankanao</title>
+<link rel="icon" href="assets/img/favicon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.css">
+</head><body>
 <div id="navbar-container"></div>
-<div class="page-hero">
-  <div class="container">
-    <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="index.html">Inicio</a></li><li class="breadcrumb-item active">Plataformas</li></ol></nav>
-    <h1>Plataformas Digitales</h1><p>Accede a todos nuestros sistemas en línea</p>
+<div id="avisos-container"></div>
+<div class="page-hero"><div class="container">
+  <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="index.html">Inicio</a></li><li class="breadcrumb-item active">Plataformas</li></ol></nav>
+  <h1>Plataformas Digitales</h1><p>Accede a todos nuestros sistemas en línea</p>
+</div></div>
+
+<section class="py-5"><div class="container">
+  <div id="plataformas-list"><div class="text-center py-5 text-muted"><div class="spinner-border" role="status"></div></div></div>
+  <div class="alert border-0 rounded-4 mt-5 d-flex gap-3" style="background:#fff8e1">
+    <i class="fas fa-lock fa-lg mt-1" style="color:#D4A843"></i>
+    <div><strong>Acceso Seguro:</strong> Algunas plataformas requieren clave de acceso. Para problemas con credenciales, contacta a secretaría.</div>
+  </div>
+</div></section>
+
+<!-- MODAL CLAVE -->
+<div class="modal fade" id="modalClave" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content rounded-4 border-0 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="modal-plat-nombre">Ingresa la clave</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-3">Esta plataforma requiere clave de acceso.</p>
+        <div id="modal-error" class="alert alert-danger d-none py-2 small"></div>
+        <input type="password" id="modal-clave-input" class="form-control form-control-lg" placeholder="Clave de acceso" onkeydown="if(event.key==='Enter')verificarClave()">
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-primary w-100" onclick="verificarClave()"><i class="fas fa-unlock me-2"></i>Acceder</button>
+      </div>
+    </div>
   </div>
 </div>
-<section class="py-5">
-  <div class="container">
-    <p class="lead text-center text-muted mb-5">Nuestra escuela cuenta con plataformas digitales propias para facilitar la gestión académica y administrativa.</p>
-    <div id="plataformas-list">
-      <div class="loading-spinner"><div class="spinner-border" role="status"></div><p class="mt-2">Cargando...</p></div>
-    </div>
-    <div class="alert border-0 rounded-4 mt-5 d-flex gap-3" style="background:#fff8e1">
-      <i class="fas fa-lock fa-lg mt-1" style="color:#D4A843"></i>
-      <div><strong>Acceso Seguro:</strong> Para acceder a las plataformas necesitas tus credenciales de usuario. Si tienes problemas para ingresar, contacta a la secretaría de la escuela.</div>
-    </div>
-  </div>
-</section>
+
 <div id="footer-container"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/app.js"></script>
 <script>
-  initComponents('plataformas'); loadAvisos();
-  const ICONS = ['fas fa-graduation-cap','fas fa-search','fas fa-user-check','fas fa-boxes','fas fa-bus','fas fa-cogs'];
-  const COLORS = ['#1B4F8A','#2A6B3C','#D4A843','#e74c3c','#9b59b6','#607d8b'];
-  async function loadPlataformas() {
-    const container = document.getElementById('plataformas-list');
-    try {
-      const data = await gasGet('getConfig');
-      const plats = (data.config||{}).plataformas || [];
-      if(!plats.length) { container.innerHTML = `<div class="text-center py-5 text-muted"><i class="fas fa-laptop fa-4x mb-3"></i><p>Las plataformas serán configuradas próximamente.</p></div>`; return; }
-      container.innerHTML = plats.filter(p=>p.url).map((p,i) => `
-        <div class="card border-0 shadow-sm mb-3 hover-lift">
-          <div class="card-body d-flex align-items-center gap-4 p-4">
-            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:70px;height:70px;background:${COLORS[i%COLORS.length]}">
-              <i class="${ICONS[i%ICONS.length]} fa-2x text-white"></i>
-            </div>
-            <div class="flex-grow-1">
-              <h5 class="fw-bold mb-1">${p.nombre}</h5>
-              ${p.descripcion?`<p class="text-muted mb-0">${p.descripcion}</p>`:''}
-            </div>
-            <a href="${p.url}" target="_blank" class="btn btn-primary btn-lg flex-shrink-0"><i class="fas fa-external-link-alt me-2"></i>Acceder</a>
+initComponents('plataformas'); loadAvisos();
+const ICONS=['fas fa-graduation-cap','fas fa-search','fas fa-user-check','fas fa-boxes','fas fa-bus','fas fa-cogs','fas fa-laptop','fas fa-globe'];
+const COLORS=['#1B4F8A','#2A6B3C','#D4A843','#e74c3c','#9b59b6','#607d8b','#e67e22','#1abc9c'];
+let platActual = null;
+const modal = new bootstrap.Modal(document.getElementById('modalClave'));
+
+async function cargarPlataformas() {
+  const container = document.getElementById('plataformas-list');
+  try {
+    const data = await gasGet('getConfig');
+    const plats = (data.config||{}).plataformas||[];
+    if(!plats.length) { container.innerHTML='<div class="text-center py-5 text-muted"><i class="fas fa-laptop fa-4x mb-3"></i><p>Las plataformas serán configuradas pronto.</p></div>'; return; }
+    container.innerHTML = plats.filter(p=>p.url).map((p,i)=>`
+      <div class="card border-0 shadow-sm mb-3 hover-lift">
+        <div class="card-body d-flex align-items-center gap-4 p-4">
+          <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:70px;height:70px;background:${COLORS[i%COLORS.length]}">
+            <i class="${ICONS[i%ICONS.length]} fa-2x text-white"></i>
           </div>
-        </div>`).join('');
-    } catch(e) {
-      container.innerHTML = `
-        <div class="row g-3">
-          ${[['Notas','fas fa-graduation-cap','#1B4F8A','Sistema de calificaciones'],['Consulta','fas fa-search','#2A6B3C','Notas en línea'],['Inspectoría','fas fa-user-check','#D4A843','Atrasos y permisos'],['Bodega','fas fa-boxes','#e74c3c','Gestión de inventario'],['Transporte','fas fa-bus','#9b59b6','Rutas escolares']].map((p,i)=>`
-          <div class="col-md-6 col-lg-4">
-            <div class="card border-0 shadow-sm hover-lift">
-              <div class="card-body d-flex align-items-center gap-3 p-3">
-                <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:50px;height:50px;background:${p[2]}">
-                  <i class="${p[1]} text-white"></i>
-                </div>
-                <div>
-                  <h6 class="fw-bold mb-0">${p[0]}</h6>
-                  <small class="text-muted">${p[3]}</small>
-                </div>
-              </div>
-            </div>
-          </div>`).join('')}
+          <div class="flex-grow-1">
+            <h5 class="fw-bold mb-1">${p.nombre}</h5>
+            ${p.descripcion?`<p class="text-muted mb-0 small">${p.descripcion}</p>`:''}
+          </div>
+          <button class="btn btn-primary btn-lg flex-shrink-0" onclick="acceder('${p.nombre}','${p.url}',${!!p.clave})">
+            ${p.clave?'<i class="fas fa-lock me-2"></i>':'<i class="fas fa-external-link-alt me-2"></i>'}Acceder
+          </button>
         </div>
-        <p class="text-center text-muted mt-4 small">Configure las URLs desde el <a href="admin.html">panel de administración</a>.</p>`;
+      </div>`).join('');
+  } catch(e) { container.innerHTML='<div class="text-center py-5 text-muted"><i class="fas fa-laptop fa-4x mb-3"></i><p>Las plataformas estarán disponibles pronto.</p></div>'; }
+}
+
+function acceder(nombre, url, tieneClave) {
+  if(!tieneClave) { window.open(url,'_blank'); return; }
+  platActual = nombre;
+  document.getElementById('modal-plat-nombre').textContent = nombre;
+  document.getElementById('modal-clave-input').value = '';
+  document.getElementById('modal-error').classList.add('d-none');
+  modal.show();
+  setTimeout(()=>document.getElementById('modal-clave-input').focus(), 500);
+}
+
+async function verificarClave() {
+  const clave = document.getElementById('modal-clave-input').value.trim();
+  if(!clave) return;
+  const btn = document.querySelector('#modalClave .btn-primary');
+  btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Verificando...';
+  try {
+    const r = await gasGet('verificarClavePlat', {nombre: platActual, clave});
+    if(r.ok) {
+      modal.hide();
+      window.open(r.url||'#','_blank');
+    } else {
+      document.getElementById('modal-error').textContent = r.error||'Clave incorrecta';
+      document.getElementById('modal-error').classList.remove('d-none');
     }
+  } catch(e) {
+    document.getElementById('modal-error').textContent = 'Error de conexión';
+    document.getElementById('modal-error').classList.remove('d-none');
   }
-  loadPlataformas();
-</script>
-</body></html>
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-unlock me-2"></i>Acceder';
+}
+cargarPlataformas();
+</script></body></html>
