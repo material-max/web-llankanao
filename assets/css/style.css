@@ -152,6 +152,10 @@ img.rounded-circle{border:3px solid var(--color-secondary)}
 /* ── REVEAL ANIMATION ── */
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
 .reveal.visible{opacity:1;transform:none}
+/* Contenido dinámico siempre visible */
+#plataformas-home .platform-card,
+#noticias-home .news-card,
+#equipo-container .card{opacity:1;transform:none}
 
 /* ── LOADING SPINNER ── */
 .loading-spinner{text-align:center;padding:3rem;color:var(--color-muted)}
