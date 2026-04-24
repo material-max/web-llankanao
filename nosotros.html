@@ -21,9 +21,9 @@
     <div class="row align-items-center g-5">
       <div class="col-lg-6 reveal">
         <span class="section-badge">Historia</span>
-        <h2 class="section-title">Nuestra Historia</h2>
-        <p class="lead text-muted">La Escuela Básica Llankanao M.F.M.S. es una institución educativa de la ciudad de Linares, comprometida con la formación integral de niños y niñas de la región del Maule.</p>
-        <p class="text-muted">Con años de trayectoria en la educación básica, nuestra escuela ha formado a generaciones de estudiantes, entregando valores, conocimientos y habilidades para la vida. El nombre "Llankanao" proviene de la lengua mapuche y refleja nuestra identidad local.</p>
+        <h2 class="section-title" id="nos-h-titulo">Nuestra Historia</h2>
+        <p class="lead text-muted" id="nos-p1">La Escuela Básica Llankanao M.F.M.S. es una institución educativa de la ciudad de Linares, comprometida con la formación integral de niños y niñas de la región del Maule.</p>
+        <p class="text-muted" id="nos-p2">Con años de trayectoria en la educación básica, nuestra escuela ha formado a generaciones de estudiantes, entregando valores, conocimientos y habilidades para la vida. El nombre "Llankanao" proviene de la lengua mapuche y refleja nuestra identidad local.</p>
         <p class="text-muted">Somos una escuela comprometida con la inclusión, la diversidad y la calidad educativa, trabajando día a día para que cada estudiante alcance su máximo potencial.</p>
       </div>
       <div class="col-lg-6 reveal">
@@ -45,21 +45,27 @@
         <div class="card border-0 shadow-sm h-100 p-4 text-center">
           <div class="mb-3 mx-auto" style="background:var(--color-primary);width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-bullseye fa-2x text-white"></i></div>
           <h4 class="fw-bold">Misión</h4>
-          <p class="text-muted">Formar ciudadanos íntegros, críticos y comprometidos con su entorno, entregando educación de calidad con énfasis en valores, inclusión y el desarrollo pleno de cada estudiante.</p>
+          <p class="text-muted" id="nos-mision">Formar ciudadanos íntegros, críticos y comprometidos con su entorno, entregando educación de calidad con énfasis en valores, inclusión y el desarrollo pleno de cada estudiante.</p>
         </div>
       </div>
       <div class="col-md-4 reveal">
         <div class="card border-0 shadow-sm h-100 p-4 text-center">
           <div class="mb-3 mx-auto" style="background:var(--color-secondary);width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-eye fa-2x text-white"></i></div>
           <h4 class="fw-bold">Visión</h4>
-          <p class="text-muted">Ser una escuela de excelencia, reconocida en la comunidad de Linares por su compromiso con la calidad educativa, la innovación pedagógica y la formación valórica de sus estudiantes.</p>
+          <p class="text-muted" id="nos-vision">Ser una escuela de excelencia, reconocida en la comunidad de Linares por su compromiso con la calidad educativa, la innovación pedagógica y la formación valórica de sus estudiantes.</p>
         </div>
       </div>
       <div class="col-md-4 reveal">
         <div class="card border-0 shadow-sm h-100 p-4 text-center">
           <div class="mb-3 mx-auto" style="background:var(--color-accent);width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-heart fa-2x text-white"></i></div>
           <h4 class="fw-bold">Valores</h4>
-          <p class="text-muted">Respeto, responsabilidad, solidaridad, honestidad e inclusión son los pilares que guían nuestra convivencia escolar y el quehacer pedagógico diario.</p>
+          <div id="nos-valores" class="d-flex flex-wrap gap-1 justify-content-center">
+            <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Respeto</span>
+            <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Responsabilidad</span>
+            <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Solidaridad</span>
+            <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Honestidad</span>
+            <span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">Inclusión</span>
+          </div>
         </div>
       </div>
     </div>
@@ -81,5 +87,13 @@
 <div id="footer-container"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/app.js"></script>
-<script>initComponents('nosotros');loadAvisos();</script>
+<script>initComponents('nosotros');loadAvisos();
+gasGet('getPagina',{pagina:'nosotros'}).then(function(d){
+  var c=d.contenido; if(!c) return;
+  function set(id,val){var e=document.getElementById(id);if(e&&val)e.textContent=val;}
+  set('nos-h-titulo',c.historiaTitulo); set('nos-p1',c.historiaP1); set('nos-p2',c.historiaP2);
+  set('nos-mision',c.mision); set('nos-vision',c.vision);
+  if(c.valores){var vals=c.valores.split(',').map(function(v){return v.trim();}).filter(Boolean);var cont=document.getElementById('nos-valores');if(cont&&vals.length)cont.innerHTML=vals.map(function(v){return '<span class="badge rounded-pill" style="background:rgba(27,79,138,.1);color:var(--color-primary)">'+v+'</span>';}).join(' ');}
+}).catch(function(){});
+</script>
 </body></html>

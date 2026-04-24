@@ -93,8 +93,63 @@
                 <div class="col-6"><label class="form-label fw-semibold">Categoría</label><select id="n-cat" class="form-select"><option>Noticias</option><option>Eventos</option><option>Logros</option><option>Actividades</option></select></div>
                 <div class="col-6"><label class="form-label fw-semibold">Estado</label><select id="n-estado" class="form-select"><option value="publicado">Publicado</option><option value="borrador">Borrador</option></select></div>
               </div>
-              <div class="mb-3"><label class="form-label fw-semibold">URL imagen</label><input type="url" id="n-img" class="form-control" placeholder="https://..."><small class="text-muted">Google Drive, Imgur, etc.</small></div>
-              <div class="d-flex gap-2"><button class="btn btn-primary" onclick="saveNoticia()">Guardar</button><button class="btn btn-outline-secondary" onclick="resetN()">Limpiar</button></div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Imagen de la noticia</label>
+                <!-- Subir desde dispositivo -->
+                <div class="card border-0 rounded-3 p-3 mb-2" style="background:#f8fafc;border:2px dashed #e2e8f0!important">
+                  <div class="d-flex align-items-center gap-3 mb-2">
+                    <div id="n-img-preview-wrap" class="d-none">
+                      <img id="n-img-preview" src="" style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #e2e8f0">
+                    </div>
+                    <div class="flex-grow-1">
+                      <label class="btn btn-outline-primary btn-sm mb-1" for="n-img-file">
+                        <i class="fas fa-upload me-1"></i>Seleccionar imagen
+                      </label>
+                      <input type="file" id="n-img-file" accept="image/*" class="d-none" onchange="previsualizarImagen(this)">
+                      <p id="n-img-file-name" class="text-muted small mb-0">Ningún archivo seleccionado</p>
+                    </div>
+                    <button id="n-upload-btn" class="btn btn-success btn-sm d-none" onclick="subirImagen()">
+                      <i class="fas fa-cloud-upload-alt me-1"></i>Subir a Drive
+                    </button>
+                  </div>
+                  <div id="n-upload-progress" class="d-none">
+                    <div class="progress" style="height:6px"><div class="progress-bar progress-bar-striped progress-bar-animated w-100"></div></div>
+                    <p class="text-muted small mt-1 mb-0">Subiendo imagen a Google Drive...</p>
+                  </div>
+                  <div id="n-upload-ok" class="d-none">
+                    <small class="text-success"><i class="fas fa-check-circle me-1"></i>Imagen subida correctamente a Google Drive</small>
+                  </div>
+                </div>
+                <!-- O pegar URL -->
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text text-muted">o URL</span>
+                  <input type="url" id="n-img" class="form-control" placeholder="https://...">
+                </div>
+                <small class="text-muted">Para Instagram la imagen debe ser pública. Al subir a Drive queda automáticamente pública.</small>
+              </div>
+              <!-- PUBLICAR EN REDES -->
+              <div class="p-3 rounded-3 mb-3" style="background:#f0f4ff;border:1px solid #d0d9f5">
+                <p class="fw-semibold small mb-2"><i class="fas fa-share-alt me-1" style="color:#1B4F8A"></i>Publicar en Redes Sociales</p>
+                <div class="form-check mb-1">
+                  <input class="form-check-input" type="checkbox" id="n-pub-web" checked>
+                  <label class="form-check-label small" for="n-pub-web">🌐 Publicar en el sitio web</label>
+                </div>
+                <div class="form-check mb-1">
+                  <input class="form-check-input" type="checkbox" id="n-pub-fb">
+                  <label class="form-check-label small" for="n-pub-fb"><i class="fab fa-facebook text-primary me-1"></i>Publicar en Facebook</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="n-pub-ig">
+                  <label class="form-check-label small" for="n-pub-ig"><i class="fab fa-instagram me-1" style="color:#e4405f"></i>Publicar en Instagram <small class="text-muted">(requiere imagen)</small></label>
+                </div>
+                <div id="n-social-url" class="d-none">
+                  <label class="form-label fw-semibold small">URL de la noticia (para el link en redes)</label>
+                  <input type="url" id="n-link" class="form-control form-control-sm" placeholder="https://material-max.github.io/web-llankanao/noticia.html?id=...">
+                  <small class="text-muted">Déjalo vacío para no incluir enlace</small>
+                </div>
+              </div>
+              <div id="n-social-result" class="d-none mb-3"></div>
+              <div class="d-flex gap-2"><button class="btn btn-primary" onclick="saveNoticia()"><i class="fas fa-save me-1"></i>Guardar</button><button class="btn btn-outline-secondary" onclick="resetN()">Limpiar</button></div>
             </div></div>
           </div>
           <div class="col-lg-7"><div class="admin-card"><div class="card-header d-flex justify-content-between align-items-center"><span>Noticias</span><input type="text" id="n-buscar" class="form-control form-control-sm w-auto" placeholder="Buscar..." oninput="filtrarN()"></div><div class="card-body p-0" id="noticias-tbl"></div></div></div>
@@ -257,11 +312,123 @@
             <li class="nav-item"><button class="nav-link active" onclick="cfgTab('esc',this)">Escuela</button></li>
             <li class="nav-item"><button class="nav-link" onclick="cfgTab('red',this)">Redes</button></li>
             <li class="nav-item"><button class="nav-link" onclick="cfgTab('ctc',this)">Contacto</button></li>
+            <li class="nav-item"><button class="nav-link" onclick="cfgTab('api',this)"><i class="fas fa-key me-1"></i>API Social</button></li>
           </ul>
           <div id="cfg-esc"><div class="row g-3"><div class="col-md-6"><label class="form-label fw-semibold">Nombre</label><input type="text" id="cfg-nombre" class="form-control"></div><div class="col-md-6"><label class="form-label fw-semibold">Slogan</label><input type="text" id="cfg-slogan" class="form-control"></div><div class="col-12"><label class="form-label fw-semibold">URL Logo</label><input type="url" id="cfg-logo" class="form-control" placeholder="https://raw.githubusercontent.com/..."></div></div></div>
           <div id="cfg-red" class="d-none"><div class="row g-3"><div class="col-md-6"><label class="form-label fw-semibold"><i class="fab fa-facebook me-1 text-primary"></i>Facebook</label><input type="url" id="cfg-fb" class="form-control"></div><div class="col-md-6"><label class="form-label fw-semibold"><i class="fab fa-instagram me-1" style="color:#e4405f"></i>Instagram</label><input type="url" id="cfg-ig" class="form-control"></div></div></div>
           <div id="cfg-ctc" class="d-none"><div class="row g-3"><div class="col-md-6"><label class="form-label fw-semibold">Dirección</label><input type="text" id="cfg-dir" class="form-control"></div><div class="col-md-6"><label class="form-label fw-semibold">Teléfono</label><input type="text" id="cfg-tel" class="form-control"></div><div class="col-md-6"><label class="form-label fw-semibold">Email</label><input type="email" id="cfg-email" class="form-control"></div></div></div>
-          <div class="mt-4"><button class="btn btn-primary btn-lg px-5" onclick="saveCfg()"><i class="fas fa-save me-2"></i>Guardar</button></div>
+          <div id="cfg-api" class="d-none">
+            <div class="alert border-0 rounded-3 mb-4" style="background:#fff8e1">
+              <small>Para publicar en Facebook e Instagram desde el admin necesitas crear una <strong>Meta App</strong> y obtener los tokens. Ver guía de configuración abajo.</small>
+            </div>
+            <!-- FACEBOOK -->
+            <h6 class="fw-bold mb-3"><i class="fab fa-facebook me-2 text-primary"></i>Facebook — Graph API</h6>
+            <div class="row g-3 mb-4">
+              <div class="col-md-5">
+                <label class="form-label fw-semibold small">Facebook Page ID</label>
+                <input type="text" id="cfg-fb-page-id" class="form-control" placeholder="123456789012345">
+                <small class="text-muted">El ID numérico de tu página de Facebook</small>
+              </div>
+              <div class="col-md-7">
+                <label class="form-label fw-semibold small">Page Access Token (permanente)</label>
+                <input type="password" id="cfg-fb-token" class="form-control" placeholder="EAABx...">
+                <small class="text-muted">Token que nunca expira. Ver guía abajo.</small>
+              </div>
+            </div>
+            <!-- INSTAGRAM -->
+            <h6 class="fw-bold mb-3"><i class="fab fa-instagram me-2" style="color:#e4405f"></i>Instagram — Graph API</h6>
+            <div class="row g-3 mb-4">
+              <div class="col-md-5">
+                <label class="form-label fw-semibold small">Instagram User ID (Business)</label>
+                <input type="text" id="cfg-ig-user-id" class="form-control" placeholder="17841400000000000">
+                <small class="text-muted">ID de tu cuenta Business de Instagram</small>
+              </div>
+              <div class="col-md-7">
+                <label class="form-label fw-semibold small">Access Token (mismo token de Facebook)</label>
+                <input type="password" id="cfg-ig-token" class="form-control" placeholder="EAABx...">
+                <small class="text-muted">Usa el mismo Page Access Token de Facebook</small>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold small">Hashtags por defecto (Instagram)</label>
+                <input type="text" id="cfg-ig-hashtags" class="form-control" placeholder="#escuelallankanao #linares #educacion #chile">
+                <small class="text-muted">Se agregan automáticamente a cada publicación de Instagram</small>
+              </div>
+            </div>
+            <div class="d-flex gap-3 mb-5">
+              <button class="btn btn-primary px-4" onclick="saveSocialCfg()"><i class="fas fa-save me-2"></i>Guardar Tokens</button>
+              <button class="btn btn-outline-secondary" onclick="testSocialCfg()"><i class="fas fa-vial me-2"></i>Probar conexión</button>
+            </div>
+            <div id="social-test-result" class="d-none mb-4"></div>
+
+            <!-- GUÍA -->
+            <div class="card border-0 rounded-4" style="background:#f8fafc">
+              <div class="card-body p-4">
+                <h6 class="fw-bold mb-3"><i class="fas fa-book me-2"></i>Guía de configuración paso a paso</h6>
+                <div class="accordion" id="guia-acc">
+                  <div class="accordion-item border-0 mb-2">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#g1">Paso 1 — Crear una Meta App</button></h2>
+                    <div id="g1" class="accordion-collapse collapse" data-bs-parent="#guia-acc">
+                      <div class="accordion-body small">
+                        <ol>
+                          <li>Ve a <a href="https://developers.facebook.com/apps" target="_blank">developers.facebook.com/apps</a></li>
+                          <li>Clic en <strong>Crear app</strong> → Tipo: <strong>Empresa</strong> (o "Otro")</li>
+                          <li>Ponle un nombre (ej: "Escuela Llankanao Web") y tu email</li>
+                          <li>En el dashboard, agrega el producto <strong>Facebook Login</strong> y también <strong>Instagram Graph API</strong></li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item border-0 mb-2">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#g2">Paso 2 — Obtener el Page Access Token permanente (Facebook)</button></h2>
+                    <div id="g2" class="accordion-collapse collapse" data-bs-parent="#guia-acc">
+                      <div class="accordion-body small">
+                        <ol>
+                          <li>Ve a <a href="https://developers.facebook.com/tools/explorer" target="_blank">Graph API Explorer</a></li>
+                          <li>Selecciona tu app en el menú desplegable</li>
+                          <li>Clic en <strong>Generar token de acceso de usuario</strong></li>
+                          <li>Agrega estos permisos: <code>pages_manage_posts</code>, <code>pages_read_engagement</code>, <code>instagram_content_publish</code>, <code>instagram_basic</code></li>
+                          <li>Genera el token y autoriza tu página</li>
+                          <li>Copia el token corto y ve a: <br><code>GET /oauth/access_token?grant_type=fb_exchange_token&client_id=APP_ID&client_secret=APP_SECRET&fb_exchange_token=TOKEN_CORTO</code></li>
+                          <li>Obtendrás un token de larga duración (~60 días). Para hacerlo <strong>permanente</strong>: <br><code>GET /me/accounts?access_token=TOKEN_LARGO</code><br>El campo <code>access_token</code> de tu página es el <strong>Page Access Token permanente</strong></li>
+                        </ol>
+                        <p class="text-muted mt-2">El <strong>Page ID</strong> lo encuentras en: Facebook → tu Página → Acerca de → Page ID</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item border-0 mb-2">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#g3">Paso 3 — Obtener el Instagram User ID</button></h2>
+                    <div id="g3" class="accordion-collapse collapse" data-bs-parent="#guia-acc">
+                      <div class="accordion-body small">
+                        <ol>
+                          <li>Tu cuenta de Instagram debe ser <strong>Business</strong> (no personal, no creador). Cámbiala en: Instagram → Configuración → Cuenta → Cambiar a cuenta profesional</li>
+                          <li>Conéctala a tu Página de Facebook (Instagram → Configuración → Cuenta → Cuenta vinculada a Facebook)</li>
+                          <li>En Graph API Explorer, con el token largo, ejecuta:<br><code>GET /me/accounts?fields=instagram_business_account</code></li>
+                          <li>El valor de <code>instagram_business_account.id</code> es tu <strong>Instagram User ID</strong></li>
+                          <li>Usa el mismo <strong>Page Access Token permanente</strong> para Instagram</li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item border-0">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#g4">⚠️ Restricciones importantes</button></h2>
+                    <div id="g4" class="accordion-collapse collapse" data-bs-parent="#guia-acc">
+                      <div class="accordion-body small">
+                        <ul>
+                          <li><strong>Facebook:</strong> La app debe estar en modo <strong>Live</strong> (no Development) para publicar como página</li>
+                          <li><strong>Instagram:</strong> Solo funciona con cuentas <strong>Business</strong> (no personal, no creador)</li>
+                          <li><strong>Instagram:</strong> La imagen debe ser una URL pública accesible (no Google Drive privado). Usa Imgur, Google Drive con acceso público, o cualquier CDN</li>
+                          <li><strong>Instagram:</strong> Máximo 25 publicaciones por 24 horas</li>
+                          <li><strong>Instagram:</strong> Solo acepta imágenes JPEG</li>
+                          <li>Los tokens de página de Facebook <strong>no expiran</strong> si se obtienen correctamente</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="cfg-esc-save" class="mt-4"><button class="btn btn-primary btn-lg px-5" onclick="saveCfg()"><i class="fas fa-save me-2"></i>Guardar</button></div>
         </div></div>
       </div>
 
@@ -364,6 +531,113 @@ function loadDashboard(){
   }).catch(function(){});
 }
 
+// SUBIDA DE IMÁGENES
+function previsualizarImagen(input) {
+  var file = input.files[0];
+  if (!file) return;
+  document.getElementById('n-img-file-name').textContent = file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)';
+  document.getElementById('n-upload-btn').classList.remove('d-none');
+  document.getElementById('n-upload-ok').classList.add('d-none');
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('n-img-preview').src = e.target.result;
+    document.getElementById('n-img-preview-wrap').classList.remove('d-none');
+  };
+  reader.readAsDataURL(file);
+}
+
+function subirImagen() {
+  var file = document.getElementById('n-img-file').files[0];
+  if (!file) return;
+  var btn = document.getElementById('n-upload-btn');
+  btn.disabled = true;
+  document.getElementById('n-upload-progress').classList.remove('d-none');
+  document.getElementById('n-upload-progress').querySelector('p').textContent = 'Procesando imagen...';
+  document.getElementById('n-upload-ok').classList.add('d-none');
+
+  // Redimensionar automáticamente antes de subir
+  redimensionarImagen(file, 1920, 4 * 1024 * 1024, function(base64, tamFinal) {
+    document.getElementById('n-upload-progress').querySelector('p').textContent = 'Subiendo a Google Drive... (' + (tamFinal/1024).toFixed(0) + ' KB)';
+    ga('uploadImagen', {
+      base64:   base64,
+      nombre:   file.name.replace(/\.[^.]+$/, '') + '.jpg',
+      mimeType: 'image/jpeg'
+    }).then(function(r) {
+      document.getElementById('n-upload-progress').classList.add('d-none');
+      btn.disabled = false;
+      if (r.ok) {
+        document.getElementById('n-img').value = r.url;
+        document.getElementById('n-upload-ok').classList.remove('d-none');
+        document.getElementById('n-upload-ok').innerHTML = '<small class="text-success"><i class="fas fa-check-circle me-1"></i>Imagen subida ('+(tamFinal/1024).toFixed(0)+' KB). URL lista.</small>';
+        btn.classList.add('d-none');
+        // Actualizar preview con imagen procesada
+        document.getElementById('n-img-preview').src = base64;
+        showMsg('Imagen subida a Google Drive correctamente.');
+      } else {
+        showMsg('Error al subir: ' + (r.error||'Error desconocido'), 'danger');
+      }
+    }).catch(function() {
+      document.getElementById('n-upload-progress').classList.add('d-none');
+      btn.disabled = false;
+      showMsg('Error de conexión al subir imagen', 'danger');
+    });
+  });
+}
+
+/**
+ * Redimensiona una imagen al ancho máximo dado y la comprime
+ * hasta que quepa en maxBytes. Callback devuelve base64 y tamaño final.
+ */
+function redimensionarImagen(file, maxAncho, maxBytes, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var ctx    = canvas.getContext('2d');
+
+      // Calcular nuevas dimensiones manteniendo proporción
+      var ancho = img.width, alto = img.height;
+      if (ancho > maxAncho) {
+        alto  = Math.round(alto * maxAncho / ancho);
+        ancho = maxAncho;
+      }
+      canvas.width  = ancho;
+      canvas.height = alto;
+      ctx.drawImage(img, 0, 0, ancho, alto);
+
+      // Comprimir iterativamente hasta entrar en maxBytes
+      var calidad = 0.92;
+      var intentos = 0;
+      var resultado;
+
+      do {
+        resultado = canvas.toDataURL('image/jpeg', calidad);
+        // Calcular tamaño aproximado del base64 en bytes
+        var tamBytes = Math.round((resultado.length - 22) * 3 / 4);
+        if (tamBytes <= maxBytes || calidad <= 0.3) break;
+        calidad -= 0.08;
+        intentos++;
+      } while (intentos < 10);
+
+      // Si aún es muy grande, reducir también las dimensiones
+      if (Math.round((resultado.length - 22) * 3 / 4) > maxBytes) {
+        ancho = Math.round(ancho * 0.75);
+        alto  = Math.round(alto  * 0.75);
+        canvas.width  = ancho;
+        canvas.height = alto;
+        ctx.drawImage(img, 0, 0, ancho, alto);
+        resultado = canvas.toDataURL('image/jpeg', 0.85);
+      }
+
+      var tamFinal = Math.round((resultado.length - 22) * 3 / 4);
+      callback(resultado, tamFinal);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 // NOTICIAS
 var _ns=[];
 function loadN(){gasGet('getNoticias',{limit:200}).then(function(d){_ns=d.noticias||[];renderN();});}
@@ -378,16 +652,83 @@ function renderN(q){
     :'<div class="p-4 text-center text-muted">Sin noticias</div>';
 }
 function editN(id){var n=_ns.find(function(x){return x.id===id;});if(!n)return;document.getElementById('n-id').value=n.id;document.getElementById('n-titulo').value=n.titulo||'';document.getElementById('n-resumen').value=n.resumen||'';document.getElementById('n-contenido').value=n.contenido||'';document.getElementById('n-cat').value=n.categoria||'';document.getElementById('n-estado').value=n.estado||'publicado';document.getElementById('n-img').value=n.imagen||'';document.getElementById('nf-title').textContent='Editar Noticia';}
-function resetN(){['n-id','n-titulo','n-resumen','n-contenido','n-img'].forEach(function(i){document.getElementById(i).value='';});document.getElementById('n-estado').value='publicado';document.getElementById('nf-title').textContent='Nueva Noticia';}
+function resetN(){
+  ['n-id','n-titulo','n-resumen','n-contenido','n-img','n-link'].forEach(function(i){var e=document.getElementById(i);if(e)e.value='';});
+  document.getElementById('n-estado').value='publicado';
+  document.getElementById('nf-title').textContent='Nueva Noticia';
+  document.getElementById('n-pub-web').checked=true;
+  document.getElementById('n-pub-fb').checked=false;
+  document.getElementById('n-pub-ig').checked=false;
+  document.getElementById('n-social-url').classList.add('d-none');
+  document.getElementById('n-social-result').classList.add('d-none');
+  // Reset uploader
+  document.getElementById('n-img-file').value='';
+  document.getElementById('n-img-file-name').textContent='Ningún archivo seleccionado';
+  document.getElementById('n-img-preview-wrap').classList.add('d-none');
+  document.getElementById('n-upload-btn').classList.add('d-none');
+  document.getElementById('n-upload-ok').classList.add('d-none');
+  document.getElementById('n-upload-progress').classList.add('d-none');
+}
 function saveNoticia(){
   var t=document.getElementById('n-titulo').value; if(!t){showMsg('El título es requerido','danger');return;}
-  ga('saveNoticia',{id:document.getElementById('n-id').value||null,titulo:t,resumen:document.getElementById('n-resumen').value,contenido:document.getElementById('n-contenido').value,categoria:document.getElementById('n-cat').value,estado:document.getElementById('n-estado').value,imagen:document.getElementById('n-img').value,fecha:new Date().toISOString().split('T')[0]}).then(function(r){if(r.ok){showMsg('Noticia guardada.');resetN();loadN();}else showMsg(r.error||'Error','danger');});
+  var pubWeb = document.getElementById('n-pub-web').checked;
+  var pubFb  = document.getElementById('n-pub-fb').checked;
+  var pubIg  = document.getElementById('n-pub-ig').checked;
+  var estado = pubWeb ? document.getElementById('n-estado').value : 'borrador';
+
+  // Guardar en sitio web
+  var savePromise = pubWeb
+    ? ga('saveNoticia',{id:document.getElementById('n-id').value||null,titulo:t,resumen:document.getElementById('n-resumen').value,contenido:document.getElementById('n-contenido').value,categoria:document.getElementById('n-cat').value,estado:estado,imagen:document.getElementById('n-img').value,fecha:new Date().toISOString().split('T')[0]})
+    : Promise.resolve({ok:true,id:null});
+
+  savePromise.then(function(r){
+    if(!r.ok){showMsg(r.error||'Error guardando','danger');return;}
+    var noticiaId = r.id || document.getElementById('n-id').value;
+    var resContainer = document.getElementById('n-social-result');
+    var mensajes = [];
+    if(pubWeb) mensajes.push('✅ Publicado en el sitio web');
+
+    // Publicar en redes si está marcado
+    if(pubFb || pubIg){
+      var link = document.getElementById('n-link').value || '';
+      ga('publicarEnRedes',{
+        titulo:     t,
+        resumen:    document.getElementById('n-resumen').value,
+        imagen_url: document.getElementById('n-img').value,
+        link:       link || (noticiaId ? 'https://material-max.github.io/web-llankanao/noticia.html?id='+noticiaId : ''),
+        facebook:   String(pubFb),
+        instagram:  String(pubIg),
+      }).then(function(res){
+        if(res.facebook){
+          if(res.facebook.ok) mensajes.push('✅ Publicado en Facebook (post ID: '+res.facebook.post_id+')');
+          else mensajes.push('❌ Facebook: '+res.facebook.error);
+        }
+        if(res.instagram){
+          if(res.instagram.ok) mensajes.push('✅ Publicado en Instagram (media ID: '+res.instagram.media_id+')');
+          else mensajes.push('❌ Instagram: '+res.instagram.error);
+        }
+        resContainer.innerHTML = mensajes.map(function(m){
+          var ok = m.startsWith('✅');
+          return '<div class="alert alert-'+(ok?'success':'warning')+' py-2 mb-1 small">'+m+'</div>';
+        }).join('');
+        resContainer.classList.remove('d-none');
+      }).catch(function(e){
+        mensajes.push('❌ Error de conexión con el servidor: '+e.message);
+        resContainer.innerHTML = '<div class="alert alert-danger py-2 small">'+mensajes[mensajes.length-1]+'</div>';
+        resContainer.classList.remove('d-none');
+      });
+    } else {
+      resContainer.classList.add('d-none');
+      showMsg('Noticia guardada correctamente.');
+    }
+    resetN(); loadN();
+  }).catch(function(){showMsg('Error de conexión','danger');});
 }
 function delN(id){if(!confirm('¿Eliminar?'))return;ga('deleteNoticia',{id:id}).then(function(r){if(r.ok){showMsg('Eliminada.');loadN();}else showMsg('Error','danger');});}
 
 // AVISOS
 var _avs=[];
-function loadAv(){gasGet('getAvisos').then(function(d){_avs=d.avisos||[];renderAv();});}
+function loadAv(){ga('getAvisosAll').then(function(d){_avs=d.avisos||[];renderAv();}).catch(function(){gasGet('getAvisos').then(function(d){_avs=d.avisos||[];renderAv();});});}
 function renderAv(){
   document.getElementById('avisos-tbl').innerHTML=_avs.length
     ?'<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Texto</th><th>Tipo</th><th>Estado</th><th></th></tr></thead><tbody>'
@@ -430,7 +771,7 @@ function delCal(id){if(!confirm('¿Eliminar?'))return;ga('deleteCalendario',{id:
 
 // ACADÉMICO
 var _acad=null;
-function loadAcad(){ if(!_acad) gasGet('getAcademico').then(function(d){_acad=d.academico||{};renderAcad();}); else renderAcad(); }
+function loadAcad(){ _acad=null; gasGet('getAcademico').then(function(d){_acad=d.academico||{};renderAcad();}); }
 function acadTab(name,btn){['acad-niveles','acad-asignaturas','acad-programas','acad-horario'].forEach(function(id){document.getElementById(id).classList.add('d-none');});document.getElementById('acad-'+name).classList.remove('d-none');document.querySelectorAll('#acad-tabs .nav-link').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');if(name==='niveles')renderNiveles();if(name==='asignaturas')renderAsigs();if(name==='programas')renderProgs();if(name==='horario')renderHor();}
 function renderAcad(){renderNiveles();}
 function renderNiveles(){if(!_acad)return;var ns=_acad.niveles||[];document.getElementById('niveles-c').innerHTML=ns.map(function(n,i){return '<div class="d-flex gap-2 mb-2 align-items-center"><input type="text" class="form-control form-control-sm" value="'+esc(n.nombre||'')+'" placeholder="Nombre" onchange="_acad.niveles['+i+'].nombre=this.value"><input type="text" class="form-control form-control-sm" value="'+esc(n.descripcion||'')+'" placeholder="Descripción" onchange="_acad.niveles['+i+'].descripcion=this.value"><input type="url" class="form-control form-control-sm" value="'+esc(n.foto||'')+'" placeholder="URL foto" onchange="_acad.niveles['+i+'].foto=this.value"><button class="btn btn-sm btn-outline-danger" onclick="_acad.niveles.splice('+i+',1);renderNiveles()"><i class="fas fa-times"></i></button></div>';}).join('');}
@@ -578,7 +919,78 @@ function delUser(u){if(!confirm('¿Eliminar usuario '+u+'?'))return;ga('deleteUs
 
 // CONFIGURACIÓN
 function loadCfg(){gasGet('getConfig').then(function(d){var c=d.config||{};['nombre','slogan','logo'].forEach(function(k){var e=document.getElementById('cfg-'+k);if(e)e.value=c[k]||'';});document.getElementById('cfg-fb').value=c.facebook||'';document.getElementById('cfg-ig').value=c.instagram||'';document.getElementById('cfg-dir').value=c.direccion||'';document.getElementById('cfg-tel').value=c.telefono||'';document.getElementById('cfg-email').value=c.email||'';});}
-function cfgTab(name,btn){['cfg-esc','cfg-red','cfg-ctc'].forEach(function(id){document.getElementById(id).classList.add('d-none');});document.getElementById('cfg-'+name).classList.remove('d-none');document.querySelectorAll('#cfg-tabs .nav-link').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');}
+function cfgTab(name,btn){
+  ['cfg-esc','cfg-red','cfg-ctc','cfg-api'].forEach(function(id){document.getElementById(id).classList.add('d-none');});
+  document.getElementById('cfg-'+name).classList.remove('d-none');
+  document.querySelectorAll('#cfg-tabs .nav-link').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  // Mostrar/ocultar botón guardar general
+  document.getElementById('cfg-esc-save').style.display = name==='api' ? 'none' : '';
+  if(name==='api') loadSocialCfg();
+}
+
+function loadSocialCfg(){
+  ga('getSocialConfig').then(function(d){
+    var c=d.config||{};
+    document.getElementById('cfg-fb-page-id').value = c.fb_page_id||'';
+    document.getElementById('cfg-fb-token').value   = c.fb_page_token ? '••••••••' : '';
+    document.getElementById('cfg-ig-user-id').value = c.ig_user_id||'';
+    document.getElementById('cfg-ig-token').value   = c.ig_access_token ? '••••••••' : '';
+    document.getElementById('cfg-ig-hashtags').value= c.ig_hashtags||'';
+  }).catch(function(){});
+}
+
+function saveSocialCfg(){
+  var fbToken = document.getElementById('cfg-fb-token').value;
+  var igToken = document.getElementById('cfg-ig-token').value;
+  var cfg = {
+    fb_page_id:    document.getElementById('cfg-fb-page-id').value.trim(),
+    ig_user_id:    document.getElementById('cfg-ig-user-id').value.trim(),
+    ig_hashtags:   document.getElementById('cfg-ig-hashtags').value.trim(),
+  };
+  // Solo actualizar tokens si no son los puntos de ocultamiento
+  if(fbToken && fbToken !== '••••••••') cfg.fb_page_token   = fbToken.trim();
+  if(igToken && igToken !== '••••••••') cfg.ig_access_token = igToken.trim();
+  ga('saveSocialConfig',{config:JSON.stringify(cfg)}).then(function(r){
+    if(r.ok) showMsg('Tokens guardados de forma segura en el servidor.');
+    else showMsg(r.error||'Error al guardar','danger');
+  });
+}
+
+function testSocialCfg(){
+  var btn = event.target;
+  btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Probando...';
+  var res = document.getElementById('social-test-result');
+  // Prueba publicando en modo test (sin publicar realmente)
+  ga('getSocialConfig').then(function(d){
+    var c=d.config||{};
+    var html='<div class="row g-2">';
+    html+='<div class="col-md-6"><div class="p-3 rounded-3 '+(c.fb_page_id&&c.fb_page_token?'bg-success text-white':'bg-warning')+'">';
+    html+='<i class="fab fa-facebook me-2"></i><strong>Facebook</strong><br>';
+    if(c.fb_page_id&&c.fb_page_token) html+='<small>✅ Configurado. Page ID: '+c.fb_page_id.substring(0,8)+'...</small>';
+    else html+='<small>⚠️ Falta Page ID y/o Token</small>';
+    html+='</div></div>';
+    html+='<div class="col-md-6"><div class="p-3 rounded-3 '+(c.ig_user_id&&c.ig_access_token?'bg-success text-white':'bg-warning')+'">';
+    html+='<i class="fab fa-instagram me-2"></i><strong>Instagram</strong><br>';
+    if(c.ig_user_id&&c.ig_access_token) html+='<small>✅ Configurado. User ID: '+c.ig_user_id.substring(0,8)+'...</small>';
+    else html+='<small>⚠️ Falta User ID y/o Token</small>';
+    html+='</div></div></div>';
+    res.innerHTML=html; res.classList.remove('d-none');
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-vial me-2"></i>Probar conexión';
+  });
+}
+
+// Toggle URL field when social is checked
+document.addEventListener('DOMContentLoaded', function(){
+  ['n-pub-fb','n-pub-ig'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('change', function(){
+      var fb = document.getElementById('n-pub-fb').checked;
+      var ig = document.getElementById('n-pub-ig').checked;
+      document.getElementById('n-social-url').classList.toggle('d-none', !fb && !ig);
+    });
+  });
+});
 function saveCfg(){var c={nombre:document.getElementById('cfg-nombre').value,slogan:document.getElementById('cfg-slogan').value,logo:document.getElementById('cfg-logo').value,facebook:document.getElementById('cfg-fb').value,instagram:document.getElementById('cfg-ig').value,direccion:document.getElementById('cfg-dir').value,telefono:document.getElementById('cfg-tel').value,email:document.getElementById('cfg-email').value};ga('saveConfig',{config:JSON.stringify(c)}).then(function(r){if(r.ok)showMsg('Configuración guardada.');else showMsg(r.error||'Error','danger');});}
 
 // CONTRASEÑA
